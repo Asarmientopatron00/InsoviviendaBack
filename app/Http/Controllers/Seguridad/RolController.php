@@ -33,7 +33,6 @@ class RolController extends Controller
             if($request->ligera){
                 $roles = Rol::obtenerColeccionLigera($datos);
             }else{
-                $user = Auth::user();
                 if(isset($datos['ordenar_por'])){
                     $datos['ordenar_por'] = format_order_by_attributes($datos);
                 }

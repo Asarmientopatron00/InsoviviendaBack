@@ -36,7 +36,7 @@ class AplicacionController extends Controller
             }
 
             if($request->ligera){
-                Aplicacion::obtenerColeccionLigera($datos);
+                $aplicaciones = Aplicacion::obtenerColeccionLigera($datos);
             }else{
                 if(isset($datos['ordenar_por'])){
                     $datos['ordenar_por'] = format_order_by_attributes($datos);
