@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Seguridad;
+use App\Http\Controllers\PersonasEntidades;
 
 /*
 |--------------------------------------------------------------------------
@@ -118,5 +119,20 @@ Route::group(['middleware' => ['auth:api']], function (){
     Route::group(["prefix" => "auditoria-tablas"],function(){
         Route::get('/', [Seguridad\AuditoriaTablaController::class,'index'])->name('auditoria-tablas.index');
             // ->middleware(['permission:ListarAuditorias']);
+    });
+
+    // ---------------------- Personas/Entidades -------------------------- //
+
+    // Personas
+    Route::group(["prefix" => "personas"],function(){
+        Route::get('/', [PersonasEntidades\PersonaController::class,'index'])->name('modulos.index');
+        Route::post('/', [PersonasEntidades\PersonaController::class,'store'])->name('modulos.store');
+            // ->middleware(['permission:CrearModulo']);
+        Route::get('/{id}', [PersonasEntidades\PersonaController::class,'show'])->name('modulos.show');
+            // ->middleware(['permission:ListarModulo']);
+        Route::put('/{id}', [PersonasEntidades\PersonaController::class,'update'])->name('modulos.update');
+            // ->middleware(['permission:ModificarModulo']);
+        Route::delete('/{id}', [PersonasEntidades\PersonaController::class,'destroy'])->name('modulos.delete');
+            // ->middleware(['permission:EliminarModulo']);
     });
 });
