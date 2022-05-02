@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Seguridad;
 use App\Http\Controllers\PersonasEntidades;
+use App\Http\Controllers\Parametrizacion;
 
 /*
 |--------------------------------------------------------------------------
@@ -135,4 +136,19 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [PersonasEntidades\PersonaController::class,'destroy'])->name('modulos.delete');
             // ->middleware(['permission:EliminarModulo']);
     });
+
+    // ---------------------- Parametrizacion -------------------------- //
+    // Tipos Identificacion
+    Route::group(["prefix" => "tipos-identificacion"],function(){
+        Route::get('/', [Parametrizacion\TipoIdentificacionController::class,'index'])->name('tipos_identificacion.index');
+        Route::post('/', [Parametrizacion\TipoIdentificacionController::class,'store'])->name('tipos_identificacion.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoIdentificacionController::class,'show'])->name('tipos_identificacion.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoIdentificacionController::class,'update'])->name('tipos_identificacion.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoIdentificacionController::class,'destroy'])->name('tipos_identificacion.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
 });
