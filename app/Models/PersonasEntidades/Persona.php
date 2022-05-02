@@ -418,28 +418,28 @@ class Persona extends Model
     public static function cargar($id)
     {
         $persona = Persona::find($id);
-        $tipoIdentificacion = $persona->tipoIdentificacion;
-        $paisNacimiento = $persona->pais;
-        $departamentoNacimiento = $persona->departamentoNacimiento;
-        $ciudadNacimiento = $persona->ciudadNacimiento;
-        $estadoCivil = $persona->estadoCivil;
-        $tipoPoblacion = $persona->tipoPoblacion;
-        $tipoDicapacidad = $persona->tipoDicapacidad;
-        $eps = $persona->eps;
-        $gradoEscolaridad = $persona->gradoEscolaridad;
-        $departamento = $persona->departamento;
-        $ciudad = $persona->ciudad;
-        $comuna = $persona->comuna;
-        $barrio = $persona->barrio;
-        $tipoVivienda = $persona->tipoVivienda;
-        $tipoTecho = $persona->tipoTecho;
-        $tipoDivision = $persona->tipoDivision;
-        $ocupacion = $persona->ocupacion;
-        $departamentoCor = $persona->departamentoCor;
-        $ciudadCor = $persona->ciudadCor;
-        $comunaCor = $persona->comunaCor;
-        $barrioCor = $persona->barrioCor;
-        $familia = $persona->familia;
+        // $tipoIdentificacion = $persona->tipoIdentificacion;
+        // $paisNacimiento = $persona->pais;
+        // $departamentoNacimiento = $persona->departamentoNacimiento;
+        // $ciudadNacimiento = $persona->ciudadNacimiento;
+        // $estadoCivil = $persona->estadoCivil;
+        // $tipoPoblacion = $persona->tipoPoblacion;
+        // $tipoDicapacidad = $persona->tipoDicapacidad;
+        // $eps = $persona->eps;
+        // $gradoEscolaridad = $persona->gradoEscolaridad;
+        // $departamento = $persona->departamento;
+        // $ciudad = $persona->ciudad;
+        // $comuna = $persona->comuna;
+        // $barrio = $persona->barrio;
+        // $tipoVivienda = $persona->tipoVivienda;
+        // $tipoTecho = $persona->tipoTecho;
+        // $tipoDivision = $persona->tipoDivision;
+        // $ocupacion = $persona->ocupacion;
+        // $departamentoCor = $persona->departamentoCor;
+        // $ciudadCor = $persona->ciudadCor;
+        // $comunaCor = $persona->comunaCor;
+        // $barrioCor = $persona->barrioCor;
+        // $familia = $persona->familia;
 
         return [
             'id' => $persona->id,
@@ -530,98 +530,98 @@ class Persona extends Model
             'usuario_modificacion_nombre' => $persona->usuario_modificacion_nombre,
             'fecha_creacion' => (new Carbon($persona->created_at))->format("Y-m-d H:i:s"),
             'fecha_modificacion' => (new Carbon($persona->updated_at))->format("Y-m-d H:i:s"),
-            'tipoIdentificacion' => isset($tipoIdentificacion) ? [
-                'id' => $tipoIdentificacion->id,
-                'nombre' => $tipoIdentificacion->tipIdeDescripcion
-            ] : null,
-            'paisNacimiento' => isset($paisNacimiento) ? [
-                'id' => $paisNacimiento->id,
-                'nombre' => $paisNacimiento->paisesDescripcion
-            ] : null,
-            'departamentoNacimiento' => isset($departamentoNacimiento) ? [
-                'id' => $departamentoNacimiento->id,
-                'nombre' => $departamentoNacimiento->departamentosDescripcion
-            ] : null,
-            'ciudadNacimiento' => isset($ciudadNacimiento) ? [
-                'id' => $ciudadNacimiento->id,
-                'nombre' => $ciudadNacimiento->ciudadesDescripcion
-            ] : null,
-            'estadoCivil' => isset($estadoCivil) ? [
-                'id' => $estadoCivil->id,
-                'nombre' => $estadoCivil->estCivDescripcion
-            ] : null,
-            'tipoPoblacion' => isset($tipoPoblacion) ? [
-                'id' => $tipoPoblacion->id,
-                'nombre' => $tipoPoblacion->tipPobDescripcion
-            ] : null,
-            'tipoDicapacidad' => isset($tipoDicapacidad) ? [
-                'id' => $tipoDicapacidad->id,
-                'nombre' => $tipoDicapacidad->tipDisDescripcion
-            ] : null,
-            'eps' => isset($eps) ? [
-                'id' => $eps->id,
-                'nombre' => $eps->epsDescripcion
-            ] : null,
-            'gradoEscolaridad' => isset($gradoEscolaridad) ? [
-                'id' => $gradoEscolaridad->id,
-                'nombre' => $gradoEscolaridad->graEscDescripcion
-            ] : null,
-            'departamento' => isset($departamento) ? [
-                'id' => $departamento->id,
-                'nombre' => $departamento->departamentosDescripcion
-            ] : null,
-            'ciudad' => isset($ciudad) ? [
-                'id' => $ciudad->id,
-                'nombre' => $ciudad->ciudadesDescripcion
-            ] : null,
-            'comuna' => isset($comuna) ? [
-                'id' => $comuna->id,
-                'nombre' => $comuna->comunasDescripcion
-            ] : null,
-            'barrio' => isset($barrio) ? [
-                'id' => $barrio->id,
-                'nombre' => $barrio->barriosDescripcion
-            ] : null,
-            'tipoVivienda' => isset($tipoVivienda) ? [
-                'id' => $tipoVivienda->id,
-                'nombre' => $tipoVivienda->tipVivDescripcion
-            ] : null,
-            'tipoTecho' => isset($tipoTecho) ? [
-                'id' => $tipoTecho->id,
-                'nombre' => $tipoTecho->tipTecDescripcion
-            ] : null,
-            'tipoPiso' => isset($tipoPiso) ? [
-                'id' => $tipoPiso->id,
-                'nombre' => $tipoPiso->tipPisDescripcion
-            ] : null,
-            'tipoDivision' => isset($tipoDivision) ? [
-                'id' => $tipoDivision->id,
-                'nombre' => $tipoDivision->tipDivDescripcion
-            ] : null,
-            'ocupacion' => isset($ocupacion) ? [
-                'id' => $ocupacion->id,
-                'nombre' => $ocupacion->ocupacionesDescripcion
-            ] : null,
-            'departamentoCor' => isset($departamentoCor) ? [
-                'id' => $departamentoCor->id,
-                'nombre' => $departamentoCor->departamentosDescripcion
-            ] : null,
-            'ciudadCor' => isset($ciudadCor) ? [
-                'id' => $ciudadCor->id,
-                'nombre' => $ciudadCor->ciudadesDescripcion
-            ] : null,
-            'comunaCor' => isset($comunaCor) ? [
-                'id' => $comunaCor->id,
-                'nombre' => $comunaCor->comunasDescripcion
-            ] : null,
-            'barrioCor' => isset($barrioCor) ? [
-                'id' => $barrioCor->id,
-                'nombre' => $barrioCor->barriosDescripcion
-            ] : null,
-            'familia' => isset($familia) ? [
-                'id' => $familia->id,
-                'nombre' => $familia->identificacion_persona
-            ] : null,
+            // 'tipoIdentificacion' => isset($tipoIdentificacion) ? [
+            //     'id' => $tipoIdentificacion->id,
+            //     'nombre' => $tipoIdentificacion->tipIdeDescripcion
+            // ] : null,
+            // 'paisNacimiento' => isset($paisNacimiento) ? [
+            //     'id' => $paisNacimiento->id,
+            //     'nombre' => $paisNacimiento->paisesDescripcion
+            // ] : null,
+            // 'departamentoNacimiento' => isset($departamentoNacimiento) ? [
+            //     'id' => $departamentoNacimiento->id,
+            //     'nombre' => $departamentoNacimiento->departamentosDescripcion
+            // ] : null,
+            // 'ciudadNacimiento' => isset($ciudadNacimiento) ? [
+            //     'id' => $ciudadNacimiento->id,
+            //     'nombre' => $ciudadNacimiento->ciudadesDescripcion
+            // ] : null,
+            // 'estadoCivil' => isset($estadoCivil) ? [
+            //     'id' => $estadoCivil->id,
+            //     'nombre' => $estadoCivil->estCivDescripcion
+            // ] : null,
+            // 'tipoPoblacion' => isset($tipoPoblacion) ? [
+            //     'id' => $tipoPoblacion->id,
+            //     'nombre' => $tipoPoblacion->tipPobDescripcion
+            // ] : null,
+            // 'tipoDicapacidad' => isset($tipoDicapacidad) ? [
+            //     'id' => $tipoDicapacidad->id,
+            //     'nombre' => $tipoDicapacidad->tipDisDescripcion
+            // ] : null,
+            // 'eps' => isset($eps) ? [
+            //     'id' => $eps->id,
+            //     'nombre' => $eps->epsDescripcion
+            // ] : null,
+            // 'gradoEscolaridad' => isset($gradoEscolaridad) ? [
+            //     'id' => $gradoEscolaridad->id,
+            //     'nombre' => $gradoEscolaridad->graEscDescripcion
+            // ] : null,
+            // 'departamento' => isset($departamento) ? [
+            //     'id' => $departamento->id,
+            //     'nombre' => $departamento->departamentosDescripcion
+            // ] : null,
+            // 'ciudad' => isset($ciudad) ? [
+            //     'id' => $ciudad->id,
+            //     'nombre' => $ciudad->ciudadesDescripcion
+            // ] : null,
+            // 'comuna' => isset($comuna) ? [
+            //     'id' => $comuna->id,
+            //     'nombre' => $comuna->comunasDescripcion
+            // ] : null,
+            // 'barrio' => isset($barrio) ? [
+            //     'id' => $barrio->id,
+            //     'nombre' => $barrio->barriosDescripcion
+            // ] : null,
+            // 'tipoVivienda' => isset($tipoVivienda) ? [
+            //     'id' => $tipoVivienda->id,
+            //     'nombre' => $tipoVivienda->tipVivDescripcion
+            // ] : null,
+            // 'tipoTecho' => isset($tipoTecho) ? [
+            //     'id' => $tipoTecho->id,
+            //     'nombre' => $tipoTecho->tipTecDescripcion
+            // ] : null,
+            // 'tipoPiso' => isset($tipoPiso) ? [
+            //     'id' => $tipoPiso->id,
+            //     'nombre' => $tipoPiso->tipPisDescripcion
+            // ] : null,
+            // 'tipoDivision' => isset($tipoDivision) ? [
+            //     'id' => $tipoDivision->id,
+            //     'nombre' => $tipoDivision->tipDivDescripcion
+            // ] : null,
+            // 'ocupacion' => isset($ocupacion) ? [
+            //     'id' => $ocupacion->id,
+            //     'nombre' => $ocupacion->ocupacionesDescripcion
+            // ] : null,
+            // 'departamentoCor' => isset($departamentoCor) ? [
+            //     'id' => $departamentoCor->id,
+            //     'nombre' => $departamentoCor->departamentosDescripcion
+            // ] : null,
+            // 'ciudadCor' => isset($ciudadCor) ? [
+            //     'id' => $ciudadCor->id,
+            //     'nombre' => $ciudadCor->ciudadesDescripcion
+            // ] : null,
+            // 'comunaCor' => isset($comunaCor) ? [
+            //     'id' => $comunaCor->id,
+            //     'nombre' => $comunaCor->comunasDescripcion
+            // ] : null,
+            // 'barrioCor' => isset($barrioCor) ? [
+            //     'id' => $barrioCor->id,
+            //     'nombre' => $barrioCor->barriosDescripcion
+            // ] : null,
+            // 'familia' => isset($familia) ? [
+            //     'id' => $familia->id,
+            //     'nombre' => $familia->identificacion_persona
+            // ] : null,
         ];
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
+use App\Exports\PersonasEntidades\PersonaInformacion;
 use App\Http\Controllers\Controller;
 use App\Models\PersonasEntidades\Persona;
 use Illuminate\Support\Facades\Validator;
@@ -683,5 +684,12 @@ class PersonaController extends Controller
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function informePersonas(Request $request)
+    {
+        $nombreArchivo = 'personas-' . time() . '.xlsx';
+        return (new PersonaInformacion($request->all()))->download($nombreArchivo);
+        // return Excel::download(new ParticipanteInformacion($request->all()), $nombreArchivo);
     }
 }
