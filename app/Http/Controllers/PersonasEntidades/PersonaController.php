@@ -122,7 +122,7 @@ class PersonaController extends Controller
                 'personasSeguridadSocial' => 'string|required',
                 'eps_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('eps','id')->where(function ($query) {
                         $query->where('epsEstado', 1);
                     }),
@@ -134,7 +134,7 @@ class PersonaController extends Controller
                         $query->where('graEscEstado', 1);
                     }),
                 ],
-                'personasVehiculo' => 'string|required',
+                'personasVehiculo' => 'string|nullable',
                 'personasCorreo' => 'string|nullable',
                 'personasFechaVinculacion' => 'date|required',
                 'departamento_id' => [
@@ -153,19 +153,19 @@ class PersonaController extends Controller
                 ],
                 'comuna_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('comunas','id')->where(function ($query) {
                         $query->where('comunasEstado', 1);
                     }),
                 ],
                 'barrio_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('barrios','id')->where(function ($query) {
                         $query->where('barriosEstado', 1);
                     }),
                 ],
-                'personasDireccion' => 'string|nullable',
+                'personasDireccion' => 'string|required',
                 'personasZona' => 'string|required',
                 'personasEstrato' => 'string|required',
                 'personasTelefonoCasa' => 'string|nullable',
@@ -178,10 +178,10 @@ class PersonaController extends Controller
                     }),
                 ],
                 'personasTipoPropiedad' => 'string|required',
-                'personasNumeroEscritura' => 'string|required',
-                'personasNotariaEscritura' => 'string|required',
-                'personasFechaEscritura' => 'date|required',
-                'personasIndicativoPC' => 'string|required',
+                'personasNumeroEscritura' => 'string|nullable',
+                'personasNotariaEscritura' => 'string|nullable',
+                'personasFechaEscritura' => 'date|nullable',
+                'personasIndicativoPC' => 'string|nullable',
                 'personasNumeroHabitaciones' => 'integer|required',
                 'personasNumeroBanos' => 'integer|required',
                 'tipo_techo_id' => [
@@ -221,32 +221,32 @@ class PersonaController extends Controller
                 'personasTipoContrato' => 'string|required',
                 'personasNombreEmpresa' => 'string|nullable',
                 'personasTelefonoEmpresa' => 'string|nullable',
-                'personasPuntajeProcredito' => 'integer|nullable',
-                'personasPuntajeDatacredito' => 'integer|nullable',
+                'personasPuntajeProcredito' => 'integer|required',
+                'personasPuntajeDatacredito' => 'integer|required',
                 'departamento_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('departamentos','id')->where(function ($query) {
                         $query->where('departamentosEstado', 1);
                     }),
                 ],
                 'ciudad_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('ciudades','id')->where(function ($query) {
                         $query->where('ciudadesEstado', 1);
                     }),
                 ],
                 'comuna_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('comunas','id')->where(function ($query) {
                         $query->where('comunasEstado', 1);
                     }),
                 ],
                 'barrio_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('barrios','id')->where(function ($query) {
                         $query->where('barriosEstado', 1);
                     }),
@@ -255,18 +255,18 @@ class PersonaController extends Controller
                 'personasCorTelefono' => 'string|nullable',
                 'personasIngresosFormales' => 'numeric|required',
                 'personasIngresosInformales' => 'numeric|required',
-                'personasIngresosArriendo' => 'numeric|required',
-                'personasIngresosSubsidios' => 'numeric|required',
-                'personasIngresosPaternidad' => 'numeric|required',
-                'personasIngresosTerceros' => 'numeric|required',
-                'personasIngresosOtros' => 'numeric|required',
+                'personasIngresosArriendo' => 'numeric|nullable',
+                'personasIngresosSubsidios' => 'numeric|nullable',
+                'personasIngresosPaternidad' => 'numeric|nullable',
+                'personasIngresosTerceros' => 'numeric|nullable',
+                'personasIngresosOtros' => 'numeric|nullable',
                 'personasAportesFormales' => 'numeric|required',
                 'personasAportesInformales' => 'numeric|required',
-                'personasAportesArriendo' => 'numeric|required',
-                'personasAportesSubsidios' => 'numeric|required',
-                'personasAportesPaternidad' => 'numeric|required',
-                'personasAportesTerceros' => 'numeric|required',
-                'personasAportesOtros' => 'numeric|required',
+                'personasAportesArriendo' => 'numeric|nullable',
+                'personasAportesSubsidios' => 'numeric|nullable',
+                'personasAportesPaternidad' => 'numeric|nullable',
+                'personasAportesTerceros' => 'numeric|nullable',
+                'personasAportesOtros' => 'numeric|nullable',
                 'personasRefNombre1' => 'string|nullable',
                 'personasRefTelefono1' => 'string|nullable',
                 'personasRefNombre2' => 'string|nullable',
@@ -436,7 +436,7 @@ class PersonaController extends Controller
                 'personasSeguridadSocial' => 'string|required',
                 'eps_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('eps','id')->where(function ($query) {
                         $query->where('epsEstado', 1);
                     }),
@@ -448,7 +448,7 @@ class PersonaController extends Controller
                         $query->where('graEscEstado', 1);
                     }),
                 ],
-                'personasVehiculo' => 'string|required',
+                'personasVehiculo' => 'string|nullable',
                 'personasCorreo' => 'string|nullable',
                 'personasFechaVinculacion' => 'date|required',
                 'departamento_id' => [
@@ -467,19 +467,19 @@ class PersonaController extends Controller
                 ],
                 'comuna_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('comunas','id')->where(function ($query) {
                         $query->where('comunasEstado', 1);
                     }),
                 ],
                 'barrio_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('barrios','id')->where(function ($query) {
                         $query->where('barriosEstado', 1);
                     }),
                 ],
-                'personasDireccion' => 'string|nullable',
+                'personasDireccion' => 'string|required',
                 'personasZona' => 'string|required',
                 'personasEstrato' => 'string|required',
                 'personasTelefonoCasa' => 'string|nullable',
@@ -492,10 +492,10 @@ class PersonaController extends Controller
                     }),
                 ],
                 'personasTipoPropiedad' => 'string|required',
-                'personasNumeroEscritura' => 'string|required',
-                'personasNotariaEscritura' => 'string|required',
-                'personasFechaEscritura' => 'date|required',
-                'personasIndicativoPC' => 'string|required',
+                'personasNumeroEscritura' => 'string|nullable',
+                'personasNotariaEscritura' => 'string|nullable',
+                'personasFechaEscritura' => 'date|nullable',
+                'personasIndicativoPC' => 'string|nullable',
                 'personasNumeroHabitaciones' => 'integer|required',
                 'personasNumeroBanos' => 'integer|required',
                 'tipo_techo_id' => [
@@ -535,32 +535,32 @@ class PersonaController extends Controller
                 'personasTipoContrato' => 'string|required',
                 'personasNombreEmpresa' => 'string|nullable',
                 'personasTelefonoEmpresa' => 'string|nullable',
-                'personasPuntajeProcredito' => 'integer|nullable',
-                'personasPuntajeDatacredito' => 'integer|nullable',
+                'personasPuntajeProcredito' => 'integer|required',
+                'personasPuntajeDatacredito' => 'integer|required',
                 'departamento_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('departamentos','id')->where(function ($query) {
                         $query->where('departamentosEstado', 1);
                     }),
                 ],
                 'ciudad_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('ciudades','id')->where(function ($query) {
                         $query->where('ciudadesEstado', 1);
                     }),
                 ],
                 'comuna_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('comunas','id')->where(function ($query) {
                         $query->where('comunasEstado', 1);
                     }),
                 ],
                 'barrio_correspondencia_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('barrios','id')->where(function ($query) {
                         $query->where('barriosEstado', 1);
                     }),
@@ -569,18 +569,18 @@ class PersonaController extends Controller
                 'personasCorTelefono' => 'string|nullable',
                 'personasIngresosFormales' => 'numeric|required',
                 'personasIngresosInformales' => 'numeric|required',
-                'personasIngresosArriendo' => 'numeric|required',
-                'personasIngresosSubsidios' => 'numeric|required',
-                'personasIngresosPaternidad' => 'numeric|required',
-                'personasIngresosTerceros' => 'numeric|required',
-                'personasIngresosOtros' => 'numeric|required',
+                'personasIngresosArriendo' => 'numeric|nullable',
+                'personasIngresosSubsidios' => 'numeric|nullable',
+                'personasIngresosPaternidad' => 'numeric|nullable',
+                'personasIngresosTerceros' => 'numeric|nullable',
+                'personasIngresosOtros' => 'numeric|nullable',
                 'personasAportesFormales' => 'numeric|required',
                 'personasAportesInformales' => 'numeric|required',
-                'personasAportesArriendo' => 'numeric|required',
-                'personasAportesSubsidios' => 'numeric|required',
-                'personasAportesPaternidad' => 'numeric|required',
-                'personasAportesTerceros' => 'numeric|required',
-                'personasAportesOtros' => 'numeric|required',
+                'personasAportesArriendo' => 'numeric|nullable',
+                'personasAportesSubsidios' => 'numeric|nullable',
+                'personasAportesPaternidad' => 'numeric|nullable',
+                'personasAportesTerceros' => 'numeric|nullable',
+                'personasAportesOtros' => 'numeric|nullable',
                 'personasRefNombre1' => 'string|nullable',
                 'personasRefTelefono1' => 'string|nullable',
                 'personasRefNombre2' => 'string|nullable',

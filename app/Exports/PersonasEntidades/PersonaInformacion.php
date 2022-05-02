@@ -52,7 +52,13 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
         ->select(
             'tipos_identificacion.tipIdeDescripcion',
             'personas.personasIdentificacion',
-            'personas.personasCategoriaAportes',
+            DB::Raw('CASE personas.personasCategoriaAportes
+                    WHEN "SO" THEN "Solicitante"
+                    WHEN "AG" THEN "Aportante Grupo Familiar"
+                    WHEN "NG" THEN "No Aportante Grupo Familiar"
+                    WHEN "CO" THEN "Codeudor"
+                    ELSE "" END AS personasCategoriaAportes'
+            ),
             DB::Raw(
                 "CONCAT(
                     IFNULL(CONCAT(personasNombres), ''),
@@ -66,11 +72,29 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
             'departamento_nacimiento.departamentosDescripcion as depNacimiento',
             'ciudad_nacimiento.ciudadesDescripcion as ciuNacimiento',
             'personas.personasGenero',
+            DB::Raw('CASE personas.personasGenero
+                    WHEN "MA" THEN "Masculino"
+                    WHEN "FE" THEN "Femenino"
+                    ELSE "" END AS personasGenero'
+            ),
             'estados_civil.estCivDescripcion',
-            'personas.personasParentesco',
+            DB::Raw('CASE personas.personasParentesco
+                    WHEN "PA" THEN "Padre"
+                    WHEN "MA" THEN "Madre"
+                    WHEN "TI" THEN "Tio(a)"
+                    WHEN "AB" THEN "Abuelo(a)"
+                    WHEN "HE" THEN "Hermano(a)"
+                    WHEN "PR" THEN "Primo(a)"
+                    WHEN "OT" THEN "Otro"
+                    ELSE "" END AS personasParentesco'
+            ),
             'tipos_poblacion.tipPobDescripcion',
             'tipos_discapacidad.tipDisDescripcion',
-            'personas.personasSeguridadSocial',
+            DB::Raw('CASE personas.personasSeguridadSocial
+                    WHEN "SU" THEN "Subsidiado"
+                    WHEN "CO" THEN "Contributivo"
+                    ELSE "" END AS personasSeguridadSocial'
+            ),
             'eps.epsDescripcion',
             'grados_escolaridad.graEscDescripcion',
             DB::Raw('CASE personas.personasVehiculo
@@ -85,16 +109,30 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
             'comunas.comunasDescripcion',
             'barrios.barriosDescripcion',
             'personas.personasDireccion',
-            'personas.personasZona',
+            DB::Raw('CASE personas.personasZona
+                    WHEN "UR" THEN "Urbana"
+                    WHEN "RU" THEN "Rural"
+                    ELSE "" END AS personasZona'
+            ),
             'personas.personasEstrato',
             'personas.personasTelefonoCasa',
             'personas.personasTelefonoCelular',
             'tipos_vivienda.tipVivDescripcion',
-            'personas.personasTipoPropiedad',
+            DB::Raw('CASE personas.personasTipoPropiedad
+                    WHEN "ES" THEN "Escritura"
+                    WHEN "CO" THEN "Compraventa"
+                    WHEN "PO" THEN "Posesión"
+                    WHEN "SD" THEN "Sin Documento"
+                    ELSE "" END AS personasTipoPropiedad'
+            ),
             'personas.personasNumeroEscritura',
             'personas.personasNotariaEscritura',
             'personas.personasFechaEscritura',
-            'personas.personasIndicativoPC',
+            DB::Raw('CASE personas.personasIndicativoPC
+                    WHEN "PO" THEN "Posesión"
+                    WHEN "CV" THEN "Compraventa"
+                    ELSE "" END AS personasIndicativoPC'
+            ),
             'personas.personasNumeroHabitaciones',
             'personas.personasNumeroBanos',
             'tipos_techo.tipTecDescripcion',
@@ -126,8 +164,19 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
                     ELSE "" END AS personasTerraza'
             ),
             'ocupaciones.ocupacionesDescripcion',
-            'personas.personasTipoTrabajo',
-            'personas.personasTipoContrato',
+            DB::Raw('CASE personas.personasTipoTrabajo
+                    WHEN "FO" THEN "Formal"
+                    WHEN "IN" THEN "Informal"
+                    WHEN "PE" THEN "Pensionado"
+                    ELSE "" END AS personasTipoTrabajo'
+            ),
+            DB::Raw('CASE personas.personasTipoContrato
+                    WHEN "IN" THEN "Indefinidio"
+                    WHEN "TF" THEN "Término Fijo"
+                    WHEN "OL" THEN "Por Obra Labor"
+                    WHEN "PS" THEN "Prestación de Servicios"
+                    ELSE "" END AS personasTipoContrato'
+            ),
             'personas.personasNombreEmpresa',
             'personas.personasTelefonoEmpresa',
             'personas.personasPuntajeProcredito',
@@ -157,8 +206,19 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
             'personas.personasRefNombre2',
             'personas.personasRefTelefono2',
             'personas.personasObservaciones',
-            'personas.personasEstadoTramite',
-            'personas.personasEstadoRegistro',
+            DB::Raw('CASE personas.personasEstadoTramite
+                    WHEN "SO" THEN "Solicitud"
+                    WHEN "PR" THEN "Prospecto"
+                    WHEN "ES" THEN "Estudio"
+                    WHEN "AP" THEN "Aprobado"
+                    WHEN "RE" THEN "Rechazado"
+                    ELSE "" END AS personasEstadoTramite'
+            ),
+            DB::Raw('CASE personas.personasEstadoRegistro
+                    WHEN "IN" THEN "Inactivo"
+                    WHEN "AC" THEN "Activo"
+                    ELSE "" END AS personasEstadoRegistro'
+            ),
             'familias.identificacion_persona',        
             'personas.usuario_modificacion_nombre',
             'personas.updated_at AS fecha_modificacion',
