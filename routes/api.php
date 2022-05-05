@@ -151,4 +151,44 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+        // ---------------------- Parametrizacion -------------------------- //
+    // Tipos Parentesco
+    Route::group(["prefix" => "tipos-parentesco"],function(){
+        Route::get('/', [Parametrizacion\TipoParentescoController::class,'index'])->name('tipos_parentesco.index');
+        Route::post('/', [Parametrizacion\TipoParentescoController::class,'store'])->name('tipos_parentesco.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoParentescoController::class,'show'])->name('tipos_parentesco.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoParentescoController::class,'update'])->name('tipos_parentesco.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoParentescoController::class,'destroy'])->name('tipos_parentesco.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Tipos Discapacidad
+    Route::group(["prefix" => "tipos-discapacidad"],function(){
+        Route::get('/', [Parametrizacion\TipoDiscapacidadController::class,'index'])->name('tipos_discapacidad.index');
+        Route::post('/', [Parametrizacion\TipoDiscapacidadController::class,'store'])->name('tipos_discapacidad.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoDiscapacidadController::class,'show'])->name('tipos_discapacidad.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoDiscapacidadController::class,'update'])->name('tipos_discapacidad.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoDiscapacidadController::class,'destroy'])->name('tipos_discapacidad.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Tipos Asesorias
+    Route::group(["prefix" => "tipos-orientacion"],function(){
+        Route::get('/', [Parametrizacion\TipoAsesoriaController::class,'index'])->name('tipos_orientacion.index');
+        Route::post('/', [Parametrizacion\TipoAsesoriaController::class,'store'])->name('tipos_orientacion.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoAsesoriaController::class,'show'])->name('tipos_orientacion.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoAsesoriaController::class,'update'])->name('tipos_orientacion.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoAsesoriaController::class,'destroy'])->name('tipos_orientacion.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
 });
