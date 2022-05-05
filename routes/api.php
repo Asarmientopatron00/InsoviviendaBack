@@ -126,14 +126,27 @@ Route::group(['middleware' => ['auth:api']], function (){
 
     // Personas
     Route::group(["prefix" => "personas"],function(){
-        Route::get('/', [PersonasEntidades\PersonaController::class,'index'])->name('modulos.index');
-        Route::post('/', [PersonasEntidades\PersonaController::class,'store'])->name('modulos.store');
+        Route::get('/', [PersonasEntidades\PersonaController::class,'index'])->name('personas.index');
+        Route::post('/', [PersonasEntidades\PersonaController::class,'store'])->name('personas.store');
             // ->middleware(['permission:CrearModulo']);
-        Route::get('/{id}', [PersonasEntidades\PersonaController::class,'show'])->name('modulos.show');
+        Route::get('/{id}', [PersonasEntidades\PersonaController::class,'show'])->name('personas.show');
             // ->middleware(['permission:ListarModulo']);
-        Route::put('/{id}', [PersonasEntidades\PersonaController::class,'update'])->name('modulos.update');
+        Route::put('/{id}', [PersonasEntidades\PersonaController::class,'update'])->name('personas.update');
             // ->middleware(['permission:ModificarModulo']);
-        Route::delete('/{id}', [PersonasEntidades\PersonaController::class,'destroy'])->name('modulos.delete');
+        Route::delete('/{id}', [PersonasEntidades\PersonaController::class,'destroy'])->name('personas.delete');
+            // ->middleware(['permission:EliminarModulo']);
+    });
+
+    // Familias
+    Route::group(["prefix" => "familias"],function(){
+        Route::get('/', [PersonasEntidades\FamiliaController::class,'index'])->name('familias.index');
+        Route::post('/', [PersonasEntidades\FamiliaController::class,'store'])->name('familias.store');
+            // ->middleware(['permission:CrearModulo']);
+        Route::get('/{id}', [PersonasEntidades\FamiliaController::class,'show'])->name('familias.show');
+            // ->middleware(['permission:ListarModulo']);
+        Route::put('/{id}', [PersonasEntidades\FamiliaController::class,'update'])->name('familias.update');
+            // ->middleware(['permission:ModificarModulo']);
+        Route::delete('/{id}', [PersonasEntidades\FamiliaController::class,'destroy'])->name('familias.delete');
             // ->middleware(['permission:EliminarModulo']);
     });
 
