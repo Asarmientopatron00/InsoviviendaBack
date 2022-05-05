@@ -191,4 +191,17 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Tipos Asesorias
+    Route::group(["prefix" => "orientador"],function(){
+        Route::get('/', [PersonasEntidades\OrientadorController::class,'index'])->name('orientadores.index');
+        Route::post('/', [PersonasEntidades\OrientadorController::class,'store'])->name('orientadores.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [PersonasEntidades\OrientadorController::class,'show'])->name('orientadores.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [PersonasEntidades\OrientadorController::class,'update'])->name('orientadores.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [PersonasEntidades\OrientadorController::class,'destroy'])->name('orientadores.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
 });
