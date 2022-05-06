@@ -2,20 +2,51 @@
 
 namespace App\Http\Controllers\Parametrizacion;
 
-use App\Models\Parametrizacion\TipoFamilia;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Parametrizacion\TipoFamilia;
 
 class TipoFamiliaController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        try{
+            $datos = $request->all();
+            if(!$request->ligera){
+                $validator = Validator::make($datos, [
+                    'limite' => 'integer|between:1,500'
+                ]);
+
+                if($validator->fails()) {
+                    return response(
+                        get_response_body(format_messages_validator($validator))
+                        , Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+
+            if($request->ligera){
+                $tipoFamilia = TipoFamilia::obtenerColeccionLigera($datos);
+            }else{
+                if(isset($datos['ordenar_por'])){
+                    $datos['ordenar_por'] = format_order_by_attributes($datos);
+                }
+                $tipoFamilia = TipoFamilia::obtenerColeccion($datos);
+            }
+            return response($tipoFamilia, Response::HTTP_OK);
+        }catch(Exception $e){
+            return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -36,18 +67,64 @@ class TipoFamiliaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try {
+            $datos = $request->all();
+            $validator = Validator::make($datos, [
+                'tipFamDescripcion' => 'string|required|max:128',
+                'tipFamEstado' => 'boolean|required'
+            ]);
+
+            if ($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $tipoFamilia = TipoFamilia::modificarOCrear($datos);
+            
+            if ($tipoFamilia) {
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El Tipo de Familia ha sido creado.", 2], $tipoFamilia),
+                    Response::HTTP_CREATED
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar crear el Tipo de Familia."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Parametrizacion\TipoFamilia  $tipoFamilia
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(TipoFamilia $tipoFamilia)
+    public function show($id)
     {
-        //
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:tipos_Familia,id'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            return response(TipoFamilia::cargar($id), Response::HTTP_OK);
+        }catch (Exception $e){
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -64,23 +141,82 @@ class TipoFamiliaController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Parametrizacion\TipoFamilia  $tipoFamilia
+     *@param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, TipoFamilia $tipoFamilia)
+    public function update(Request $request, $id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos = $request->all();
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:tipos_Familia,id',
+                'tipFamDescripcion' => 'string|required|max:128',
+                'tipFamEstado' => 'boolean|required'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $tipoFamilia = TipoFamilia::modificarOCrear($datos);
+            if($tipoFamilia){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El Tipo de Familia ha sido modificado.", 1], $tipoFamilia),
+                    Response::HTTP_OK
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar modificar el Tipo de Familia."]), Response::HTTP_CONFLICT);;
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(get_response_body([$e->getMessage()]), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Parametrizacion\TipoFamilia  $tipoFamilia
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(TipoFamilia $tipoFamilia)
+    public function destroy($id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:tipos_Familia,id'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $eliminado = TipoFamilia::eliminar($id);
+            if($eliminado){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El Tipo de Familia ha sido elimado.", 3]),
+                    Response::HTTP_OK
+                );
+            }else{
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar eliminar el Tipo de Familia."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
