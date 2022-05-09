@@ -46,7 +46,7 @@ class Familia extends Model
     ];
 
     public function persona(){
-        return $this->belongsTo(Persona::class, 'identificacion_persona');
+        return $this->belongsTo(Persona::class, 'identificacion_persona', 'personasIdentificacion');
     }
 
     public function tipoFamilia(){
@@ -252,6 +252,7 @@ class Familia extends Model
 
         return [
             'id' => $familia->id,
+            'identificacion_persona' => $familia->identificacion_persona,
             'familiasFechaVisitaDomici' => $familia->familiasFechaVisitaDomici,
             'familiasAportesFormales' => $familia->familiasAportesFormales,
             'familiasAportesInformales' => $familia->familiasAportesInformales,
