@@ -13,92 +13,94 @@ use App\Models\Seguridad\AuditoriaTabla;
 
 class Banco extends Model
 {
-   protected $table = 'bancos'; // nombre de la tabla en la base de datos
+    protected $table = 'bancos'; // nombre de la tabla en la base de datos
 
-   protected $fillable = ['bancosDescripcion',
-                          'bancosEstado',
-                          'usuario_creacion_id',
-                          'usuario_creacion_nombre',
-                          'usuario_modificacion_id',
-                          'usuario_modificacion_nombre',];
+    protected $fillable = ['bancosDescripcion',
+                           'bancosEstado',
+                           'usuario_creacion_id',
+                           'usuario_creacion_nombre',
+                           'usuario_modificacion_id',
+                           'usuario_modificacion_nombre',];
 
-   public static function obtenerColeccionLigera($dto) {
-       $query = DB::table('bancos')->select('id',
-                                            'bancosDescripcion AS nombre',
-                                            'bancosEstado AS estado',);
-       $query->orderBy('bancosDescripcion', 'asc');
-       return $query->get();
-   }
+    public static function obtenerColeccionLigera($dto) 
+    {
+        $query = DB::table('bancos')->select('id',
+                                             'bancosDescripcion AS nombre',
+                                             'bancosEstado AS estado',);
+        $query->orderBy('bancosDescripcion', 'asc');
+        return $query->get();
+    }
 
-   public static function obtenerColeccion($dto) {
-       $query = DB::table('bancos')->select('id',
-                                            'bancosDescripcion As nombre',
-                                            'bancosEstado As estado',
-                                            'usuario_creacion_id',
-                                            'usuario_creacion_nombre',
-                                            'usuario_modificacion_id',
-                                            'usuario_modificacion_nombre',
-                                            'created_at AS fecha_creacion',
-                                            'updated_at AS fecha_modificacion',);
+    public static function obtenerColeccion($dto) 
+    {
+        $query = DB::table('bancos')->select('id',
+                                             'bancosDescripcion As nombre',
+                                             'bancosEstado As estado',
+                                             'usuario_creacion_id',
+                                             'usuario_creacion_nombre',
+                                             'usuario_modificacion_id',
+                                             'usuario_modificacion_nombre',
+                                             'created_at AS fecha_creacion',
+                                             'updated_at AS fecha_modificacion',);
 
-       if (isset($dto['nombre']))
-           $query->where('bancosDescripcion', 'like', '%' . $dto['nombre'] . '%');
+        if (isset($dto['nombre']))
+            $query->where('bancosDescripcion', 'like', '%' . $dto['nombre'] . '%');
 
-       if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
-           foreach ($dto['ordenar_por'] as $attribute => $value){
-               if($attribute == 'nombre')
-                   $query->orderBy('bancos.bancosDescripcion', $value);
-               if($attribute == 'estado')
-                   $query->orderBy('bancos.bancosEstado', $value);
-               if($attribute == 'usuario_creacion_nombre')
-                   $query->orderBy('bancos.usuario_creacion_nombre', $value);
-               if($attribute == 'usuario_modificacion_nombre')
-                   $query->orderBy('bancos.usuario_modificacion_nombre', $value);
-               if($attribute == 'fecha_creacion')
-                   $query->orderBy('bancos.created_at', $value);
-               if($attribute == 'fecha_modificacion')
-                   $query->orderBy('bancos.updated_at', $value);
-           }
-       else {
-           $query->orderBy("bancos.updated_at", "desc");
-       }
+        if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
+            foreach ($dto['ordenar_por'] as $attribute => $value) {
+                if ($attribute == 'nombre')
+                    $query->orderBy('bancos.bancosDescripcion', $value);
+                if ($attribute == 'estado')
+                    $query->orderBy('bancos.bancosEstado', $value);
+                if ($attribute == 'usuario_creacion_nombre')
+                    $query->orderBy('bancos.usuario_creacion_nombre', $value);
+                if ($attribute == 'usuario_modificacion_nombre')
+                    $query->orderBy('bancos.usuario_modificacion_nombre', $value);
+                if ($attribute == 'fecha_creacion')
+                    $query->orderBy('bancos.created_at', $value);
+                if ($attribute == 'fecha_modificacion')
+                    $query->orderBy('bancos.updated_at', $value);
+            }
+        else {
+            $query->orderBy("bancos.updated_at", "desc");
+        }
 
-       $bancoS = $query->paginate($dto['limite'] ?? 100);
-       $datos = [];
+        $pag = $query->paginate($dto['limite'] ?? 100);
+        $datos = [];
 
-       foreach ($bancoS ?? [] as $banco)
-           array_push($datos, $banco);
+        foreach ($pag ?? [] as $pagTmp)
+            array_push($datos, $pagTmp);
 
-       $total_bancoS = count($bancoS);
-       $to = isset($bancoS) && $total_bancoS > 0 ? $bancoS->currentPage() * $bancoS->perPage() : null;
-       $to = isset($to) && isset($bancoS) && $to > $bancoS->total() && $total_bancoS > 0 ? $bancoS->total() : $to;
-       $from = isset($to) && isset($bancoS) && $total_bancoS > 0 ? ( $bancoS->perPage() > $to ? 1 : ($to - $total_bancoS) + 1 ) : null;
+        $totReg = count($pag);
+        $to = isset($pag) && $totReg > 0 ? $pag->currentPage() * $pag->perPage() : null;
+        $to = isset($to) && isset($pag) && $to > $pag->total() && $totReg > 0 ? $pag->total() : $to;
+        $from = isset($to) && isset($pag) && $totReg > 0 ? ( $pag->perPage() > $to ? 1 : ($to - $totReg) + 1 ) : null;
 
-       return ['datos' => $datos,
-               'desde' => $from,
-               'hasta' => $to,
-               'por_pagina' => isset($bancoS) && $total_bancoS > 0 ? +$bancoS->perPage() : 0,
-               'pagina_actual' => isset($bancoS) && $total_bancoS > 0 ? $bancoS->currentPage() : 1,
-               'ultima_pagina' => isset($bancoS) && $total_bancoS > 0 ? $bancoS->lastPage() : 0,
-               'total' => isset($bancoS) && $total_bancoS > 0 ? $bancoS->total() : 0];
-   }
+        return ['datos' => $datos,
+                'desde' => $from,
+                'hasta' => $to,
+                'por_pagina' => isset($pag) && $totReg > 0 ? +$pag->perPage() : 0,
+                'pagina_actual' => isset($pag) && $totReg > 0 ? $pag->currentPage() : 1,
+                'ultima_pagina' => isset($pag) && $totReg > 0 ? $pag->lastPage() : 0,
+                'total' => isset($pag) && $totReg > 0 ? $pag->total() : 0];
+    }
 
-   public static function cargar($id)
-   {
-       $banco = Banco::find($id);
-       return ['id' => $banco->id,
-               'nombre' => $banco->bancosDescripcion,
-               'estado' => $banco->bancosEstado,
-               'usuario_creacion_id' => $banco->usuario_creacion_id,
-               'usuario_creacion_nombre' => $banco->usuario_creacion_nombre,
-               'usuario_modificacion_id' => $banco->usuario_modificacion_id,
-               'usuario_modificacion_nombre' => $banco->usuario_modificacion_nombre,
-               'fecha_creacion' => (new Carbon($banco->created_at))->format("Y-m-d H:i:s"),
-               'fecha_modificacion' => (new Carbon($banco->updated_at))->format("Y-m-d H:i:s")];
-   }
+    public static function cargar($id)
+    {
+        $regCargar = Banco::find($id);
+        return ['id' => $regCargar->id,
+                'nombre' => $regCargar->bancosDescripcion,
+                'estado' => $regCargar->bancosEstado,
+                'usuario_creacion_id' => $regCargar->usuario_creacion_id,
+                'usuario_creacion_nombre' => $regCargar->usuario_creacion_nombre,
+                'usuario_modificacion_id' => $regCargar->usuario_modificacion_id,
+                'usuario_modificacion_nombre' => $regCargar->usuario_modificacion_nombre,
+                'fecha_creacion' => (new Carbon($regCargar->created_at))->format("Y-m-d H:i:s"),
+                'fecha_modificacion' => (new Carbon($regCargar->updated_at))->format("Y-m-d H:i:s")];
+    }
 
-   public static function modificarOCrear($dto)
-   {
+    public static function modificarOCrear($dto)
+    {
        $user = Auth::user();
        $usuario = $user->usuario();
 
@@ -112,44 +114,43 @@ class Banco extends Model
        }
 
        // Consultar aplicación
-       $banco = isset($dto['id']) ? Banco::find($dto['id']) : new Banco();
+       $reg = isset($dto['id']) ? Banco::find($dto['id']) : new Banco();
 
        // Guardar objeto original para auditoria
-       $bancoOriginal = $banco->toJson();
+       $regOri = $reg->toJson();
 
-       $banco->fill($dto);
-       $guardado = $banco->save();
-       if (!$guardado) {
-           throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $banco);
-       }
+       $reg->fill($dto);
+       $guardado = $reg->save();
+       if (!$guardado) 
+           throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
 
        // Guardar auditoria
-       $auditoriaDto = ['id_recurso' => $banco->id,
+       $auditoriaDto = ['id_recurso' => $reg->id,
                         'nombre_recurso' => Banco::class,
-                        'descripcion_recurso' => $banco->bancosDescripcion,
+                        'descripcion_recurso' => $reg->bancosDescripcion,
                         'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
-                        'recurso_original' => isset($dto['id']) ? $bancoOriginal : $banco->toJson(),
-                        'recurso_resultante' => isset($dto['id']) ? $banco->toJson() : null];
+                        'recurso_original' => isset($dto['id']) ? $regOri : $reg->toJson(),
+                        'recurso_resultante' => isset($dto['id']) ? $reg->toJson() : null];
 
        AuditoriaTabla::crear($auditoriaDto);
 
-       return Banco::cargar($banco->id);
-   }
+       return Banco::cargar($reg->id);
+    }
 
-   public static function eliminar($id)
-   {
-       $banco = Banco::find($id);
+    public static function eliminar($id)
+    {
+        $regEli = Banco::find($id);
 
-       // Guardar auditoria
-       $auditoriaDto = ['id_recurso' => $banco->id,
-                        'nombre_recurso' => Banco::class,
-                        'descripcion_recurso' => $banco->bancosDescripcion,
-                        'accion' => AccionAuditoriaEnum::ELIMINAR,
-                        'recurso_original' => $banco->toJson()];
-       AuditoriaTabla::crear($auditoriaDto);
+        // Guardar auditoria
+        $auditoriaDto = ['id_recurso' => $regEli->id,
+                         'nombre_recurso' => Banco::class,
+                         'descripcion_recurso' => $regEli->bancosDescripcion,
+                         'accion' => AccionAuditoriaEnum::ELIMINAR,
+                         'recurso_original' => $regEli->toJson()];
+        AuditoriaTabla::crear($auditoriaDto);
 
-       return $banco->delete();
-   }
+        return $regEli->delete();
+    }
 
-   use HasFactory;
+    use HasFactory;
 }

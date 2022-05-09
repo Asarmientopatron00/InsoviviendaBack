@@ -24,7 +24,8 @@ class TipoDocumentoProyecto extends Model
                            'usuario_modificacion_id',
                            'usuario_modificacion_nombre',];
  
-    public static function obtenerColeccionLigera($dto) {
+    public static function obtenerColeccionLigera($dto) 
+    {
         $query = DB::table('tipos_documentos_proyecto')->select('id',
                                                                'tiDoPrDescripcion AS nombre',
                                                                'tiDoPrEtapa AS etapa',
@@ -52,61 +53,61 @@ class TipoDocumentoProyecto extends Model
  
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
             foreach ($dto['ordenar_por'] as $attribute => $value){
-                if($attribute == 'nombre')
+                if ($attribute == 'nombre')
                     $query->orderBy('tipos_documentos_proyecto.tiDoPrDescripcion', $value);
-                if($attribute == 'etapa')
+                if ($attribute == 'etapa')
                     $query->orderBy('tipos_documentos_proyecto.tiDoPrEtapa', $value);
-                if($attribute == 'requerido')
+                if ($attribute == 'requerido')
                     $query->orderBy('tipos_documentos_proyecto.tiDoPrRequerido', $value);
-                if($attribute == 'estado')
+                if ($attribute == 'estado')
                     $query->orderBy('tipos_documentos_proyecto.tiDoPrEstado', $value);
-                if($attribute == 'usuario_creacion_nombre')
+                if ($attribute == 'usuario_creacion_nombre')
                     $query->orderBy('tipos_documentos_proyecto.usuario_creacion_nombre', $value);
-                if($attribute == 'usuario_modificacion_nombre')
+                if ($attribute == 'usuario_modificacion_nombre')
                     $query->orderBy('tipos_documentos_proyecto.usuario_modificacion_nombre', $value);
-                if($attribute == 'fecha_creacion')
+                if ($attribute == 'fecha_creacion')
                     $query->orderBy('tipos_documentos_proyecto.created_at', $value);
-                if($attribute == 'fecha_modificacion')
+                if ($attribute == 'fecha_modificacion')
                     $query->orderBy('tipos_documentos_proyecto.updated_at', $value);
             }
         else {
             $query->orderBy("tipos_documentos_proyecto.updated_at", "desc");
         }
  
-        $tipoDocumentoProyectoS = $query->paginate($dto['limite'] ?? 100);
+        $pag = $query->paginate($dto['limite'] ?? 100);
         $datos = [];
  
-        foreach ($tipoDocumentoProyectoS ?? [] as $tipoDocumentoProyecto)
-            array_push($datos, $tipoDocumentoProyecto);
+        foreach ($pag ?? [] as $pagTmp)
+            array_push($datos, $pagTmp);
  
-        $total_tipoDocumentoProyectoS = count($tipoDocumentoProyectoS);
-        $to = isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? $tipoDocumentoProyectoS->currentPage() * $tipoDocumentoProyectoS->perPage() : null;
-        $to = isset($to) && isset($tipoDocumentoProyectoS) && $to > $tipoDocumentoProyectoS->total() && $total_tipoDocumentoProyectoS > 0 ? $tipoDocumentoProyectoS->total() : $to;
-        $from = isset($to) && isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? ( $tipoDocumentoProyectoS->perPage() > $to ? 1 : ($to - $total_tipoDocumentoProyectoS) + 1 ) : null;
+        $totReg = count($pag);
+        $to = isset($pag) && $totReg > 0 ? $pag->currentPage() * $pag->perPage() : null;
+        $to = isset($to) && isset($pag) && $to > $pag->total() && $totReg > 0 ? $pag->total() : $to;
+        $from = isset($to) && isset($pag) && $totReg > 0 ? ( $pag->perPage() > $to ? 1 : ($to - $totReg) + 1 ) : null;
  
         return ['datos' => $datos,
                 'desde' => $from,
                 'hasta' => $to,
-                'por_pagina' => isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? + $tipoDocumentoProyectoS->perPage() : 0,
-                'pagina_actual' => isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? $tipoDocumentoProyectoS->currentPage() : 1,
-                'ultima_pagina' => isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? $tipoDocumentoProyectoS->lastPage() : 0,
-                'total' => isset($tipoDocumentoProyectoS) && $total_tipoDocumentoProyectoS > 0 ? $tipoDocumentoProyectoS->total() : 0];
+                'por_pagina' => isset($pag) && $totReg > 0 ? + $pag->perPage() : 0,
+                'pagina_actual' => isset($pag) && $totReg > 0 ? $pag->currentPage() : 1,
+                'ultima_pagina' => isset($pag) && $totReg > 0 ? $pag->lastPage() : 0,
+                'total' => isset($pag) && $totReg > 0 ? $pag->total() : 0];
     }
  
     public static function cargar($id)
     {
-        $tipoDocumentoProyecto = TipoDocumentoProyecto::find($id);
-        return ['id' => $tipoDocumentoProyecto->id,
-                'nombre' => $tipoDocumentoProyecto->tiDoPrDescripcion,
-                'etapa' => $tipoDocumentoProyecto->tiDoPrEtapa,
-                'requerido' => $tipoDocumentoProyecto->tiDoPrRequerido,
-                'estado' => $tipoDocumentoProyecto->tiDoPrEstado,
-                'usuario_creacion_id' => $tipoDocumentoProyecto->usuario_creacion_id,
-                'usuario_creacion_nombre' => $tipoDocumentoProyecto->usuario_creacion_nombre,
-                'usuario_modificacion_id' => $tipoDocumentoProyecto->usuario_modificacion_id,
-                'usuario_modificacion_nombre' => $tipoDocumentoProyecto->usuario_modificacion_nombre,
-                'fecha_creacion' => (new Carbon($tipoDocumentoProyecto->created_at))->format("Y-m-d H:i:s"),
-                'fecha_modificacion' => (new Carbon($tipoDocumentoProyecto->updated_at))->format("Y-m-d H:i:s")];
+        $regCargar = TipoDocumentoProyecto::find($id);
+        return ['id' => $regCargar->id,
+                'nombre' => $regCargar->tiDoPrDescripcion,
+                'etapa' => $regCargar->tiDoPrEtapa,
+                'requerido' => $regCargar->tiDoPrRequerido,
+                'estado' => $regCargar->tiDoPrEstado,
+                'usuario_creacion_id' => $regCargar->usuario_creacion_id,
+                'usuario_creacion_nombre' => $regCargar->usuario_creacion_nombre,
+                'usuario_modificacion_id' => $regCargar->usuario_modificacion_id,
+                'usuario_modificacion_nombre' => $regCargar->usuario_modificacion_nombre,
+                'fecha_creacion' => (new Carbon($regCargar->created_at))->format("Y-m-d H:i:s"),
+                'fecha_modificacion' => (new Carbon($regCargar->updated_at))->format("Y-m-d H:i:s")];
     }
  
     public static function modificarOCrear($dto)
@@ -124,43 +125,42 @@ class TipoDocumentoProyecto extends Model
         }
  
         // Consultar aplicación
-        $tipoDocumentoProyecto = isset($dto['id']) ? TipoDocumentoProyecto::find($dto['id']) : new TipoDocumentoProyecto();
+        $reg = isset($dto['id']) ? TipoDocumentoProyecto::find($dto['id']) : new TipoDocumentoProyecto();
  
         // Guardar objeto original para auditoria
-        $tipoDocumentoProyectoOriginal = $tipoDocumentoProyecto->toJson();
+        $regOri = $reg->toJson();
  
-        $tipoDocumentoProyecto->fill($dto);
-        $guardado = $tipoDocumentoProyecto->save();
-        if (!$guardado) {
-            throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $tipoDocumentoProyecto);
-        }
+        $reg->fill($dto);
+        $guardado = $reg->save();
+        if (!$guardado) 
+            throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
  
         // Guardar auditoria
-        $auditoriaDto = ['id_recurso' => $tipoDocumentoProyecto->id,
+        $auditoriaDto = ['id_recurso' => $reg->id,
                          'nombre_recurso' => TipoDocumentoProyecto::class,
-                         'descripcion_recurso' => $tipoDocumentoProyecto->tiDoPrDescripcion,
+                         'descripcion_recurso' => $reg->tiDoPrDescripcion,
                          'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
-                         'recurso_original' => isset($dto['id']) ? $tipoDocumentoProyectoOriginal : $tipoDocumentoProyecto->toJson(),
-                         'recurso_resultante' => isset($dto['id']) ? $tipoDocumentoProyecto->toJson() : null];
+                         'recurso_original' => isset($dto['id']) ? $regOri : $reg->toJson(),
+                         'recurso_resultante' => isset($dto['id']) ? $reg->toJson() : null];
  
         AuditoriaTabla::crear($auditoriaDto);
  
-        return TipoDocumentoProyecto::cargar($tipoDocumentoProyecto->id);
+        return TipoDocumentoProyecto::cargar($reg->id);
     }
  
     public static function eliminar($id)
     {
-        $tipoDocumentoProyecto = TipoDocumentoProyecto::find($id);
+        $regEli = TipoDocumentoProyecto::find($id);
  
         // Guardar auditoria
-        $auditoriaDto = ['id_recurso' => $tipoDocumentoProyecto->id,
+        $auditoriaDto = ['id_recurso' => $regEli->id,
                          'nombre_recurso' => TipoDocumentoProyecto::class,
-                         'descripcion_recurso' => $tipoDocumentoProyecto->tiDoPrDescripcion,
+                         'descripcion_recurso' => $regEli->tiDoPrDescripcion,
                          'accion' => AccionAuditoriaEnum::ELIMINAR,
-                         'recurso_original' => $tipoDocumentoProyecto->toJson()];
+                         'recurso_original' => $regEli->toJson()];
         AuditoriaTabla::crear($auditoriaDto);
  
-        return $tipoDocumentoProyecto->delete();
+        return $regEli->delete();
     }
  
     use HasFactory;

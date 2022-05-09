@@ -229,4 +229,17 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Parametros correos
+    Route::group(["prefix" => "parametros-correos"],function(){
+        Route::get('/', [Parametrizacion\ParametroCorreoController::class,'index'])->name('parametros_correos.index');
+        Route::post('/', [Parametrizacion\ParametroCorreoController::class,'store'])->name('parametros_correos.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\ParametroCorreoController::class,'show'])->name('parametros_correos.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\ParametroCorreoController::class,'update'])->name('parametros_correos.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\ParametroCorreoController::class,'destroy'])->name('parametros_correos.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
 });

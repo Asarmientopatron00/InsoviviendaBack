@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Controlador para comunicación entre la vista y el modelo de la funcionalidad de Tipos de gastos.
+ * @author  ASSIS S.A.S
+ *          Jose Alejandro Gutierrez B
+ * @version 06/05/2022/A
+ */
+
 namespace App\Http\Controllers\Parametrizacion;
 
 use Exception;
@@ -12,9 +19,8 @@ use App\Models\Parametrizacion\TipoGasto;
 
 class TipoGastoController extends Controller
 {
-    /**
-    * Display a listing of the resource.
-    *
+   /**
+    * Presenta un listado con la información de la funcionalidad.
     * @param Request $request
     * @return Response
     */
@@ -23,22 +29,23 @@ class TipoGastoController extends Controller
        try {
            $datos = $request->all();
 
-           // Valida entrada de parametros a la funcion
+           // valida entrada de parametros a la funcion
            if (!$request->ligera) {
-               $validator = Validator::make($datos, ['limite' => 'integer|between:1,500']);
-               if ($validator->fails())
-                   return response(get_response_body(format_messages_validator($validator)), Response::HTTP_BAD_REQUEST);
+               $retVal = Validator::make($datos, ['limite' => 'integer|between:1,500']);
+               if ($retVal->fails())
+                   return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
            }
 
+           // captura lista de registros de repositorio tipos_gasto
            if ($request->ligera)
-               $tipGasDescr = TipoGasto::obtenerColeccionLigera($datos);
+               $retLista = TipoGasto::obtenerColeccionLigera($datos);
            else {
                if (isset($datos['ordenar_por']))
                    $datos['ordenar_por'] = format_order_by_attributes($datos);
-               $tipGasDescr = TipoGasto::obtenerColeccion($datos);
+               $retLista = TipoGasto::obtenerColeccion($datos);
            }
 
-           return response($tipGasDescr, Response::HTTP_OK);
+           return response($retLista, Response::HTTP_OK);
        }
        catch(Exception $e)
        {
@@ -47,8 +54,7 @@ class TipoGastoController extends Controller
    }
 
    /**
-    * Store a newly created resource in storage.
-    *
+    * Almacena o crea un registro en el repositorio de la funcionalidad.
     * @param  \Illuminate\Http\Request  $request
     * @return \Illuminate\Http\Response
     */
@@ -56,18 +62,18 @@ class TipoGastoController extends Controller
    {
        DB::beginTransaction(); // Se abre la transaccion
        try {
+           // realiza validaciones generales de datos para el repositorio tipos_gasto
            $datos = $request->all();
-           $validator = Validator::make($datos, ['tipGasDescripcion' => 'string|required|max:128',
-                                                 'tipGasEstado' => 'boolean|required']);
+           $retVal = Validator::make($datos, ['tipGasDescripcion' => 'string|required|max:128',
+                                              'tipGasEstado' => 'boolean|required']);
+           if ($retVal->fails())
+               return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
-           if ($validator->fails())
-               return response(get_response_body(format_messages_validator($validator)), Response::HTTP_BAD_REQUEST);
-
-           $tipGasDescr = TipoGasto::modificarOCrear($datos);
-
-           if ($tipGasDescr) {
+           // inserta registro en repositorio tipos_gasto
+           $regCre = TipoGasto::modificarOCrear($datos);
+           if ($regCre) {
                DB::commit(); // Se cierra la transaccion correctamente
-               return response(get_response_body(["Tipo de gasto, ha sido creado.", 2], $tipGasDescr), Response::HTTP_CREATED);
+               return response(get_response_body(["Tipo de gasto, ha sido creado.", 2], $regCre), Response::HTTP_CREATED);
            }
            else {
                DB::rollback(); // Se devuelven los cambios, por que la transaccion falla
@@ -82,20 +88,20 @@ class TipoGastoController extends Controller
    }
 
    /**
-    * Display the specified resource.
-    *
+    * Presenta la informaci�n de un registro especifico de la funcionalidad.
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
    public function show($id)
    {
        try {
+           // verifica la existencia del id de registro en el repositorio tipos_gasto
            $datos['id'] = $id;
-           $validator = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id']);
+           $retVal = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id']);
+           if ($retVal->fails())
+               return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
-           if ($validator->fails())
-               return response(get_response_body(format_messages_validator($validator)), Response::HTTP_BAD_REQUEST);
-
+           // captura y retorna el detalle de registro del repositorio tipos_gasto
            return response(TipoGasto::cargar($id), Response::HTTP_OK);
        }
        catch (Exception $e)
@@ -105,8 +111,7 @@ class TipoGastoController extends Controller
    }
 
    /**
-    * Show the form for editing the specified resource.
-    *
+    * Presenta el formulario para actualizar el registro especifico de la funcionalidad.
     * @param  \Illuminate\Http\Request  $request
     * @param  int  $id
     * @return \Illuminate\Http\Response
@@ -115,19 +120,20 @@ class TipoGastoController extends Controller
    {
        DB::beginTransaction(); // Se abre la transaccion
        try {
+           // verifica la existencia del id de registro y realiza validaciones a los campos para actualizar el repositorio tipos_gasto
            $datos = $request->all();
            $datos['id'] = $id;
-           $validator = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id',
-                                                 'tipGasDescripcion' => 'string|required|max:128',
-                                                 'tipGasEstado' => 'boolean|required']);
+           $retVal = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id',
+                                              'tipGasDescripcion' => 'string|required|max:128',
+                                              'tipGasEstado' => 'boolean|required']);
+           if ($retVal->fails())
+               return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
-           if ($validator->fails())
-               return response(get_response_body(format_messages_validator($validator)), Response::HTTP_BAD_REQUEST);
-
-           $tipGasDescr = TipoGasto::modificarOCrear($datos);
-           if ($tipGasDescr) {
+           // actualiza/modifica registro en repositorio tipos_gasto
+           $regMod = TipoGasto::modificarOCrear($datos);
+           if ($regMod) {
                DB::commit(); // Se cierra la transaccion correctamente
-               return response(get_response_body(["Tipo de gasto, ha sido modificado.", 1], $tipGasDescr), Response::HTTP_OK);
+               return response(get_response_body(["Tipo de gasto, ha sido modificado.", 1], $regMod), Response::HTTP_OK);
            }
            else {
                DB::rollback(); // Se devuelven los cambios, por que la transaccion falla
@@ -142,8 +148,7 @@ class TipoGastoController extends Controller
    }
 
    /**
-    * Remove the specified resource from storage.
-    *
+    * Elimina un registro especifico de la funcionalidad.
     * @param  int  $id
     * @return \Illuminate\Http\Response
     */
@@ -151,14 +156,15 @@ class TipoGastoController extends Controller
    {
        DB::beginTransaction(); // Se abre la transaccion
        try {
+           // verifica la existencia del id de registro en el repositorio tipos_gasto
            $datos['id'] = $id;
-           $validator = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id']);
+           $retVal = Validator::make($datos, ['id' => 'integer|required|exists:tipos_gasto,id']);
+           if ($retVal->fails())
+               return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
-           if ($validator->fails())
-               return response(get_response_body(format_messages_validator($validator)), Response::HTTP_BAD_REQUEST);
-
-           $eliminado = TipoGasto::eliminar($id);
-           if ($eliminado){
+           // elimina registro en repositorio tipos_gasto
+           $regEli = TipoGasto::eliminar($id);
+           if ($regEli){
                DB::commit(); // Se cierra la transaccion correctamente
                return response(get_response_body(["Tipo de gasto, ha sido eliminado.", 3]), Response::HTTP_OK);
            }
