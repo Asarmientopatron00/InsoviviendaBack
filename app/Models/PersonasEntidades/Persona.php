@@ -208,6 +208,7 @@ class Persona extends Model
             ->select(
                 'id',
                 'personasIdentificacion',
+                'personasEstadoRegistro AS estado',
                 DB::Raw(
                     "CONCAT(
                         IFNULL(CONCAT(personasNombres), ''),

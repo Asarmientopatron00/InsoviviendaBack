@@ -121,7 +121,7 @@ class Familia extends Model
             );
 
         if(isset($dto['identificacion'])){
-            $query->where('familias.identificacion_persona', 'like', '%' . $dto['nombre'] . '%');
+            $query->where('familias.identificacion_persona', 'like', '%' . $dto['identificacion'] . '%');
         }
 
         if(isset($dto['estado'])){
