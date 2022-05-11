@@ -122,6 +122,12 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:ListarAuditorias']);
     });
 
+    // Auditoria Proceso
+    Route::group(["prefix" => "auditoria-procesos"],function(){
+        Route::get('/', [Seguridad\AuditoriaProcesoController::class,'index'])->name('auditoria-procesos.index');
+            // ->middleware(['permission:ListarAuditorias']);
+    });
+
     // ---------------------- Personas/Entidades -------------------------- //
 
     // Personas
