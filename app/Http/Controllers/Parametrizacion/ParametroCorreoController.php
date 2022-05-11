@@ -67,7 +67,7 @@ class ParametroCorreoController extends Controller
            // realiza validaciones generales de datos para el repositorio parametros_correos
            $retVal = Validator::make($datos, ['nombre' => 'string|required|max:128',
                                               'asunto' => 'string|required|max:128',
-                                              'texto' => 'text|required',
+                                              'texto' => 'string|required',
                                               'parametros' => 'string|required|max:128',
                                               'estado' => 'boolean|required']);
            if ($retVal->fails())
@@ -132,7 +132,7 @@ class ParametroCorreoController extends Controller
            $retVal = Validator::make($datos, ['id' => 'integer|required|exists:parametros_correos,id',
                                               'nombre' => 'string|required|max:128',
                                               'asunto' => 'string|required|max:128',
-                                              'texto' => 'text|required',
+                                              'texto' => 'string|required',
                                               'parametros' => 'string|required|max:128',
                                               'estado' => 'boolean|required']);
            if ($retVal->fails())

@@ -106,11 +106,11 @@ class TipoDonacion extends Model
 
         if (!isset($dto['id'])) {
             $dto['usuario_creacion_id'] = $usuario->id ?? ($dto['usuario_creacion_id'] ?? null);
-            $dto['usuario_creacion_nombre'] = $usuario-nombre ?? ($dto['usuario_creacion_nombre'] ?? null);
+            $dto['usuario_creacion_nombre'] = $usuario->nombre ?? ($dto['usuario_creacion_nombre'] ?? null);
         }
         if (isset($usuario) || isset($dto['usuario_modificacion_d'])) {
             $dto['usuario_modificacion_id'] = $usuario->id ?? ($dto['usuario_modificacion_id'] ?? null);
-            $dto['usuario_modificacion_nombre'] = $usuario->nmbre ?? ($dto['usuario_modificacion_nombre'] ?? null);
+            $dto['usuario_modificacion_nombre'] = $usuario->nombre ?? ($dto['usuario_modificacion_nombre'] ?? null);
         }
 
        // Consultar aplicacin
