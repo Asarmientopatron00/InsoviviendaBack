@@ -885,6 +885,34 @@ class Persona extends Model
         ];
         
         AuditoriaTabla::crear($auditoriaDto);
+
+        // --- Para proceso de Calculo Aportes Familia ---
+
+        $registroInicial = json_decode($personaOriginal);
+        if(!isset($dto['id'])&&isset($dto['familia_id'])){
+            Familia::calcularAportes($dto);
+        } else if (isset($dto['id'])){
+            $data['usuario_creacion_id'] = $usuario->id;
+            $data['usuario_creacion_nombre'] = $usuario->nombre;
+            if(isset($dto['familia_id'])){
+                $dto['usuario_creacion_id'] = $usuario->id;
+                $dto['usuario_creacion_nombre'] = $usuario->nombre;
+                if($registroInicial->familia_id){
+                    $data['familia_id'] = $registroInicial->familia_id;
+                    if($registroInicial->familia_id==$dto['familia_id']){
+                        Familia::calcularAportes($dto);
+                    } else {
+                        Familia::calcularAportes($dto);
+                        Familia::calcularAportes($data);
+                    }
+                } else {
+                    Familia::calcularAportes($dto);
+                }
+            } else if ($registroInicial->familia_id){
+                $data['familia_id'] = $registroInicial->familia_id;
+                Familia::calcularAportes($data);
+            }
+        }
         
         // return Persona::cargar($persona->id);
         return $persona;
@@ -892,6 +920,8 @@ class Persona extends Model
 
     public static function eliminar($id)
     {
+        $user = Auth::user();
+        $usuario = $user->usuario();
         $persona = Persona::find($id);
 
         // Guardar auditoria
@@ -903,6 +933,13 @@ class Persona extends Model
             'recurso_original' => $persona->toJson()
         ];
         AuditoriaTabla::crear($auditoriaDto);
+
+        if($persona->familia_id){
+            $dto['usuario_creacion_id'] = $usuario->id;
+            $dto['usuario_creacion_nombre'] = $usuario->nombre;
+            $dto['familia_id'] = $persona->familia_id;
+            Familia::calcularAportes($dto);
+        }
 
         return $persona->delete();
     }

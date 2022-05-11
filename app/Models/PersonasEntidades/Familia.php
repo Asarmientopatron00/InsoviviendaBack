@@ -350,5 +350,20 @@ class Familia extends Model
         return $familia->delete();
     }
 
+    public static function calcularAportes($dto){
+        $familiaId = $dto['familia_id'];
+        $transaccion = 'CalcularAportesFamilia';
+        $usuarioId = $dto['usuario_creacion_id'];
+        $usuario = $dto['usuario_creacion_nombre'];
+        $procedure = DB::select(
+            'CALL SP_FamiliasCalcularAportes(?,?,?,?)', 
+            array(
+                $familiaId, 
+                $transaccion,
+                $usuario,
+                $usuarioId
+            ));
+    }
+
     use HasFactory;
 }
