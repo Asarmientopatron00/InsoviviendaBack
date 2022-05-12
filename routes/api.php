@@ -210,8 +210,8 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
-    // Tipos Asesorias
-    Route::group(["prefix" => "orientador"],function(){
+    // Tipos orientador
+    Route::group(["prefix" => "orientadores"],function(){
         Route::get('/', [PersonasEntidades\OrientadorController::class,'index'])->name('orientadores.index');
         Route::post('/', [PersonasEntidades\OrientadorController::class,'store'])->name('orientadores.store');
             // ->middleware(['permission:CrearAplicacion']);

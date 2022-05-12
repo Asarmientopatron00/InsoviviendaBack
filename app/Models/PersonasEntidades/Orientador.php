@@ -52,8 +52,8 @@ class Orientador extends Model
                 'updated_at AS fecha_modificacion',
             );
 
-        if(isset($dto['identificacion'])){
-            $query->where('orientadoresIdentificacion', 'like', '%' . $dto['identificacion'] . '%');
+        if(isset($dto['nombre'])){
+            $query->where('orientadoresNombre', 'like', '%' . $dto['nombre'] . '%');
         }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
