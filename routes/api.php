@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\Seguridad;
 use App\Http\Controllers\PersonasEntidades;
 use App\Http\Controllers\Parametrizacion;
+use App\Http\Controllers\Proyectos;
 
 /*
 |--------------------------------------------------------------------------
@@ -170,7 +171,6 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
-        // ---------------------- Parametrizacion -------------------------- //
     // Tipos Parentesco
     Route::group(["prefix" => "tipos-parentesco"],function(){
         Route::get('/', [Parametrizacion\TipoParentescoController::class,'index'])->name('tipos_parentesco.index');
@@ -222,6 +222,7 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [PersonasEntidades\OrientadorController::class,'destroy'])->name('orientadores.delete');
     });
     
+    // Estados Civil
     Route::group(["prefix" => "estados-civil"],function(){
         Route::get('/', [Parametrizacion\EstadoCivilController::class,'index'])->name('estado_civil.index');
         Route::post('/', [Parametrizacion\EstadoCivilController::class,'store'])->name('estado_civil.store');
@@ -234,6 +235,7 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Grado Escolaridad
     Route::group(["prefix" => "grado-escolaridad"],function(){
         Route::get('/', [Parametrizacion\GradoEscolaridadController::class,'index'])->name('grado_escolaridad.index');
         Route::post('/', [Parametrizacion\GradoEscolaridadController::class,'store'])->name('grado_escolaridad.store');
@@ -246,6 +248,7 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Ocupaciones
     Route::group(["prefix" => "ocupaciones"],function(){
         Route::get('/', [Parametrizacion\OcupacionController::class,'index'])->name('Ocupaciones.index');
         Route::post('/', [Parametrizacion\OcupacionController::class,'store'])->name('Ocupaciones.store');
@@ -258,6 +261,7 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Eps
     Route::group(["prefix" => "eps"],function(){
         Route::get('/', [Parametrizacion\EpsController::class,'index'])->name('eps.index');
         Route::post('/', [Parametrizacion\EpsController::class,'store'])->name('eps.store');
@@ -270,6 +274,7 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Tipos Familia
     Route::group(["prefix" => "tipos-familia"],function(){
         Route::get('/', [Parametrizacion\TipoFamiliaController::class,'index'])->name('tiposFamilia.index');
         Route::post('/', [Parametrizacion\TipoFamiliaController::class,'store'])->name('tiposFamilia.store');
@@ -372,4 +377,17 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // ---------------------- Proyectos -------------------------- //
+     // Parametros correos
+     Route::group(["prefix" => "proyectos"],function(){
+        Route::get('/', [Proyectos\ProyectoController::class,'index'])->name('proyectos.index');
+        Route::post('/', [Proyectos\ProyectoController::class,'store'])->name('proyectos.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Proyectos\ProyectoController::class,'show'])->name('proyectos.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Proyectos\ProyectoController::class,'update'])->name('proyectos.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Proyectos\ProyectoController::class,'destroy'])->name('proyectos.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
 });
