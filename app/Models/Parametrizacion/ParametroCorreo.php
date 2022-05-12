@@ -52,6 +52,9 @@ class ParametroCorreo extends Model
         if (isset($dto['nombre']))
             $query->where('nombre', 'like', '%' . $dto['nombre'] . '%');
 
+        if (isset($dto['asunto']))
+            $query->where('asunto', 'like', '%' . $dto['asunto'] . '%');
+
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
             foreach ($dto['ordenar_por'] as $attribute => $value){
                 if ($attribute == 'nombre')
