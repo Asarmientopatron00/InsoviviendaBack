@@ -302,13 +302,26 @@ Route::group(['middleware' => ['auth:api']], function (){
     // Formas de pago
     Route::group(["prefix" => "formas-pago"],function(){
         Route::get('/', [Parametrizacion\FormaPagoController::class,'index'])->name('formas_pago.index');
-        Route::post('/', [Parametrizacion\TipoGastoController::class,'store'])->name('formas_pago.store');
+        Route::post('/', [Parametrizacion\FormaPagoController::class,'store'])->name('formas_pago.store');
             // ->middleware(['permission:CrearAplicacion']);
         Route::get('/{id}', [Parametrizacion\FormaPagoController::class,'show'])->name('formas_pago.show');
             // ->middleware(['permission:ListarAplicacion']);
         Route::put('/{id}', [Parametrizacion\FormaPagoController::class,'update'])->name('formas_pago.update');
             // ->middleware(['permission:ModificarAplicacion']);
         Route::delete('/{id}', [Parametrizacion\FormaPagoController::class,'destroy'])->name('formas_pago.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Parametros correos
+    Route::group(["prefix" => "parametros-correo"],function(){
+        Route::get('/', [Parametrizacion\ParametroCorreoController::class,'index'])->name('parametros_correo.index');
+        Route::post('/', [Parametrizacion\ParametroCorreoController::class,'store'])->name('parametros_correo.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\ParametroCorreoController::class,'show'])->name('parametros_correo.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\ParametroCorreoController::class,'update'])->name('parametros_correo.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\ParametroCorreoController::class,'destroy'])->name('parametros_correo.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
@@ -325,16 +338,16 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
-    // Tipos de gasto
-    Route::group(["prefix" => "tipos-gasto"],function(){
-        Route::get('/', [Parametrizacion\TipoGastoController::class,'index'])->name('tipos_gasto.index');
-        Route::post('/', [Parametrizacion\TipoGastoController::class,'store'])->name('tipos_gasto.store');
+    // Tipos documentos proyectos
+    Route::group(["prefix" => "tipos_documentos_proyecto"],function(){
+        Route::get('/', [Parametrizacion\TipoDocumentoProyectoController::class,'index'])->name('tipos_documentos_proyecto.index');
+        Route::post('/', [Parametrizacion\TipoDocumentoProyectoController::class,'store'])->name('tipos_documentos_proyecto.store');
             // ->middleware(['permission:CrearAplicacion']);
-        Route::get('/{id}', [Parametrizacion\TipoGastoController::class,'show'])->name('tipos_gasto.show');
+        Route::get('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'show'])->name('tipos_documentos_proyecto.show');
             // ->middleware(['permission:ListarAplicacion']);
-        Route::put('/{id}', [Parametrizacion\TipoGastoController::class,'update'])->name('tipos_gasto.update');
+        Route::put('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'update'])->name('tipos_documentos_proyecto.update');
             // ->middleware(['permission:ModificarAplicacion']);
-        Route::delete('/{id}', [Parametrizacion\TipoGastoController::class,'destroy'])->name('tipos_gasto.delete');
+        Route::delete('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'destroy'])->name('tipos_documentos_proyecto.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
@@ -351,29 +364,16 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
-    // Tipos documentos proyectos
-    Route::group(["prefix" => "tipo-documento-proyecto"],function(){
-        Route::get('/', [Parametrizacion\TipoDocumentoProyectoController::class,'index'])->name('tipo_documento_proyecto.index');
-        Route::post('/', [Parametrizacion\TipoDocumentoProyectoController::class,'store'])->name('tipo_documento_proyecto.store');
+    // Tipos de gasto
+    Route::group(["prefix" => "tipos-gasto"],function(){
+        Route::get('/', [Parametrizacion\TipoGastoController::class,'index'])->name('tipos_gasto.index');
+        Route::post('/', [Parametrizacion\TipoGastoController::class,'store'])->name('tipos_gasto.store');
             // ->middleware(['permission:CrearAplicacion']);
-        Route::get('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'show'])->name('tipo_documento_proyecto.show');
+        Route::get('/{id}', [Parametrizacion\TipoGastoController::class,'show'])->name('tipos_gasto.show');
             // ->middleware(['permission:ListarAplicacion']);
-        Route::put('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'update'])->name('tipo_documento_proyecto.update');
+        Route::put('/{id}', [Parametrizacion\TipoGastoController::class,'update'])->name('tipos_gasto.update');
             // ->middleware(['permission:ModificarAplicacion']);
-        Route::delete('/{id}', [Parametrizacion\TipoDocumentoProyectoController::class,'destroy'])->name('tipo_documento_proyecto.delete');
-            // ->middleware(['permission:EliminarAplicacion']);
-    });
-
-    // Parametros correos
-    Route::group(["prefix" => "parametros-correos"],function(){
-        Route::get('/', [Parametrizacion\ParametroCorreoController::class,'index'])->name('parametros_correos.index');
-        Route::post('/', [Parametrizacion\ParametroCorreoController::class,'store'])->name('parametros_correos.store');
-            // ->middleware(['permission:CrearAplicacion']);
-        Route::get('/{id}', [Parametrizacion\ParametroCorreoController::class,'show'])->name('parametros_correos.show');
-            // ->middleware(['permission:ListarAplicacion']);
-        Route::put('/{id}', [Parametrizacion\ParametroCorreoController::class,'update'])->name('parametros_correos.update');
-            // ->middleware(['permission:ModificarAplicacion']);
-        Route::delete('/{id}', [Parametrizacion\ParametroCorreoController::class,'destroy'])->name('parametros_correos.delete');
+        Route::delete('/{id}', [Parametrizacion\TipoGastoController::class,'destroy'])->name('tipos_gasto.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
 

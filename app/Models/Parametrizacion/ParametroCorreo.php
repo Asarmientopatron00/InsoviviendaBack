@@ -142,7 +142,7 @@ class ParametroCorreo extends Model
         // Guardar auditoria
         $auditoriaDto = ['id_recurso' => $reg->id,
                          'nombre_recurso' => ParametroCorreo::class,
-                         'descripcion_recurso' => $reg->tiDoPrDescripcion,
+                         'descripcion_recurso' => $reg->nombre,
                          'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
                          'recurso_original' => isset($dto['id']) ? $regOri : $reg->toJson(),
                          'recurso_resultante' => isset($dto['id']) ? $reg->toJson() : null];
@@ -159,7 +159,7 @@ class ParametroCorreo extends Model
         // Guardar auditoria
         $auditoriaDto = ['id_recurso' => $regEli->id,
                         'nombre_recurso' => ParametroCorreo::class,
-                        'descripcion_recurso' => $regEli->tiDoPrDescripcion,
+                        'descripcion_recurso' => $regEli->nombre,
                         'accion' => AccionAuditoriaEnum::ELIMINAR,
                         'recurso_original' => $regEli->toJson()];
         AuditoriaTabla::crear($auditoriaDto);
