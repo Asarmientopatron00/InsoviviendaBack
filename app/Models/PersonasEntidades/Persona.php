@@ -373,6 +373,9 @@ class Persona extends Model
                 if($attribute == 'personasCategoriaAportes'){
                     $query->orderBy('personas.personasCategoriaAportes', $value);
                 }
+                if($attribute == 'nombre'){
+                    $query->orderBy('personas.personasNombres', $value);
+                }
                 if($attribute == 'personasFechaNacimiento'){
                     $query->orderBy('personas.personasFechaNacimiento', $value);
                 }
