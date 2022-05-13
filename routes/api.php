@@ -151,4 +151,82 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Paises
+    Route::group(["prefix" => "paises"],function(){
+        Route::get('/', [Parametrizacion\PaisController::class,'index'])->name('pais-index');
+        Route::post('/', [Parametrizacion\PaisController::class,'store'])->name('pais-store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\PaisController::class,'show'])->name('pais-show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\PaisController::class,'update'])->name('pais-update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\PaisController::class,'destroy'])->name('pais-delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+     // Departamentos
+     Route::group(["prefix" => "departamentos"],function(){
+        Route::get('/', [Parametrizacion\DepartamentoController::class,'index'])->name('departamento-index');
+        Route::post('/', [Parametrizacion\DepartamentoController::class,'store'])->name('departamento-store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\DepartamentoController::class,'show'])->name('departamento-show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\DepartamentoController::class,'update'])->name('departamento-update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\DepartamentoController::class,'destroy'])->name('departamento-delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Ciudades
+    Route::group(["prefix" => "ciudades"],function(){
+        Route::get('/', [Parametrizacion\CiudadController::class,'index'])->name('ciudad-index');
+        Route::post('/', [Parametrizacion\CiudadController::class,'store'])->name('ciudad-store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\CiudadController::class,'show'])->name('ciudad-show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\CiudadController::class,'update'])->name('ciudad-update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\CiudadController::class,'destroy'])->name('ciudad-delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // barrios
+    Route::group(["prefix" => "comunas"],function(){
+        Route::get('/', [Parametrizacion\ComunaController::class,'index'])->name('comuna-index');
+        Route::post('/', [Parametrizacion\ComunaController::class,'store'])->name('comuna-store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\ComunaController::class,'show'])->name('comuna-show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\ComunaController::class,'update'])->name('comuna-update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\ComunaController::class,'destroy'])->name('comuna-delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Barrios
+    Route::group(["prefix" => "barrios"],function(){
+        Route::get('/', [Parametrizacion\BarrioController::class,'index'])->name('barrio-index');
+        Route::post('/', [Parametrizacion\BarrioController::class,'store'])->name('barrio-store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\BarrioController::class,'show'])->name('barrio-show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\BarrioController::class,'update'])->name('barrio-update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\BarrioController::class,'destroy'])->name('barrio-delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Tipos Programa
+    Route::group(["prefix" => "tipos-programa"],function(){
+        Route::get('/', [Parametrizacion\TipoProgramaController::class,'index'])->name('tipos_programa.index');
+        Route::post('/', [Parametrizacion\TipoProgramaController::class,'store'])->name('tipos_programa.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoProgramaController::class,'show'])->name('tipos_programa.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoProgramaController::class,'update'])->name('tipos_programa.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoProgramaController::class,'destroy'])->name('tipos_programa.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
 });
