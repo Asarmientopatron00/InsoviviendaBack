@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers\Parametrizacion;
 
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Parametrizacion\Departamento;
 
 class DepartamentoController extends Controller
@@ -11,21 +15,38 @@ class DepartamentoController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        try{
+            $datos = $request->all();
+            if(!$request->ligera){
+                $validator = Validator::make($datos, [
+                    'limite' => 'integer|between:1,500'
+                ]);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+                if($validator->fails()) {
+                    return response(
+                        get_response_body(format_messages_validator($validator))
+                        , Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+
+            if($request->ligera){
+                $departamento = Departamento::obtenerColeccionLigera($datos);
+            }else{
+                if(isset($datos['ordenar_por'])){
+                    $datos['ordenar_por'] = format_order_by_attributes($datos);
+                }
+                $departamento = Departamento::obtenerColeccion($datos);
+            }
+            return response($departamento, Response::HTTP_OK);
+        }catch(Exception $e){
+            return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -36,51 +57,147 @@ class DepartamentoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try {
+            $datos = $request->all();
+            $validator = Validator::make($datos, [
+                'departamentosDescripcion' => 'string|required|min:3|max:128|',
+                'pais_id' => 'required|integer|exists:paises,id',
+                'departamentosEstado' => 'boolean|required'
+            ]);
+
+            if ($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $aplicacion = Departamento::modificarOCrear($datos);
+            
+            if ($aplicacion) {
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El departamento ha sido creado.", 2], $aplicacion),
+                    Response::HTTP_CREATED
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar crear el departamento."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Parametrizacion\Departamento  $departamento
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Departamento $departamento)
+    public function show($id)
     {
-        //
-    }
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:Departamentos,id'
+            ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Parametrizacion\Departamento  $departamento
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Departamento $departamento)
-    {
-        //
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            return response(Departamento::cargar($id), Response::HTTP_OK);
+        }catch (Exception $e){
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Parametrizacion\Departamento  $departamento
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Departamento $departamento)
+    public function update(Request $request, $id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos = $request->all();
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:Departamentos,id',
+                'departamentosDescripcion' => 'string|required|min:3|max:128|',
+                'pais_id' => 'required|integer|exists:paises,id',
+                'departamentosEstado' => 'boolean|required'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $aplicacion = Departamento::modificarOCrear($datos);
+            if($aplicacion){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El departamento ha sido modificado.", 1], $aplicacion),
+                    Response::HTTP_OK
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar modificar el departamento."]), Response::HTTP_CONFLICT);;
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(get_response_body([$e->getMessage()]), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Parametrizacion\Departamento  $departamento
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Departamento $departamento)
+    public function destroy($id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:Departamentos,id'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $eliminado = Departamento::eliminar($id);
+            if($eliminado){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["El departamento ha sido eliminado.", 3]),
+                    Response::HTTP_OK
+                );
+            }else{
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar eliminar el departamento."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
