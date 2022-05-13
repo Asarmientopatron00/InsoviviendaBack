@@ -192,7 +192,7 @@ class Proyecto extends Model
             );
 
         if(isset($dto['solicitante'])){
-            $query->where('proyectos.persona_id', $dto['solicitante']);
+            $query->where('personas.personasIdentificacion', 'like', '%' . $dto['solicitante'] . '%');
         }
         if(isset($dto['tipo'])){
             $query->where('proyectos.proyectosTipoProyecto', $dto['tipo']);
