@@ -29,8 +29,8 @@ class Orientador extends Model
         $query = DB::table('orientadores')
             ->select(
                 'id',
-                'orientadoresIdentificacion AS Identificacion',
-                'orientadoresNombre AS Nombre',
+                'orientadoresIdentificacion AS identificacion',
+                'orientadoresNombre AS nombre',
                 'orientadoresEstado AS estado',
             );
         $query->orderBy('orientadoresIdentificacion', 'asc');

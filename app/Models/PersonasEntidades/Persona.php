@@ -207,7 +207,7 @@ class Persona extends Model
         $query = DB::table('personas')
             ->select(
                 'id',
-                'personasIdentificacion',
+                'personasIdentificacion As identificacion',
                 'personasEstadoRegistro AS estado',
                 DB::Raw(
                     "CONCAT(
