@@ -108,7 +108,7 @@ class EstadoCivil extends Model
         $estadoCivil = EstadoCivil::find($id);
         return [
             'id' => $estadoCivil->id,
-            'nombre' => $estadoCivil->estCivDescricion,
+            'nombre' => $estadoCivil->estCivDescripcion,
             'estado' => $estadoCivil->estCivEstado,
             'usuario_creacion_id' => $estadoCivil->usuario_creacion_id,
             'usuario_creacion_nombre' => $estadoCivil->usuario_creacion_nombre,
