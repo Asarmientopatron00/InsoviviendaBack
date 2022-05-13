@@ -105,6 +105,13 @@ class PersonaController extends Controller
                         $query->where('estCivEstado', 1);
                     }),
                 ],
+                'tipo_parentesco_id' => [
+                    'integer',
+                    'required',
+                    Rule::exists('tipos_parentesco','id')->where(function ($query) {
+                        $query->where('tipParEstado', 1);
+                    }),
+                ],
                 'tipo_poblacion_id' => [
                     'integer',
                     'required',
@@ -288,6 +295,7 @@ class PersonaController extends Controller
                     'departamento_nacimiento_id.exists'=>'El departamento seleccionado no existe o está en estado inactivo',
                     'ciudad_nacimiento_id.exists'=>'La ciudad seleccionada no existe o está en estado inactivo',
                     'estado_civil_id.exists'=>'El estado civil seleccionado no existe o está en estado inactivo',
+                    'tipo_parentesco_id.exists'=>'El tipo de parentesco seleccionado no existe o está en estado inactivo',
                     'tipo_poblacion_id.exists'=>'El tipo de poblacion seleccionado no existe o está en estado inactivo',
                     'tipo_discapacidad_id.exists'=>'El tipo de discapacidad seleccionado no existe o está en estado inactivo',
                     'eps_id.exists'=>'La EPS seleccionada no existe o está en estado inactivo',
@@ -357,7 +365,7 @@ class PersonaController extends Controller
 
             return response(Persona::cargar($id), Response::HTTP_OK);
         }catch (Exception $e){
-            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -417,6 +425,13 @@ class PersonaController extends Controller
                     'required',
                     Rule::exists('estados_civil','id')->where(function ($query) {
                         $query->where('estCivEstado', 1);
+                    }),
+                ],
+                'tipo_parentesco_id' => [
+                    'integer',
+                    'required',
+                    Rule::exists('tipos_parentesco','id')->where(function ($query) {
+                        $query->where('tipParEstado', 1);
                     }),
                 ],
                 'tipo_poblacion_id' => [
@@ -602,6 +617,7 @@ class PersonaController extends Controller
                     'departamento_nacimiento_id.exists'=>'El departamento seleccionado no existe o está en estado inactivo',
                     'ciudad_nacimiento_id.exists'=>'La ciudad seleccionada no existe o está en estado inactivo',
                     'estado_civil_id.exists'=>'El estado civil seleccionado no existe o está en estado inactivo',
+                    'tipo_parentesco_id.exists'=>'El tipo de parentesco seleccionado no existe o está en estado inactivo',
                     'tipo_poblacion_id.exists'=>'El tipo de poblacion seleccionado no existe o está en estado inactivo',
                     'tipo_discapacidad_id.exists'=>'El tipo de discapacidad seleccionado no existe o está en estado inactivo',
                     'eps_id.exists'=>'La EPS seleccionada no existe o está en estado inactivo',
