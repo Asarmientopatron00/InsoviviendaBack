@@ -31,6 +31,7 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
         ->join('departamentos AS departamento_nacimiento','departamento_nacimiento.id','=','personas.departamento_nacimiento_id')
         ->join('ciudades AS ciudad_nacimiento','ciudad_nacimiento.id','=','personas.ciudad_nacimiento_id')
         ->join('estados_civil','estados_civil.id','=','personas.estado_civil_id')
+        ->join('tipos_parentesco','tipos_parentesco.id','=','personas.tipo_parentesco_id')
         ->join('tipos_poblacion','tipos_poblacion.id','=','personas.tipo_poblacion_id')
         ->join('tipos_discapacidad','tipos_discapacidad.id','=','personas.tipo_discapacidad_id')
         ->join('eps','eps.id','=','personas.eps_id')
@@ -78,16 +79,7 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
                     ELSE "" END AS personasGenero'
             ),
             'estados_civil.estCivDescripcion',
-            DB::Raw('CASE personas.personasParentesco
-                    WHEN "PA" THEN "Padre"
-                    WHEN "MA" THEN "Madre"
-                    WHEN "TI" THEN "Tio(a)"
-                    WHEN "AB" THEN "Abuelo(a)"
-                    WHEN "HE" THEN "Hermano(a)"
-                    WHEN "PR" THEN "Primo(a)"
-                    WHEN "OT" THEN "Otro"
-                    ELSE "" END AS personasParentesco'
-            ),
+            'tipos_parentesco.tipParDescripcion',
             'tipos_poblacion.tipPobDescripcion',
             'tipos_discapacidad.tipDisDescripcion',
             DB::Raw('CASE personas.personasSeguridadSocial
@@ -227,7 +219,56 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
         );
 
         if(isset($this->dto['nombre'])){
-            $query->where('personas.personasNombres', 'like', '%' . $this->dto['nombre'] . '%');
+            $arrayNames = explode(' ', $this->dto['nombre']);
+            $long = count($arrayNames);
+            if($long===1){
+                $query->orWhere('personas.personasNombres', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasPrimerApellido', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasSegundoApellido', 'like', '%' . $arrayNames[0] . '%');
+            }
+            if($long===2){
+                $query->orWhere('personas.personasNombres', 'like', '%'.$arrayNames[0].' '.$arrayNames[1].'%');
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+            }
+            if($long===3){
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+            }
+            if($long===4){
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ',
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+            }
         }
         if(isset($this->dto['identificacion'])){
             $query->where('personas.personasIdentificacion', 'like', '%' . $this->dto['identificacion'] . '%');
@@ -237,9 +278,6 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
         }
         if(isset($this->dto['estado'])){
             $query->where('personas.personasEstadoRegistro', $this->dto['estado']);
-        }
-        if(isset($this->dto['primerApellido'])){
-            $query->where('personas.personasPrimerApellido', 'like', '%' . $this->dto['primerApellido'] . '%');
         }
         if(isset($this->dto['familia'])){
             $query->where('personas.familia_id', $this->dto['familia']);

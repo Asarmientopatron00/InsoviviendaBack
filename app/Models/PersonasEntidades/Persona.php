@@ -359,7 +359,56 @@ class Persona extends Model
             );
 
         if(isset($dto['nombre'])){
-            $query->where('personas.personasNombres', 'like', '%' . $dto['nombre'] . '%');
+            $arrayNames = explode(' ', $dto['nombre']);
+            $long = count($arrayNames);
+            if($long===1){
+                $query->orWhere('personas.personasNombres', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasPrimerApellido', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasSegundoApellido', 'like', '%' . $arrayNames[0] . '%');
+            }
+            if($long===2){
+                $query->orWhere('personas.personasNombres', 'like', '%'.$arrayNames[0].' '.$arrayNames[1].'%');
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+            }
+            if($long===3){
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+            }
+            if($long===4){
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ',
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+            }
         }
         if(isset($dto['identificacion'])){
             $query->where('personas.personasIdentificacion', 'like', '%' . $dto['identificacion'] . '%');
@@ -369,9 +418,6 @@ class Persona extends Model
         }
         if(isset($dto['estado'])){
             $query->where('personas.personasEstadoRegistro', $dto['estado']);
-        }
-        if(isset($dto['primerApellido'])){
-            $query->where('personas.personasPrimerApellido', 'like', '%' . $dto['primerApellido'] . '%');
         }
         if(isset($dto['familia'])){
             $query->where('personas.familia_id', $dto['familia']);

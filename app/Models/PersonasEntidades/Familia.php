@@ -252,6 +252,8 @@ class Familia extends Model
 
         return [
             'id' => $familia->id,
+            'tipo_familia_id' => $familia->tipo_familia_id,
+            'condicion_familia_id' => $familia->condicion_familia_id,
             'identificacion_persona' => $familia->identificacion_persona,
             'familiasFechaVisitaDomici' => $familia->familiasFechaVisitaDomici,
             'familiasAportesFormales' => $familia->familiasAportesFormales,
