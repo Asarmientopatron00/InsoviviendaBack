@@ -150,5 +150,76 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [Parametrizacion\TipoIdentificacionController::class,'destroy'])->name('tipos_identificacion.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
-
+    // Condicion Familia
+    Route::group(["prefix" => "condiciones-familia"],function(){
+        Route::get('/', [Parametrizacion\CondicionFamiliaController::class,'index'])->name('condicion_familia.index');
+        Route::post('/', [Parametrizacion\CondicionFamiliaController::class,'store'])->name('condicion_familia.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\CondicionFamiliaController::class,'show'])->name('condicion_familia.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\CondicionFamiliaController::class,'update'])->name('condicion_familia.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\CondicionFamiliaController::class,'destroy'])->name('condicion_familia.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+     // Tipos población
+     Route::group(["prefix" => "tipos-poblacion"],function(){
+        Route::get('/', [Parametrizacion\TipoPoblacionController::class,'index'])->name('tipos_poblacion.index');
+        Route::post('/', [Parametrizacion\TipoPoblacionController::class,'store'])->name('tipos_poblacion.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoPoblacionController::class,'show'])->name('tipos_poblacion.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoPoblacionController::class,'update'])->name('tipos_poblacion.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoPoblacionController::class,'destroy'])->name('tipos_poblacion.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+     // Tipos vivienda
+     Route::group(["prefix" => "tipos-vivienda"],function(){
+        Route::get('/', [Parametrizacion\TipoViviendaController::class,'index'])->name('tipo_vivienda.index');
+        Route::post('/', [Parametrizacion\TipoViviendaController::class,'store'])->name('tipos_vivienda.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoViviendaController::class,'show'])->name('tipos_vivienda.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoViviendaController::class,'update'])->name('tipos_vivienda.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoViviendaController::class,'destroy'])->name('tipos_vivienda.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+     // Tipos techo
+     Route::group(["prefix" => "tipos-techo"],function(){
+        Route::get('/', [Parametrizacion\TipoTechoController::class,'index'])->name('tipo_techo.index');
+        Route::post('/', [Parametrizacion\TipoTechoController::class,'store'])->name('tipos_techo.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoTechoController::class,'show'])->name('tipos_techo.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoTechoController::class,'update'])->name('tipos_techo.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoTechoController::class,'destroy'])->name('tipos_techo.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });    
+     // Tipos piso
+     Route::group(["prefix" => "tipos-piso"],function(){
+        Route::get('/', [Parametrizacion\TipoPisoController::class,'index'])->name('tipo_Piso.index');
+        Route::post('/', [Parametrizacion\TipoPisoController::class,'store'])->name('tipos_Piso.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoPisoController::class,'show'])->name('tipos_Piso.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoPisoController::class,'update'])->name('tipos_Piso.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoPisoController::class,'destroy'])->name('tipos_Piso.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });        
+     // Tipos division
+     Route::group(["prefix" => "tipos-division"],function(){
+        Route::get('/', [Parametrizacion\TipoDivisionController::class,'index'])->name('tipo_Division.index');
+        Route::post('/', [Parametrizacion\TipoDivisionController::class,'store'])->name('tipos_Division.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Parametrizacion\TipoDivisionController::class,'show'])->name('tipos_Division.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Parametrizacion\TipoDivisionController::class,'update'])->name('tipos_Division.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Parametrizacion\TipoDivisionController::class,'destroy'])->name('tipos_Division.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });            
 });

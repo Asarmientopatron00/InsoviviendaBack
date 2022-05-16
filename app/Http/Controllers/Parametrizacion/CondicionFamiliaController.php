@@ -2,30 +2,45 @@
 
 namespace App\Http\Controllers\Parametrizacion;
 
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Parametrizacion\CondicionFamilia;
 
 class CondicionFamiliaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
-    }
+        try{
+            $datos = $request->all();
+            if(!$request->ligera){
+                $validator = Validator::make($datos, [
+                    'limite' => 'integer|between:1,500'
+                ]);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+                if($validator->fails()) {
+                    return response(
+                        get_response_body(format_messages_validator($validator))
+                        , Response::HTTP_BAD_REQUEST
+                    );
+                }
+            }
+
+            if($request->ligera){
+                $condicionFamilia = CondicionFamilia::obtenerColeccionLigera($datos);
+            }else{
+                if(isset($datos['ordenar_por'])){
+                    $datos['ordenar_por'] = format_order_by_attributes($datos);
+                }
+                $condicionFamilia = CondicionFamilia::obtenerColeccion($datos);
+            }
+            return response($condicionFamilia, Response::HTTP_OK);
+        }catch(Exception $e){
+            return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
@@ -36,51 +51,145 @@ class CondicionFamiliaController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try {
+            $datos = $request->all();
+            $validator = Validator::make($datos, [
+                'conFamDescripcion' => 'string|required|max:128',
+                'conFamEstado' => 'boolean|required'
+            ]);
+
+            if ($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $condicionFamilia = CondicionFamilia::modificarOCrear($datos);
+            
+            if ($condicionFamilia) {
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["La Condicion Familia ha sido creada.", 2], $condicionFamilia),
+                    Response::HTTP_CREATED
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar crear la Condicion Familia."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Parametrizacion\CondicionFamilia  $condicionFamilia
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(CondicionFamilia $condicionFamilia)
+    public function show($id)
     {
-        //
-    }
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:condiciones_familia,id'
+            ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Parametrizacion\CondicionFamilia  $condicionFamilia
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(CondicionFamilia $condicionFamilia)
-    {
-        //
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            return response(CondicionFamilia::cargar($id), Response::HTTP_OK);
+        }catch (Exception $e){
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Parametrizacion\CondicionFamilia  $condicionFamilia
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, CondicionFamilia $condicionFamilia)
+    public function update(Request $request, $id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos = $request->all();
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:condiciones_familia,id',
+                'conFamDescripcion' => 'string|required|max:128',
+                'conFamEstado' => 'boolean|required'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $condicionFamilia = CondicionFamilia::modificarOCrear($datos);
+            if($condicionFamilia){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["La Condicion Familia ha sido modificada.", 1], $condicionFamilia),
+                    Response::HTTP_OK
+                );
+            } else {
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar modificar la Condicion Familia."]), Response::HTTP_CONFLICT);;
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(get_response_body([$e->getMessage()]), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Parametrizacion\CondicionFamilia  $condicionFamilia
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(CondicionFamilia $condicionFamilia)
+    public function destroy($id)
     {
-        //
+        DB::beginTransaction(); // Se abre la transacción
+        try{
+            $datos['id'] = $id;
+            $validator = Validator::make($datos, [
+                'id' => 'integer|required|exists:condiciones_familia,id'
+            ]);
+
+            if($validator->fails()) {
+                return response(
+                    get_response_body(format_messages_validator($validator))
+                    , Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            $eliminado = CondicionFamilia::eliminar($id);
+            if($eliminado){
+                DB::commit(); // Se cierra la transacción correctamente
+                return response(
+                    get_response_body(["La Condicion Familia ha sido elimada.", 3]),
+                    Response::HTTP_OK
+                );
+            }else{
+                DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+                return response(get_response_body(["Ocurrió un error al intentar eliminar la Condicion Familia."]), Response::HTTP_CONFLICT);
+            }
+        }catch (Exception $e){
+            DB::rollback(); // Se devuelven los cambios, por que la transacción falla
+            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }
