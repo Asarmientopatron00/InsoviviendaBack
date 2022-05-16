@@ -711,18 +711,18 @@ class Persona extends Model
         $ciudadNacimiento = $persona->ciudadNacimiento;
         $estadoCivil = $persona->estadoCivil;
         $tipoParentesco = $persona->tipoParentesco;
-        // $tipoPoblacion = $persona->tipoPoblacion;
-        $tipoDicapacidad = $persona->tipoDicapacidad;
+        $tipoPoblacion = $persona->tipoPoblacion;
+        $tipoDicapacidad = $persona->tipoDiscapacidad;
         $eps = $persona->eps;
         $gradoEscolaridad = $persona->gradoEscolaridad;
         $departamento = $persona->departamento;
         $ciudad = $persona->ciudad;
         $comuna = $persona->comuna;
         $barrio = $persona->barrio;
-        // $tipoVivienda = $persona->tipoVivienda;
-        // $tipoTecho = $persona->tipoTecho;
-        // $tipoPiso = $persona->tipoPiso;
-        // $tipoDivision = $persona->tipoDivision;
+        $tipoVivienda = $persona->tipoVivienda;
+        $tipoTecho = $persona->tipoTecho;
+        $tipoPiso = $persona->tipoPiso;
+        $tipoDivision = $persona->tipoDivision;
         $ocupacion = $persona->ocupacion;
         $departamentoCor = $persona->departamentoCor;
         $ciudadCor = $persona->ciudadCor;
@@ -843,10 +843,10 @@ class Persona extends Model
                 'id' => $tipoParentesco->id,
                 'nombre' => $tipoParentesco->tipParDescripcion
             ] : null,
-            // 'tipoPoblacion' => isset($tipoPoblacion) ? [
-            //     'id' => $tipoPoblacion->id,
-            //     'nombre' => $tipoPoblacion->tipPobDescripcion
-            // ] : null,
+            'tipoPoblacion' => isset($tipoPoblacion) ? [
+                'id' => $tipoPoblacion->id,
+                'nombre' => $tipoPoblacion->tipPobDescripcion
+            ] : null,
             'tipoDicapacidad' => isset($tipoDicapacidad) ? [
                 'id' => $tipoDicapacidad->id,
                 'nombre' => $tipoDicapacidad->tipDisDescripcion
@@ -875,22 +875,22 @@ class Persona extends Model
                 'id' => $barrio->id,
                 'nombre' => $barrio->barriosDescripcion
             ] : null,
-            // 'tipoVivienda' => isset($tipoVivienda) ? [
-            //     'id' => $tipoVivienda->id,
-            //     'nombre' => $tipoVivienda->tipVivDescripcion
-            // ] : null,
-            // 'tipoTecho' => isset($tipoTecho) ? [
-            //     'id' => $tipoTecho->id,
-            //     'nombre' => $tipoTecho->tipTecDescripcion
-            // ] : null,
-            // 'tipoPiso' => isset($tipoPiso) ? [
-            //     'id' => $tipoPiso->id,
-            //     'nombre' => $tipoPiso->tipPisDescripcion
-            // ] : null,
-            // 'tipoDivision' => isset($tipoDivision) ? [
-            //     'id' => $tipoDivision->id,
-            //     'nombre' => $tipoDivision->tipDivDescripcion
-            // ] : null,
+            'tipoVivienda' => isset($tipoVivienda) ? [
+                'id' => $tipoVivienda->id,
+                'nombre' => $tipoVivienda->tipVivDescripcion
+            ] : null,
+            'tipoTecho' => isset($tipoTecho) ? [
+                'id' => $tipoTecho->id,
+                'nombre' => $tipoTecho->tipTecDescripcion
+            ] : null,
+            'tipoPiso' => isset($tipoPiso) ? [
+                'id' => $tipoPiso->id,
+                'nombre' => $tipoPiso->tipPisDescripcion
+            ] : null,
+            'tipoDivision' => isset($tipoDivision) ? [
+                'id' => $tipoDivision->id,
+                'nombre' => $tipoDivision->tipDivDescripcion
+            ] : null,
             'ocupacion' => isset($ocupacion) ? [
                 'id' => $ocupacion->id,
                 'nombre' => $ocupacion->ocupacionesDescripcion

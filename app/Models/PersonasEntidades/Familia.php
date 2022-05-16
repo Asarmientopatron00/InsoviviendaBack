@@ -247,8 +247,8 @@ class Familia extends Model
     {
         $familia = Familia::find($id);
         $persona = $familia->persona;
-        // $tipoFamilia = $familia->tipoFamilia;
-        // $condicionFamilia = $familia->condicionFamilia;
+        $tipoFamilia = $familia->tipoFamilia;
+        $condicionFamilia = $familia->condicionFamilia;
 
         return [
             'id' => $familia->id,
@@ -283,14 +283,14 @@ class Familia extends Model
                 'id' => $persona->id,
                 'nombre' => $persona->personasNombres.' '.$persona->personasPrimerApellido.' '.$persona->personasSegundoApellido
             ] : null,
-            // 'tipoFamilia' => isset($tipoFamilia) ? [
-            //     'id' => $tipoFamilia->id,
-            //     'nombre' => $tipoFamilia->tipFamDescripcion
-            // ] : null,
-            // 'condicionFamilia' => isset($condicionFamilia) ? [
-            //     'id' => $condicionFamilia->id,
-            //     'nombre' => $condicionFamilia->conFamDescripcion
-            // ] : null,
+            'tipoFamilia' => isset($tipoFamilia) ? [
+                'id' => $tipoFamilia->id,
+                'nombre' => $tipoFamilia->tipFamDescripcion
+            ] : null,
+            'condicionFamilia' => isset($condicionFamilia) ? [
+                'id' => $condicionFamilia->id,
+                'nombre' => $condicionFamilia->conFamDescripcion
+            ] : null,
         ];
     }
 
