@@ -36,6 +36,7 @@ class Comuna extends Model
             ->select(
                 'comunas.id',
                 'comunasDescripcion As nombre',
+                'ciudades.id As ciudad_id',
                 'ciudadesDescripcion As ciudad',
                 'comunasEstado As estado',
             );

@@ -36,6 +36,7 @@ class Barrio extends Model
             ->select(
                 'barrios.id',
                 'barriosDescripcion As nombre',
+                'comunas.id As comuna_id',
                 'comunasDescripcion As comuna',
                 'barriosEstado As estado',
             );

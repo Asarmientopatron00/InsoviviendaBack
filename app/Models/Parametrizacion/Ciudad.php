@@ -36,6 +36,7 @@ public static function obtenerColeccionLigera($dto){
         ->select(
             'ciudades.id',
             'ciudadesDescripcion As nombre',
+            'departamentos.id As departamento_id',
             'departamentosDescripcion As departamento',
             'ciudadesEstado As estado',
         );
