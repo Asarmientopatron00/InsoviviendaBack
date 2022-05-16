@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers\Parametrizacion;
 
-use App\Models\Pais;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\Seguridad\Aplicacion;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Parametrizacion\Pais;
 
 class PaisController extends Controller
 {
@@ -32,14 +37,14 @@ class PaisController extends Controller
             }
 
             if($request->ligera){
-                $aplicaciones = Aplicacion::obtenerColeccionLigera($datos);
+                $pais = Pais::obtenerColeccionLigera($datos);
             }else{
                 if(isset($datos['ordenar_por'])){
                     $datos['ordenar_por'] = format_order_by_attributes($datos);
                 }
-                $aplicaciones = Aplicacion::obtenerColeccion($datos);
+                $pais = Pais::obtenerColeccion($datos);
             }
-            return response($aplicaciones, Response::HTTP_OK);
+            return response($pais, Response::HTTP_OK);
         }catch(Exception $e){
             return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -57,8 +62,8 @@ class PaisController extends Controller
         try {
             $datos = $request->all();
             $validator = Validator::make($datos, [
-                'nombre' => 'string|required|min:3|max:128|unique:aplicaciones,nombre',
-                'estado' => 'boolean|required'
+                'paisesDescripcion' => 'string|required|min:3|max:128|',
+                'paisesEstado' => 'boolean|required'
             ]);
 
             if ($validator->fails()) {
@@ -68,17 +73,17 @@ class PaisController extends Controller
                 );
             }
 
-            $aplicacion = Aplicacion::modificarOCrear($datos);
+            $aplicacion = Pais::modificarOCrear($datos);
             
             if ($aplicacion) {
                 DB::commit(); // Se cierra la transacción correctamente
                 return response(
-                    get_response_body(["La Aplicación Ha Sido Creada.", 2], $aplicacion),
+                    get_response_body(["El país ha sido creado.", 2], $aplicacion),
                     Response::HTTP_CREATED
                 );
             } else {
                 DB::rollback(); // Se devuelven los cambios, por que la transacción falla
-                return response(get_response_body(["Ocurrió un error al intentar crear la aplicación."]), Response::HTTP_CONFLICT);
+                return response(get_response_body(["Ocurrió un error al intentar crear el país."]), Response::HTTP_CONFLICT);
             }
         }catch (Exception $e){
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
@@ -97,7 +102,7 @@ class PaisController extends Controller
         try{
             $datos['id'] = $id;
             $validator = Validator::make($datos, [
-                'id' => 'integer|required|exists:aplicaciones,id'
+                'id' => 'integer|required|exists:paises,id'
             ]);
 
             if($validator->fails()) {
@@ -107,7 +112,7 @@ class PaisController extends Controller
                 );
             }
 
-            return response(Aplicacion::cargar($id), Response::HTTP_OK);
+            return response(Pais::cargar($id), Response::HTTP_OK);
         }catch (Exception $e){
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -127,9 +132,9 @@ class PaisController extends Controller
             $datos = $request->all();
             $datos['id'] = $id;
             $validator = Validator::make($datos, [
-                'id' => 'integer|required|exists:aplicaciones,id',
-                'nombre' => 'string|required|min:3|max:128|unique:aplicaciones,nombre,' .$id,
-                'estado' => 'boolean|required'
+                'id' => 'integer|required|exists:paises,id',
+                'paisesDescripcion' => 'string|required|min:3|max:128|',
+                'paisesEstado' => 'boolean|required'
             ]);
 
             if($validator->fails()) {
@@ -139,16 +144,16 @@ class PaisController extends Controller
                 );
             }
 
-            $aplicacion = Aplicacion::modificarOCrear($datos);
+            $aplicacion = Pais::modificarOCrear($datos);
             if($aplicacion){
                 DB::commit(); // Se cierra la transacción correctamente
                 return response(
-                    get_response_body(["La Aplicación Ha Sido Modificada.", 1], $aplicacion),
+                    get_response_body(["El país ha sido modificado.", 1], $aplicacion),
                     Response::HTTP_OK
                 );
             } else {
                 DB::rollback(); // Se devuelven los cambios, por que la transacción falla
-                return response(get_response_body(["Ocurrió un error al intentar modificar la aplicación."]), Response::HTTP_CONFLICT);;
+                return response(get_response_body(["Ocurrió un error al intentar modificar el país."]), Response::HTTP_CONFLICT);;
             }
         }catch (Exception $e){
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
@@ -168,7 +173,7 @@ class PaisController extends Controller
         try{
             $datos['id'] = $id;
             $validator = Validator::make($datos, [
-                'id' => 'integer|required|exists:aplicaciones,id'
+                'id' => 'integer|required|exists:paises,id'
             ]);
 
             if($validator->fails()) {
@@ -178,16 +183,16 @@ class PaisController extends Controller
                 );
             }
 
-            $eliminado = Aplicacion::eliminar($id);
+            $eliminado = Pais::eliminar($id);
             if($eliminado){
                 DB::commit(); // Se cierra la transacción correctamente
                 return response(
-                    get_response_body(["La Aplicación Ha Sido Eliminada.", 3]),
+                    get_response_body(["El país ha sido eliminado.", 3]),
                     Response::HTTP_OK
                 );
             }else{
                 DB::rollback(); // Se devuelven los cambios, por que la transacción falla
-                return response(get_response_body(["Ocurrió un error al intentar eliminar la aplicación."]), Response::HTTP_CONFLICT);
+                return response(get_response_body(["Ocurrió un error al intentar eliminar el país."]), Response::HTTP_CONFLICT);
             }
         }catch (Exception $e){
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla

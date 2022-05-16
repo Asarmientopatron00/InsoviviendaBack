@@ -9,15 +9,21 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Parametrizacion\EPS;
 use App\Models\Parametrizacion\Pais;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Parametrizacion\Barrio;
 use App\Models\Parametrizacion\Ciudad;
+use App\Models\Parametrizacion\Comuna;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Parametrizacion\TipoPiso;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\Parametrizacion\Ocupacion;
 use App\Models\Parametrizacion\TipoTecho;
 use App\Models\PersonasEntidades\Familia;
 use App\Models\Parametrizacion\EstadoCivil;
 use App\Models\Parametrizacion\Departamento;
+use App\Models\Parametrizacion\TipoDivision;
 use App\Models\Parametrizacion\TipoVivienda;
 use App\Models\Parametrizacion\TipoPoblacion;
+use App\Models\Parametrizacion\TipoParentesco;
 use App\Models\Parametrizacion\GradoEscolaridad;
 use App\Models\Parametrizacion\TipoDiscapacidad;
 use App\Models\Parametrizacion\TipoIdentificacion;
@@ -40,7 +46,7 @@ class Persona extends Model
         'ciudad_nacimiento_id',
         'personasGenero',
         'estado_civil_id',
-        'personasParentesco',
+        'tipo_parentesco_id',
         'tipo_poblacion_id',
         'tipo_discapacidad_id',
         'personasSeguridadSocial',
@@ -134,6 +140,10 @@ class Persona extends Model
     public function estadoCivil(){
         return $this->belongsTo(EstadoCivil::class, 'estado_civil_id');
     }
+
+    public function tipoParentesco(){
+        return $this->belongsTo(TipoParentesco::class, 'tipo_parentesco_id');
+    }
     
     public function tipoPoblacion(){
         return $this->belongsTo(TipoPoblacion::class, 'tipo_poblacion_id');
@@ -199,6 +209,10 @@ class Persona extends Model
         return $this->belongsTo(Barrio::class, 'barrio_correspondencia_id');
     }
 
+    public function ocupacion(){
+        return $this->belongsTo(Ocupacion::class, 'ocupacion_id');
+    }
+
     public function familia(){
         return $this->belongsTo(Familia::class, 'familia_id');
     }
@@ -207,7 +221,8 @@ class Persona extends Model
         $query = DB::table('personas')
             ->select(
                 'id',
-                'personasIdentificacion',
+                'personasIdentificacion As identificacion',
+                'personasEstadoRegistro AS estado',
                 DB::Raw(
                     "CONCAT(
                         IFNULL(CONCAT(personasNombres), ''),
@@ -228,23 +243,24 @@ class Persona extends Model
             ->join('departamentos AS departamento_nacimiento','departamento_nacimiento.id','=','personas.departamento_nacimiento_id')
             ->join('ciudades AS ciudad_nacimiento','ciudad_nacimiento.id','=','personas.ciudad_nacimiento_id')
             ->join('estados_civil','estados_civil.id','=','personas.estado_civil_id')
+            ->join('tipos_parentesco','tipos_parentesco.id','=','personas.tipo_parentesco_id')
             ->join('tipos_poblacion','tipos_poblacion.id','=','personas.tipo_poblacion_id')
             ->join('tipos_discapacidad','tipos_discapacidad.id','=','personas.tipo_discapacidad_id')
-            ->join('eps','eps.id','=','personas.eps_id')
+            ->leftJoin('eps','eps.id','=','personas.eps_id')
             ->join('grados_escolaridad','grados_escolaridad.id','=','personas.grado_escolaridad_id')
             ->join('departamentos','departamentos.id','=','personas.departamento_id')
             ->join('ciudades','ciudades.id','=','personas.ciudad_id')
-            ->join('comunas','comunas.id','=','personas.comuna_id')
-            ->join('barrios','barrios.id','=','personas.barrio_id')
+            ->leftJoin('comunas','comunas.id','=','personas.comuna_id')
+            ->leftJoin('barrios','barrios.id','=','personas.barrio_id')
             ->join('tipos_vivienda','tipos_vivienda.id','=','personas.tipo_vivienda_id')
             ->join('tipos_techo','tipos_techo.id','=','personas.tipo_techo_id')
             ->join('tipos_piso','tipos_piso.id','=','personas.tipo_piso_id')
             ->join('tipos_division','tipos_division.id','=','personas.tipo_division_id')
             ->join('ocupaciones','ocupaciones.id','=','personas.ocupacion_id')
-            ->join('departamentos AS departamento_cor','departamento_cor.id','=','personas.departamento_correspondencia_id')
-            ->join('ciudades AS ciudad_cor','ciudad_cor.id','=','personas.ciudad_correspondencia_id')
-            ->join('comunas AS comuna_cor','comuna_cor.id','=','personas.comuna_correspondencia_id')
-            ->join('barrios AS barrio_cor','barrio_cor.id','=','personas.barrio_correspondencia_id')
+            ->leftJoin('departamentos AS departamento_cor','departamento_cor.id','=','personas.departamento_correspondencia_id')
+            ->leftJoin('ciudades AS ciudad_cor','ciudad_cor.id','=','personas.ciudad_correspondencia_id')
+            ->leftJoin('comunas AS comuna_cor','comuna_cor.id','=','personas.comuna_correspondencia_id')
+            ->leftJoin('barrios AS barrio_cor','barrio_cor.id','=','personas.barrio_correspondencia_id')
             ->Leftjoin('familias','familias.id','=','personas.familia_id')
             ->select(
                 'personas.id',
@@ -265,7 +281,7 @@ class Persona extends Model
                 'ciudad_nacimiento.ciudadesDescripcion as ciuNacimiento',
                 'personas.personasGenero',
                 'estados_civil.estCivDescripcion',
-                'personas.personasParentesco',
+                'tipos_parentesco.tipParDescripcion',
                 'tipos_poblacion.tipPobDescripcion',
                 'tipos_discapacidad.tipDisDescripcion',
                 'personas.personasSeguridadSocial',
@@ -343,7 +359,56 @@ class Persona extends Model
             );
 
         if(isset($dto['nombre'])){
-            $query->where('personas.personasNombres', 'like', '%' . $dto['nombre'] . '%');
+            $arrayNames = explode(' ', $dto['nombre']);
+            $long = count($arrayNames);
+            if($long===1){
+                $query->orWhere('personas.personasNombres', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasPrimerApellido', 'like', '%' . $arrayNames[0] . '%');
+                $query->orWhere('personas.personasSegundoApellido', 'like', '%' . $arrayNames[0] . '%');
+            }
+            if($long===2){
+                $query->orWhere('personas.personasNombres', 'like', '%'.$arrayNames[0].' '.$arrayNames[1].'%');
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
+            }
+            if($long===3){
+                $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ', 
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
+            }
+            if($long===4){
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasNombres), ' ',
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+                $query->orWhereRaw("CONCAT(
+                    TRIM(personas.personasPrimerApellido), ' ', 
+                    TRIM(personas.personasSegundoApellido), ' ', 
+                    TRIM(personas.personasNombres)) like ?",
+                    ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
+            }
         }
         if(isset($dto['identificacion'])){
             $query->where('personas.personasIdentificacion', 'like', '%' . $dto['identificacion'] . '%');
@@ -354,26 +419,248 @@ class Persona extends Model
         if(isset($dto['estado'])){
             $query->where('personas.personasEstadoRegistro', $dto['estado']);
         }
-        if(isset($dto['primerApellido'])){
-            $query->where('personas.personasPrimerApellido', 'like', '%' . $dto['primerApellido'] . '%');
-        }
         if(isset($dto['familia'])){
             $query->where('personas.familia_id', $dto['familia']);
         }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
             foreach ($dto['ordenar_por'] as $attribute => $value){
+                if($attribute == 'personasIdentificacion'){
+                    $query->orderBy('personas.personasIdentificacion', $value);
+                }
+                if($attribute == 'tipIdeDescripcion'){
+                    $query->orderBy('tipos_identificacion.tipIdeDescripcion', $value);
+                }
+                if($attribute == 'personasCategoriaAportes'){
+                    $query->orderBy('personas.personasCategoriaAportes', $value);
+                }
                 if($attribute == 'nombre'){
-                    $query->orderBy('personas.nombre', $value);
+                    $query->orderBy('personas.personasNombres', $value);
                 }
-                if($attribute == 'aplicacion'){
-                    $query->orderBy('aplicaciones.nombre', $value);
+                if($attribute == 'personasFechaNacimiento'){
+                    $query->orderBy('personas.personasFechaNacimiento', $value);
                 }
-                if($attribute == 'posicion'){
-                    $query->orderBy('personas.posicion', $value);
+                if($attribute == 'paisesDescripcion'){
+                    $query->orderBy('paises.paisesDescripcion', $value);
                 }
-                if($attribute == 'estado'){
-                    $query->orderBy('personas.estado', $value);
+                if($attribute == 'depNacimiento'){
+                    $query->orderBy('departamento_nacimiento.depNacimiento', $value);
+                }
+                if($attribute == 'ciuNacimiento'){
+                    $query->orderBy('ciudad_nacimiento.ciuNacimiento', $value);
+                }
+                if($attribute == 'personasGenero'){
+                    $query->orderBy('personas.personasGenero', $value);
+                }
+                if($attribute == 'estCivDescripcion'){
+                    $query->orderBy('estados_civil.estCivDescripcion', $value);
+                }
+                if($attribute == 'tipParDescripcion'){
+                    $query->orderBy('tipos_parentesco.tipParDescripcion', $value);
+                }
+                if($attribute == 'tipPobDescripcion'){
+                    $query->orderBy('tipos_poblacion.tipPobDescripcion', $value);
+                }
+                if($attribute == 'tipDisDescripcion'){
+                    $query->orderBy('tipos_discapacidad.tipDisDescripcion', $value);
+                }
+                if($attribute == 'personasSeguridadSocial'){
+                    $query->orderBy('personas.personasSeguridadSocial', $value);
+                }
+                if($attribute == 'epsDescripcion'){
+                    $query->orderBy('eps.epsDescripcion', $value);
+                }
+                if($attribute == 'graEscDescripcion'){
+                    $query->orderBy('grados_escolaridad.graEscDescripcion', $value);
+                }
+                if($attribute == 'personasVehiculo'){
+                    $query->orderBy('personas.personasVehiculo', $value);
+                }
+                if($attribute == 'personasCorreo'){
+                    $query->orderBy('personas.personasCorreo', $value);
+                }
+                if($attribute == 'personasFechaVinculacion'){
+                    $query->orderBy('personas.personasFechaVinculacion', $value);
+                }
+                if($attribute == 'departamentosDescripcion'){
+                    $query->orderBy('departamentos.departamentosDescripcion', $value);
+                }
+                if($attribute == 'ciudadesDescripcion'){
+                    $query->orderBy('ciudades.ciudadesDescripcion', $value);
+                }
+                if($attribute == 'comunasDescripcion'){
+                    $query->orderBy('comunas.comunasDescripcion', $value);
+                }
+                if($attribute == 'barriosDescripcion'){
+                    $query->orderBy('barrios.barriosDescripcion', $value);
+                }
+                if($attribute == 'personasDireccion'){
+                    $query->orderBy('personas.personasDireccion', $value);
+                }
+                if($attribute == 'personasZona'){
+                    $query->orderBy('personas.personasZona', $value);
+                }
+                if($attribute == 'personasEstrato'){
+                    $query->orderBy('personas.personasEstrato', $value);
+                }
+                if($attribute == 'personasTelefonoCasa'){
+                    $query->orderBy('personas.personasTelefonoCasa', $value);
+                }
+                if($attribute == 'personasTelefonoCelular'){
+                    $query->orderBy('personas.personasTelefonoCelular', $value);
+                }
+                if($attribute == 'tipVivDescripcion'){
+                    $query->orderBy('tipos_vivienda.tipVivDescripcion', $value);
+                }
+                if($attribute == 'personasTipoPropiedad'){
+                    $query->orderBy('personas.personasTipoPropiedad', $value);
+                }
+                if($attribute == 'personasNumeroEscritura'){
+                    $query->orderBy('personas.personasNumeroEscritura', $value);
+                }
+                if($attribute == 'personasNotariaEscritura'){
+                    $query->orderBy('personas.personasNotariaEscritura', $value);
+                }
+                if($attribute == 'personasFechaEscritura'){
+                    $query->orderBy('personas.personasFechaEscritura', $value);
+                }
+                if($attribute == 'personasIndicativoPC'){
+                    $query->orderBy('personas.personasIndicativoPC', $value);
+                }
+                if($attribute == 'personasNumeroHabitaciones'){
+                    $query->orderBy('personas.personasNumeroHabitaciones', $value);
+                }
+                if($attribute == 'personasNumeroBanos'){
+                    $query->orderBy('personas.personasNumeroBanos', $value);
+                }
+                if($attribute == 'tipTecDescripcion'){
+                    $query->orderBy('tipos_techo.tipTecDescripcion', $value);
+                }
+                if($attribute == 'tipPisDescripcion'){
+                    $query->orderBy('tipos_piso.tipPisDescripcion', $value);
+                }
+                if($attribute == 'tipDivDescripcion'){
+                    $query->orderBy('tipos_division.tipDivDescripcion', $value);
+                }
+                if($attribute == 'personasSala'){
+                    $query->orderBy('personas.personasSala', $value);
+                }
+                if($attribute == 'personasComedor'){
+                    $query->orderBy('personas.personasComedor', $value);
+                }
+                if($attribute == 'personasCocina'){
+                    $query->orderBy('personas.personasCocina', $value);
+                }
+                if($attribute == 'personasPatio'){
+                    $query->orderBy('personas.personasPatio', $value);
+                }
+                if($attribute == 'personasTerraza'){
+                    $query->orderBy('personas.personasTerraza', $value);
+                }
+                if($attribute == 'ocupacionesDescripcion'){
+                    $query->orderBy('ocupaciones.ocupacionesDescripcion', $value);
+                }
+                if($attribute == 'personasTipoTrabajo'){
+                    $query->orderBy('personas.personasTipoTrabajo', $value);
+                }
+                if($attribute == 'personasTipoContrato'){
+                    $query->orderBy('personas.personasTipoContrato', $value);
+                }
+                if($attribute == 'personasNombreEmpresa'){
+                    $query->orderBy('personas.personasNombreEmpresa', $value);
+                }
+                if($attribute == 'personasTelefonoEmpresa'){
+                    $query->orderBy('personas.personasTelefonoEmpresa', $value);
+                }
+                if($attribute == 'personasPuntajeProcredito'){
+                    $query->orderBy('personas.personasPuntajeProcredito', $value);
+                }
+                if($attribute == 'personasPuntajeDatacredito'){
+                    $query->orderBy('personas.personasPuntajeDatacredito', $value);
+                }
+                if($attribute == 'depCorr'){
+                    $query->orderBy('departamento_cor.depCorr', $value);
+                }
+                if($attribute == 'ciuCorr'){
+                    $query->orderBy('ciudad_cor.ciuCorr', $value);
+                }
+                if($attribute == 'comCorr'){
+                    $query->orderBy('comuna_cor.comCorr', $value);
+                }
+                if($attribute == 'barCorr'){
+                    $query->orderBy('barrio_cor.barCorr', $value);
+                }
+                if($attribute == 'personasCorDireccion'){
+                    $query->orderBy('personas.personasCorDireccion', $value);
+                }
+                if($attribute == 'personasCorTelefono'){
+                    $query->orderBy('personas.personasCorTelefono', $value);
+                }
+                if($attribute == 'personasIngresosFormales'){
+                    $query->orderBy('personas.personasIngresosFormales', $value);
+                }
+                if($attribute == 'personasIngresosInformales'){
+                    $query->orderBy('personas.personasIngresosInformales', $value);
+                }
+                if($attribute == 'personasIngresosArriendo'){
+                    $query->orderBy('personas.personasIngresosArriendo', $value);
+                }
+                if($attribute == 'personasIngresosSubsidios'){
+                    $query->orderBy('personas.personasIngresosSubsidios', $value);
+                }
+                if($attribute == 'personasIngresosPaternidad'){
+                    $query->orderBy('personas.personasIngresosPaternidad', $value);
+                }
+                if($attribute == 'personasIngresosTerceros'){
+                    $query->orderBy('personas.personasIngresosTerceros', $value);
+                }
+                if($attribute == 'personasIngresosOtros'){
+                    $query->orderBy('personas.personasIngresosOtros', $value);
+                }
+                if($attribute == 'personasAportesFormales'){
+                    $query->orderBy('personas.personasAportesFormales', $value);
+                }
+                if($attribute == 'personasAportesInformales'){
+                    $query->orderBy('personas.personasAportesInformales', $value);
+                }
+                if($attribute == 'personasAportesArriendo'){
+                    $query->orderBy('personas.personasAportesArriendo', $value);
+                }
+                if($attribute == 'personasAportesSubsidios'){
+                    $query->orderBy('personas.personasAportesSubsidios', $value);
+                }
+                if($attribute == 'personasAportesPaternidad'){
+                    $query->orderBy('personas.personasAportesPaternidad', $value);
+                }
+                if($attribute == 'personasAportesTerceros'){
+                    $query->orderBy('personas.personasAportesTerceros', $value);
+                }
+                if($attribute == 'personasAportesOtros'){
+                    $query->orderBy('personas.personasAportesOtros', $value);
+                }
+                if($attribute == 'personasRefNombre1'){
+                    $query->orderBy('personas.personasRefNombre1', $value);
+                }
+                if($attribute == 'personasRefTelefono1'){
+                    $query->orderBy('personas.personasRefTelefono1', $value);
+                }
+                if($attribute == 'personasRefNombre2'){
+                    $query->orderBy('personas.personasRefNombre2', $value);
+                }
+                if($attribute == 'personasRefTelefono2'){
+                    $query->orderBy('personas.personasRefTelefono2', $value);
+                }
+                if($attribute == 'personasObservaciones'){
+                    $query->orderBy('personas.personasObservaciones', $value);
+                }
+                if($attribute == 'personasEstadoTramite'){
+                    $query->orderBy('personas.personasEstadoTramite', $value);
+                }
+                if($attribute == 'personasEstadoRegistro'){
+                    $query->orderBy('personas.personasEstadoRegistro', $value);
+                }
+                if($attribute == 'identificacion_persona'){
+                    $query->orderBy('familias.identificacion_persona', $value);
                 }
                 if($attribute == 'usuario_creacion_nombre'){
                     $query->orderBy('personas.usuario_creacion_nombre', $value);
@@ -418,28 +705,30 @@ class Persona extends Model
     public static function cargar($id)
     {
         $persona = Persona::find($id);
-        // $tipoIdentificacion = $persona->tipoIdentificacion;
-        // $paisNacimiento = $persona->pais;
-        // $departamentoNacimiento = $persona->departamentoNacimiento;
-        // $ciudadNacimiento = $persona->ciudadNacimiento;
-        // $estadoCivil = $persona->estadoCivil;
+        $tipoIdentificacion = $persona->tipoIdentificacion;
+        $paisNacimiento = $persona->pais;
+        $departamentoNacimiento = $persona->departamentoNacimiento;
+        $ciudadNacimiento = $persona->ciudadNacimiento;
+        $estadoCivil = $persona->estadoCivil;
+        $tipoParentesco = $persona->tipoParentesco;
         // $tipoPoblacion = $persona->tipoPoblacion;
-        // $tipoDicapacidad = $persona->tipoDicapacidad;
-        // $eps = $persona->eps;
-        // $gradoEscolaridad = $persona->gradoEscolaridad;
-        // $departamento = $persona->departamento;
-        // $ciudad = $persona->ciudad;
-        // $comuna = $persona->comuna;
-        // $barrio = $persona->barrio;
+        $tipoDicapacidad = $persona->tipoDicapacidad;
+        $eps = $persona->eps;
+        $gradoEscolaridad = $persona->gradoEscolaridad;
+        $departamento = $persona->departamento;
+        $ciudad = $persona->ciudad;
+        $comuna = $persona->comuna;
+        $barrio = $persona->barrio;
         // $tipoVivienda = $persona->tipoVivienda;
         // $tipoTecho = $persona->tipoTecho;
+        // $tipoPiso = $persona->tipoPiso;
         // $tipoDivision = $persona->tipoDivision;
-        // $ocupacion = $persona->ocupacion;
-        // $departamentoCor = $persona->departamentoCor;
-        // $ciudadCor = $persona->ciudadCor;
-        // $comunaCor = $persona->comunaCor;
-        // $barrioCor = $persona->barrioCor;
-        // $familia = $persona->familia;
+        $ocupacion = $persona->ocupacion;
+        $departamentoCor = $persona->departamentoCor;
+        $ciudadCor = $persona->ciudadCor;
+        $comunaCor = $persona->comunaCor;
+        $barrioCor = $persona->barrioCor;
+        $familia = $persona->familia;
 
         return [
             'id' => $persona->id,
@@ -455,7 +744,7 @@ class Persona extends Model
             'ciudad_nacimiento_id' => $persona->ciudad_nacimiento_id,
             'personasGenero' => $persona->personasGenero,
             'estado_civil_id' => $persona->estado_civil_id,
-            'personasParentesco' => $persona->personasParentesco,
+            'tipo_parentesco_id' => $persona->tipo_parentesco_id,
             'tipo_poblacion_id' => $persona->tipo_poblacion_id,
             'tipo_discapacidad_id' => $persona->tipo_discapacidad_id,
             'personasSeguridadSocial' => $persona->personasSeguridadSocial,
@@ -530,58 +819,62 @@ class Persona extends Model
             'usuario_modificacion_nombre' => $persona->usuario_modificacion_nombre,
             'fecha_creacion' => (new Carbon($persona->created_at))->format("Y-m-d H:i:s"),
             'fecha_modificacion' => (new Carbon($persona->updated_at))->format("Y-m-d H:i:s"),
-            // 'tipoIdentificacion' => isset($tipoIdentificacion) ? [
-            //     'id' => $tipoIdentificacion->id,
-            //     'nombre' => $tipoIdentificacion->tipIdeDescripcion
-            // ] : null,
-            // 'paisNacimiento' => isset($paisNacimiento) ? [
-            //     'id' => $paisNacimiento->id,
-            //     'nombre' => $paisNacimiento->paisesDescripcion
-            // ] : null,
-            // 'departamentoNacimiento' => isset($departamentoNacimiento) ? [
-            //     'id' => $departamentoNacimiento->id,
-            //     'nombre' => $departamentoNacimiento->departamentosDescripcion
-            // ] : null,
-            // 'ciudadNacimiento' => isset($ciudadNacimiento) ? [
-            //     'id' => $ciudadNacimiento->id,
-            //     'nombre' => $ciudadNacimiento->ciudadesDescripcion
-            // ] : null,
-            // 'estadoCivil' => isset($estadoCivil) ? [
-            //     'id' => $estadoCivil->id,
-            //     'nombre' => $estadoCivil->estCivDescripcion
-            // ] : null,
+            'tipoIdentificacion' => isset($tipoIdentificacion) ? [
+                'id' => $tipoIdentificacion->id,
+                'nombre' => $tipoIdentificacion->tipIdeDescripcion
+            ] : null,
+            'paisNacimiento' => isset($paisNacimiento) ? [
+                'id' => $paisNacimiento->id,
+                'nombre' => $paisNacimiento->paisesDescripcion
+            ] : null,
+            'departamentoNacimiento' => isset($departamentoNacimiento) ? [
+                'id' => $departamentoNacimiento->id,
+                'nombre' => $departamentoNacimiento->departamentosDescripcion
+            ] : null,
+            'ciudadNacimiento' => isset($ciudadNacimiento) ? [
+                'id' => $ciudadNacimiento->id,
+                'nombre' => $ciudadNacimiento->ciudadesDescripcion
+            ] : null,
+            'estadoCivil' => isset($estadoCivil) ? [
+                'id' => $estadoCivil->id,
+                'nombre' => $estadoCivil->estCivDescripcion
+            ] : null,
+            'tipoParentesco' => isset($tipoParentesco) ? [
+                'id' => $tipoParentesco->id,
+                'nombre' => $tipoParentesco->tipParDescripcion
+            ] : null,
             // 'tipoPoblacion' => isset($tipoPoblacion) ? [
             //     'id' => $tipoPoblacion->id,
             //     'nombre' => $tipoPoblacion->tipPobDescripcion
             // ] : null,
-            // 'tipoDicapacidad' => isset($tipoDicapacidad) ? [
-            //     'id' => $tipoDicapacidad->id,
-            //     'nombre' => $tipoDicapacidad->tipDisDescripcion
-            // ] : null,
-            // 'eps' => isset($eps) ? [
-            //     'id' => $eps->id,
-            //     'nombre' => $eps->epsDescripcion
-            // ] : null,
-            // 'gradoEscolaridad' => isset($gradoEscolaridad) ? [
-            //     'id' => $gradoEscolaridad->id,
-            //     'nombre' => $gradoEscolaridad->graEscDescripcion
-            // ] : null,
-            // 'departamento' => isset($departamento) ? [
-            //     'id' => $departamento->id,
-            //     'nombre' => $departamento->departamentosDescripcion
-            // ] : null,
-            // 'ciudad' => isset($ciudad) ? [
-            //     'id' => $ciudad->id,
-            //     'nombre' => $ciudad->ciudadesDescripcion
-            // ] : null,
-            // 'comuna' => isset($comuna) ? [
-            //     'id' => $comuna->id,
-            //     'nombre' => $comuna->comunasDescripcion
-            // ] : null,
-            // 'barrio' => isset($barrio) ? [
-            //     'id' => $barrio->id,
-            //     'nombre' => $barrio->barriosDescripcion
-            // ] : null,
+            'tipoDicapacidad' => isset($tipoDicapacidad) ? [
+                'id' => $tipoDicapacidad->id,
+                'nombre' => $tipoDicapacidad->tipDisDescripcion
+            ] : null,
+            'eps' => isset($eps) ? [
+                'id' => $eps->id,
+                'nombre' => $eps->epsDescripcion
+            ] : null,
+            'gradoEscolaridad' => isset($gradoEscolaridad) ? [
+                'id' => $gradoEscolaridad->id,
+                'nombre' => $gradoEscolaridad->graEscDescripcion
+            ] : null,
+            'departamento' => isset($departamento) ? [
+                'id' => $departamento->id,
+                'nombre' => $departamento->departamentosDescripcion
+            ] : null,
+            'ciudad' => isset($ciudad) ? [
+                'id' => $ciudad->id,
+                'nombre' => $ciudad->ciudadesDescripcion
+            ] : null,
+            'comuna' => isset($comuna) ? [
+                'id' => $comuna->id,
+                'nombre' => $comuna->comunasDescripcion
+            ] : null,
+            'barrio' => isset($barrio) ? [
+                'id' => $barrio->id,
+                'nombre' => $barrio->barriosDescripcion
+            ] : null,
             // 'tipoVivienda' => isset($tipoVivienda) ? [
             //     'id' => $tipoVivienda->id,
             //     'nombre' => $tipoVivienda->tipVivDescripcion
@@ -598,30 +891,30 @@ class Persona extends Model
             //     'id' => $tipoDivision->id,
             //     'nombre' => $tipoDivision->tipDivDescripcion
             // ] : null,
-            // 'ocupacion' => isset($ocupacion) ? [
-            //     'id' => $ocupacion->id,
-            //     'nombre' => $ocupacion->ocupacionesDescripcion
-            // ] : null,
-            // 'departamentoCor' => isset($departamentoCor) ? [
-            //     'id' => $departamentoCor->id,
-            //     'nombre' => $departamentoCor->departamentosDescripcion
-            // ] : null,
-            // 'ciudadCor' => isset($ciudadCor) ? [
-            //     'id' => $ciudadCor->id,
-            //     'nombre' => $ciudadCor->ciudadesDescripcion
-            // ] : null,
-            // 'comunaCor' => isset($comunaCor) ? [
-            //     'id' => $comunaCor->id,
-            //     'nombre' => $comunaCor->comunasDescripcion
-            // ] : null,
-            // 'barrioCor' => isset($barrioCor) ? [
-            //     'id' => $barrioCor->id,
-            //     'nombre' => $barrioCor->barriosDescripcion
-            // ] : null,
-            // 'familia' => isset($familia) ? [
-            //     'id' => $familia->id,
-            //     'nombre' => $familia->identificacion_persona
-            // ] : null,
+            'ocupacion' => isset($ocupacion) ? [
+                'id' => $ocupacion->id,
+                'nombre' => $ocupacion->ocupacionesDescripcion
+            ] : null,
+            'departamentoCor' => isset($departamentoCor) ? [
+                'id' => $departamentoCor->id,
+                'nombre' => $departamentoCor->departamentosDescripcion
+            ] : null,
+            'ciudadCor' => isset($ciudadCor) ? [
+                'id' => $ciudadCor->id,
+                'nombre' => $ciudadCor->ciudadesDescripcion
+            ] : null,
+            'comunaCor' => isset($comunaCor) ? [
+                'id' => $comunaCor->id,
+                'nombre' => $comunaCor->comunasDescripcion
+            ] : null,
+            'barrioCor' => isset($barrioCor) ? [
+                'id' => $barrioCor->id,
+                'nombre' => $barrioCor->barriosDescripcion
+            ] : null,
+            'familia' => isset($familia) ? [
+                'id' => $familia->id,
+                'nombre' => $familia->identificacion_persona
+            ] : null,
         ];
     }
 
@@ -648,7 +941,7 @@ class Persona extends Model
         $persona->fill($dto);
         $guardado = $persona->save();
         if(!$guardado){
-            throw new Exception("Ocurrió un error al intentar guardar el módulo.", $persona);
+            throw new Exception("Ocurrió un error al intentar guardar la persona.", $persona);
         }
 
         // Guardar auditoria
@@ -662,13 +955,43 @@ class Persona extends Model
         ];
         
         AuditoriaTabla::crear($auditoriaDto);
+
+        // --- Para proceso de Calculo Aportes Familia ---
+
+        $registroInicial = json_decode($personaOriginal);
+        if(!isset($dto['id'])&&isset($dto['familia_id'])){
+            Familia::calcularAportes($dto);
+        } else if (isset($dto['id'])){
+            $data['usuario_creacion_id'] = $usuario->id;
+            $data['usuario_creacion_nombre'] = $usuario->nombre;
+            if(isset($dto['familia_id'])){
+                $dto['usuario_creacion_id'] = $usuario->id;
+                $dto['usuario_creacion_nombre'] = $usuario->nombre;
+                if($registroInicial->familia_id){
+                    $data['familia_id'] = $registroInicial->familia_id;
+                    if($registroInicial->familia_id==$dto['familia_id']){
+                        Familia::calcularAportes($dto);
+                    } else {
+                        Familia::calcularAportes($dto);
+                        Familia::calcularAportes($data);
+                    }
+                } else {
+                    Familia::calcularAportes($dto);
+                }
+            } else if ($registroInicial->familia_id){
+                $data['familia_id'] = $registroInicial->familia_id;
+                Familia::calcularAportes($data);
+            }
+        }
         
-        // return Persona::cargar($persona->id);
-        return $persona;
+        return Persona::cargar($persona->id);
+        // return $persona;
     }
 
     public static function eliminar($id)
     {
+        $user = Auth::user();
+        $usuario = $user->usuario();
         $persona = Persona::find($id);
 
         // Guardar auditoria
@@ -680,6 +1003,13 @@ class Persona extends Model
             'recurso_original' => $persona->toJson()
         ];
         AuditoriaTabla::crear($auditoriaDto);
+
+        if($persona->familia_id){
+            $dto['usuario_creacion_id'] = $usuario->id;
+            $dto['usuario_creacion_nombre'] = $usuario->nombre;
+            $dto['familia_id'] = $persona->familia_id;
+            Familia::calcularAportes($dto);
+        }
 
         return $persona->delete();
     }
