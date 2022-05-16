@@ -5,6 +5,7 @@ namespace App\Models\Proyectos;
 use Carbon\Carbon;
 use App\Enum\AccionAuditoriaEnum;
 use Illuminate\Support\Facades\DB;
+use App\Models\Parametrizacion\Pais;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Parametrizacion\Banco;
 use App\Models\Parametrizacion\Barrio;
@@ -83,7 +84,11 @@ class Proyecto extends Model
     }
 
     public function remitente(){
-        return $this->belongsTo(Persona::class, 'remitente_id');
+        return $this->belongsTo(Persona::class, 'remitido_id');
+    }
+
+    public function pais(){
+        return $this->belongsTo(Pais::class, 'pais_id');
     }
 
     public function departamento(){
@@ -389,15 +394,15 @@ class Proyecto extends Model
     {
         $proyecto = Proyecto::find($id);
         $solicitante = $proyecto->solicitante;
-        // $tipoPrograma = $proyecto->tipoPrograma;
+        $tipoPrograma = $proyecto->tipoPrograma;
         $remitente = $proyecto->remitente;
-        // $pais = $proyecto->pais;
-        // $departamento = $proyecto->departamento;
-        // $ciudad = $proyecto->ciudad;
-        // $comuna = $proyecto->comuna;
-        // $barrio = $proyecto->barrio;
-        // $banco = $proyecto->banco;
-        // $orientador = $proyecto->orientador;
+        $pais = $proyecto->pais;
+        $departamento = $proyecto->departamento;
+        $ciudad = $proyecto->ciudad;
+        $comuna = $proyecto->comuna;
+        $barrio = $proyecto->barrio;
+        $banco = $proyecto->banco;
+        $orientador = $proyecto->orientador;
 
         return [
             'id' => $proyecto->id,
@@ -454,40 +459,43 @@ class Proyecto extends Model
             'fecha_modificacion' => (new Carbon($proyecto->updated_at))->format("Y-m-d H:i:s"),
             'solicitante' => isset($solicitante) ? [
                 'id' => $solicitante->id,
-                'nombre' => $solicitante->personasNombres.' '.$solicitante->personasPrimerApellido.' '.$solicitante->personasSegundoApellido
+                'nombre' => $solicitante->personasNombres.' '.$solicitante->personasPrimerApellido.' '.$solicitante->personasSegundoApellido,
+                'identificacion' => $solicitante->personasIdentificacion
             ] : null,
             'remitente' => isset($remitente) ? [
                 'id' => $remitente->id,
-                'nombre' => $remitente->personasNombres.' '.$remitente->personasPrimerApellido.' '.$remitente->personasSegundoApellido
+                'nombre' => $remitente->personasNombres.' '.$remitente->personasPrimerApellido.' '.$remitente->personasSegundoApellido,
+                'identificacion' => $remitente->personasIdentificacion
             ] : null,
-            // 'orientador' => isset($orientador) ? [
-            //     'id' => $orientador->id,
-            //     'nombre' => $orientador->orientadoresNombre
-            // ] : null,
-            // 'tipoPrograma' => isset($tipoPrograma) ? [
-            //     'id' => $tipoPrograma->id,
-            //     'nombre' => $tipoPrograma->tipProDescripcion
-            // ] : null,
-            // 'banco' => isset($banco) ? [
-            //     'id' => $banco->id,
-            //     'nombre' => $banco->bancosDescripcion
-            // ] : null,
-            // 'departamento' => isset($departamento) ? [
-            //     'id' => $departamento->id,
-            //     'nombre' => $departamento->departamentosDescripcion
-            // ] : null,
-            // 'ciudad' => isset($ciudad) ? [
-            //     'id' => $ciudad->id,
-            //     'nombre' => $ciudad->ciudadesDescripcion
-            // ] : null,
-            // 'comuna' => isset($comuna) ? [
-            //     'id' => $comuna->id,
-            //     'nombre' => $comuna->comunasDescripcion
-            // ] : null,
-            // 'barrio' => isset($barrio) ? [
-            //     'id' => $barrio->id,
-            //     'nombre' => $barrio->barriosDescripcion
-            // ] : null,
+            'orientador' => isset($orientador) ? [
+                'id' => $orientador->id,
+                'nombre' => $orientador->orientadoresNombre,
+                'identificacion' => $orientador->orientadoresIdentificacion,
+            ] : null,
+            'tipoPrograma' => isset($tipoPrograma) ? [
+                'id' => $tipoPrograma->id,
+                'nombre' => $tipoPrograma->tipProDescripcion
+            ] : null,
+            'banco' => isset($banco) ? [
+                'id' => $banco->id,
+                'nombre' => $banco->bancosDescripcion
+            ] : null,
+            'departamento' => isset($departamento) ? [
+                'id' => $departamento->id,
+                'nombre' => $departamento->departamentosDescripcion
+            ] : null,
+            'ciudad' => isset($ciudad) ? [
+                'id' => $ciudad->id,
+                'nombre' => $ciudad->ciudadesDescripcion
+            ] : null,
+            'comuna' => isset($comuna) ? [
+                'id' => $comuna->id,
+                'nombre' => $comuna->comunasDescripcion
+            ] : null,
+            'barrio' => isset($barrio) ? [
+                'id' => $barrio->id,
+                'nombre' => $barrio->barriosDescripcion
+            ] : null,
         ];
     }
 
