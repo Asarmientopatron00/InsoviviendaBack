@@ -63,7 +63,8 @@ class Proyecto extends Model
         'proyectosEstadoFormalizacion',
         'proyectosFechaAutNotaria',
         'proyectosFechaFirEscrituras',
-        'proyectosFechaIngresosReg',
+        'proyectosFechaIngresoReg',
+        'proyectosFechaSalidaReg',
         'proyectosAutorizacionDes',
         'proyectosFechaAutDes',
         'proyectosFechaCancelacion',
@@ -182,7 +183,8 @@ class Proyecto extends Model
                 'proyectos.proyectosEstadoFormalizacion',
                 'proyectos.proyectosFechaAutNotaria',
                 'proyectos.proyectosFechaFirEscrituras',
-                'proyectos.proyectosFechaIngresosReg',
+                'proyectos.proyectosFechaIngresoReg',
+                'proyectos.proyectosFechaSalidaReg',
                 'proyectos.proyectosAutorizacionDes',
                 'proyectos.proyectosFechaAutDes',
                 'proyectos.proyectosFechaCancelacion',
@@ -330,8 +332,11 @@ class Proyecto extends Model
                 if($attribute == 'proyectosFechaFirEscrituras'){
                     $query->orderBy('proyectos.proyectosFechaFirEscrituras', $value);
                 }
-                if($attribute == 'proyectosFechaIngresosReg'){
-                    $query->orderBy('proyectos.proyectosFechaIngresosReg', $value);
+                if($attribute == 'proyectosFechaIngresoReg'){
+                    $query->orderBy('proyectos.proyectosFechaIngresoReg', $value);
+                }
+                if($attribute == 'proyectosFechaSalidaReg'){
+                    $query->orderBy('proyectos.proyectosFechaSalidaReg', $value);
                 }
                 if($attribute == 'proyectosAutorizacionDes'){
                     $query->orderBy('proyectos.proyectosAutorizacionDes', $value);
@@ -445,7 +450,8 @@ class Proyecto extends Model
             'proyectosEstadoFormalizacion' => $proyecto->proyectosEstadoFormalizacion,
             'proyectosFechaAutNotaria' => $proyecto->proyectosFechaAutNotaria,
             'proyectosFechaFirEscrituras' => $proyecto->proyectosFechaFirEscrituras,
-            'proyectosFechaIngresosReg' => $proyecto->proyectosFechaIngresosReg,
+            'proyectosFechaIngresoReg' => $proyecto->proyectosFechaIngresoReg,
+            'proyectosFechaSalidaReg' => $proyecto->proyectosFechaSalidaReg,
             'proyectosAutorizacionDes' => $proyecto->proyectosAutorizacionDes,
             'proyectosFechaAutDes' => $proyecto->proyectosFechaAutDes,
             'proyectosFechaCancelacion' => $proyecto->proyectosFechaCancelacion,

@@ -420,7 +420,7 @@ class Persona extends Model
             $query->where('personas.personasEstadoRegistro', $dto['estado']);
         }
         if(isset($dto['familia'])){
-            $query->where('personas.familia_id', $dto['familia']);
+            $query->where('familias.identificacion_persona', $dto['familia']);
         }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
@@ -913,7 +913,8 @@ class Persona extends Model
             ] : null,
             'familia' => isset($familia) ? [
                 'id' => $familia->id,
-                'nombre' => $familia->identificacion_persona
+                'identificacion' => $familia->identificacion_persona,
+                'nombre' => $familia->persona->personasNombres.' '.$familia->persona->personasPrimerApellido.' '.$familia->persona->personasSegundoApellido,
             ] : null,
         ];
     }
