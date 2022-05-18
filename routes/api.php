@@ -397,6 +397,23 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
+    // Parametros Constantes
+    Route::group(["prefix" => "parametros-constantes"],function(){
+        Route::get('/', [Parametrizacion\ParametroConstanteController::class,'index'])->name('parametros-constantes.index');
+        Route::post('/', [Parametrizacion\ParametroConstanteController::class,'store'])->name('parametros-constantes.store');
+            // ->middleware(['permission:CrearParametroConstante']);
+        Route::get('/consultar', [Parametrizacion\ParametroConstanteController::class,'consultar'])->name('parametros-constantes.consultar');
+            // ->middleware(['permission:EliminarParametroConstante']);
+        Route::get('/tipos-rol', [Parametrizacion\ParametroConstanteController::class,'tiposRol'])->name('parametros-constantes.tiposRol');
+            // ->middleware(['permission:EliminarParametroConstante']);
+        Route::get('/{id}', [Parametrizacion\ParametroConstanteController::class,'show'])->name('parametros-constantes.show');
+            // ->middleware(['permission:ListarParametroConstante']);
+        Route::put('/{id}', [Parametrizacion\ParametroConstanteController::class,'update'])->name('parametros-constantes.update');
+            // ->middleware(['permission:ModificarParametroConstante']);
+        Route::delete('/{id}', [Parametrizacion\ParametroConstanteController::class,'destroy'])->name('parametros-constantes.delete');
+            // ->middleware(['permission:EliminarParametroConstante']);
+    });
+
     // Tipos benefactor
     Route::group(["prefix" => "tipos-benefactor"],function(){
         Route::get('/', [Parametrizacion\TipoBenefactorController::class,'index'])->name('tipos_benefactor.index');
