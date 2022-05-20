@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use Database\Seeders\UserSeed;
 use Illuminate\Database\Seeder;
+use Database\Seeders\ProyectosSeeder;
 use Database\Seeders\SeguridadSeeder;
 use Database\Seeders\DataForPersonSeeder;
+use Database\Seeders\ParametrizacionSeeder;
+use Database\Seeders\PersonasEntidadesSeeder;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class DatabaseSeeder extends Seeder
@@ -18,8 +21,11 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        $this->call(UserSeed::class);
+        // $this->call(UserSeed::class);
         $this->call(SeguridadSeeder::class);
-        $this->call(DataForPersonSeeder::class);
+        // $this->call(DataForPersonSeeder::class);
+        $this->call(ParametrizacionSeeder::class);
+        $this->call(PersonasEntidadesSeeder::class);
+        // $this->call(ProyectosSeeder::class);
     }
 }
