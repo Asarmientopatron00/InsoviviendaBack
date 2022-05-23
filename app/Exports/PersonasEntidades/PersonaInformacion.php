@@ -295,8 +295,8 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
     public function headings(): array
     {
         return [
-            "Identificación",
             "Tipo Identificación",
+            "Identificación",
             "Cat. Aportes",
             "Nombre",
             "Fecha Nacimiento",
