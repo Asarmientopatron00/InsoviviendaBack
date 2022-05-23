@@ -583,5 +583,17 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [Proyectos\ProyectoController::class,'destroy'])->name('proyectos.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
-
+    
+    // Orientación
+    Route::group(["prefix" => "orientaciones"],function(){
+        Route::get('/', [Proyectos\OrientacionController::class,'index'])->name('orientacion.index');
+        Route::post('/', [Proyectos\OrientacionController::class,'store'])->name('orientacion.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Proyectos\OrientacionController::class,'show'])->name('orientacion.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Proyectos\OrientacionController::class,'update'])->name('orientacion.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Proyectos\OrientacionController::class,'destroy'])->name('orientacion.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
 });
