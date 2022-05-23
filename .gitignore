@@ -13,3 +13,4 @@ yarn-error.log
 /.idea
 /.vscode
 MySQL-Semilla.sql
+/app/Exports/PersonasEntidades/ejemplo2.php
