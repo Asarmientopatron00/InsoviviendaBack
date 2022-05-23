@@ -7,6 +7,7 @@ use App\Http\Controllers\Seguridad;
 use App\Http\Controllers\PersonasEntidades;
 use App\Http\Controllers\Parametrizacion;
 use App\Http\Controllers\Proyectos;
+use App\Http\Controllers\Benefactores;
 
 /*
 |--------------------------------------------------------------------------
@@ -155,6 +156,18 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:ModificarModulo']);
         Route::delete('/{id}', [PersonasEntidades\FamiliaController::class,'destroy'])->name('familias.delete');
             // ->middleware(['permission:EliminarModulo']);
+    });
+
+    Route::group(["prefix" => "benefactores"],function(){
+        Route::get('/', [PersonasEntidades\BenefactorController::class,'index'])->name('benefactores.index');
+        Route::post('/', [PersonasEntidades\BenefactorController::class,'store'])->name('benefactores.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [PersonasEntidades\BenefactorController::class,'show'])->name('benefactores.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [PersonasEntidades\BenefactorController::class,'update'])->name('benefactores.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [PersonasEntidades\BenefactorController::class,'destroy'])->name('benefactores.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
     });
 
     // ---------------------- Parametrizacion -------------------------- //
@@ -428,7 +441,7 @@ Route::group(['middleware' => ['auth:api']], function (){
     });
 
     // Tipos documentos proyectos
-    Route::group(["prefix" => "tipos_documentos_proyecto"],function(){
+    Route::group(["prefix" => "tipos-documentos-proyecto"],function(){
         Route::get('/', [Parametrizacion\TipoDocumentoProyectoController::class,'index'])->name('tipos_documentos_proyecto.index');
         Route::post('/', [Parametrizacion\TipoDocumentoProyectoController::class,'store'])->name('tipos_documentos_proyecto.store');
             // ->middleware(['permission:CrearAplicacion']);
@@ -545,7 +558,20 @@ Route::group(['middleware' => ['auth:api']], function (){
     });
 
     // ---------------------- Proyectos -------------------------- //
-    // Proyectos
+     // Donaciones
+     Route::group(["prefix" => "donaciones"],function(){
+        Route::get('/', [Proyectos\DonacionController::class,'index'])->name('donaciones.index');
+        Route::post('/', [Proyectos\DonacionController::class,'store'])->name('donaciones.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Proyectos\DonacionController::class,'show'])->name('donaciones.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Proyectos\DonacionController::class,'update'])->name('donaciones.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Proyectos\DonacionController::class,'destroy'])->name('donaciones.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+     // Proyectos
      Route::group(["prefix" => "proyectos"],function(){
         Route::get('/', [Proyectos\ProyectoController::class,'index'])->name('proyectos.index');
         Route::post('/', [Proyectos\ProyectoController::class,'store'])->name('proyectos.store');

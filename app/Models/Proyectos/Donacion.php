@@ -2,10 +2,211 @@
 
 namespace App\Models\Proyectos;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Exception;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Enum\AccionAuditoriaEnum;
+use App\Models\Seguridad\AuditoriaTabla;
 
 class Donacion extends Model
 {
-    use HasFactory;
+   protected $table = 'donaciones'; // nombre de la tabla en la base de datos
+
+   protected $fillable = [ 'persona_id',
+                           'benefactor_id',
+                           'donacionesFechaDonacion',
+                           'tipo_donacion_id',
+                           'donacionesValorDonacion',
+                           'donacionesEstadoDonacion',
+                           'forma_pago_id',
+                           'donacionesNumeroCheque',
+                           'banco_id',
+                           'donacionesNumeroRecibo',
+                           'donacionesFechaRecibo',
+                           'donacionesNotas',
+                           'estado',
+                           'usuario_creacion_id',
+                           'usuario_creacion_nombre',
+                           'usuario_modificacion_id',
+                           'usuario_modificacion_nombre', ];
+ 
+   public static function obtenerColeccionLigera($dto) 
+   {
+      $query = DB::table('donaciones')->
+                  select(  'id',
+                           'persona_id',
+                           'estado', );
+      $query->orderBy('persona_id', 'asc');
+      return $query->get();
+   }
+ 
+   public static function obtenerColeccion($dto) 
+   {
+      $query = DB::table('donaciones') -> 
+                  select(  'id',
+                           'persona_id',
+                           'benefactor_id',
+                           'donacionesFechaDonacion',
+                           'tipo_donacion_id',
+                           'donacionesValorDonacion',
+                           'donacionesEstadoDonacion',
+                           'forma_pago_id',
+                           'donacionesNumeroCheque',
+                           'banco_id',
+                           'donacionesNumeroRecibo',
+                           'donacionesFechaRecibo',
+                           'donacionesNotas',
+                           'estado',
+                           'usuario_creacion_id',
+                           'usuario_creacion_nombre',
+                           'usuario_modificacion_id',
+                           'usuario_modificacion_nombre',
+                           'created_at AS fecha_creacion',
+                           'updated_at AS fecha_modificacion', );
+ 
+      //if (isset($dto['***********************']))
+      //   $query->where('***********************', 'like', '%' . $dto['***********************'] . '%');
+ 
+      if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
+         foreach ($dto['ordenar_por'] as $attribute => $value){
+            if ($attribute == 'persona_id') 
+               $query->orderBy('donaciones.persona_id', $value); 
+            if ($attribute == 'benefactor_id')  
+               $query->orderBy('donaciones.benefactor_id', $value); 
+            if ($attribute == 'donacionesFechaDonacion')  
+               $query->orderBy('donaciones.donacionesFechaDonacion', $value); 
+            if ($attribute == 'tipo_donacion_id')  
+               $query->orderBy('donaciones.tipo_donacion_id', $value); 
+            if ($attribute == 'donacionesValorDonacion')  
+               $query->orderBy('donaciones.donacionesValorDonacion', $value); 
+            if ($attribute == 'donacionesEstadoDonacion')  
+               $query->orderBy('donaciones.donacionesEstadoDonacion', $value); 
+            if ($attribute == 'forma_pago_id')  
+               $query->orderBy('donaciones.forma_pago_id', $value); 
+            if ($attribute == 'donacionesNumeroCheque')  
+               $query->orderBy('donaciones.donacionesNumeroCheque', $value); 
+            if ($attribute == 'banco_id')  
+               $query->orderBy('donaciones.banco_id', $value); 
+            if ($attribute == 'donacionesNumeroRecibo')  
+               $query->orderBy('donaciones.donacionesNumeroRecibo', $value);
+            if ($attribute == 'donacionesFechaRecibo')  
+               $query->orderBy('donaciones.donacionesFechaRecibo', $value);
+            if ($attribute == 'donacionesNotas')  
+               $query->orderBy('donaciones.donacionesNotas', $value); 
+            if ($attribute == 'estado')  
+               $query->orderBy('donaciones.estado', $value); 
+            if ($attribute == 'usuario_creacion_nombre')
+               $query->orderBy('donaciones.usuario_creacion_nombre', $value);
+            if ($attribute == 'usuario_modificacion_nombre')
+               $query->orderBy('donaciones.usuario_modificacion_nombre', $value);
+            if ($attribute == 'fecha_creacion')
+               $query->orderBy('donaciones.created_at', $value);
+            if ($attribute == 'fecha_modificacion')
+               $query->orderBy('donaciones.updated_at', $value);
+         }
+      else 
+         $query->orderBy("donaciones.updated_at", "desc");
+ 
+      $pag = $query->paginate($dto['limite'] ?? 100);
+      $datos = [];
+ 
+      foreach ($pag ?? [] as $pagTmp)
+         array_push($datos, $pagTmp);
+ 
+      $totReg = count($pag);
+      $to = isset($pag) && $totReg > 0 ? $pag->currentPage() * $pag->perPage() : null;
+      $to = isset($to) && isset($pag) && $to > $pag->total() && $totReg > 0 ? $pag->total() : $to;
+      $from = isset($to) && isset($pag) && $totReg > 0 ? ( $pag->perPage() > $to ? 1 : ($to - $totReg) + 1 ) : null;
+ 
+      return [ 'datos' => $datos,
+               'desde' => $from,
+               'hasta' => $to,
+               'por_pagina' => isset($pag) && $totReg > 0 ? + $pag->perPage() : 0,
+               'pagina_actual' => isset($pag) && $totReg > 0 ? $pag->currentPage() : 1,
+               'ultima_pagina' => isset($pag) && $totReg > 0 ? $pag->lastPage() : 0,
+               'total' => isset($pag) && $totReg > 0 ? $pag->total() : 0 ];
+   }
+ 
+   public static function cargar($id)
+   {
+      $regCargar = Donacion::find($id);
+      return [ 'id' => $regCargar->id,
+               'persona_id' => $regCargar->persona_id,
+               'benefactor_id' => $regCargar->benefactor_id,
+               'donacionesFechaDonacion' => $regCargar->donacionesFechaDonacion,
+               'tipo_donacion_id' => $regCargar->tipo_donacion_id,
+               'donacionesValorDonacion' => $regCargar->donacionesValorDonacion,
+               'donacionesEstadoDonacion' => $regCargar->donacionesEstadoDonacion,
+               'forma_pago_id' => $regCargar->forma_pago_id,
+               'donacionesNumeroCheque' => $regCargar->donacionesNumeroCheque,
+               'banco_id' => $regCargar->banco_id,
+               'donacionesNumeroRecibo' => $regCargar->donacionesNumeroRecibo,
+               'donacionesFechaRecibo' => $regCargar->donacionesFechaRecibo,
+               'donacionesNotas' => $regCargar->donacionesNotas,
+               'estado' => $regCargar->estado,
+               'usuario_creacion_id' => $regCargar->usuario_creacion_id,
+               'usuario_creacion_nombre' => $regCargar->usuario_creacion_nombre,
+               'usuario_modificacion_id' => $regCargar->usuario_modificacion_id,
+               'usuario_modificacion_nombre' => $regCargar->usuario_modificacion_nombre,
+               'fecha_creacion' => (new Carbon($regCargar->created_at))->format("Y-m-d H:i:s"),
+               'fecha_modificacion' => (new Carbon($regCargar->updated_at))->format("Y-m-d H:i:s") ];
+   }
+  
+   public static function modificarOCrear($dto)
+   {
+      $user = Auth::user();
+      $usuario = $user->usuario();
+  
+      if (!isset($dto['id'])) {
+         $dto['usuario_creacion_id'] = $usuario->id ?? ($dto['usuario_creacion_id'] ?? null);
+         $dto['usuario_creacion_nombre'] = $usuario->nombre ?? ($dto['usuario_creacion_nombre'] ?? null);
+      }
+      if (isset($usuario) || isset($dto['usuario_modificacion_id'])) {
+         $dto['usuario_modificacion_id'] = $usuario->id ?? ($dto['usuario_modificacion_id'] ?? null);
+         $dto['usuario_modificacion_nombre'] = $usuario->nombre ?? ($dto['usuario_modificacion_nombre'] ?? null);
+      }
+  
+      // Consultar aplicación
+      $reg = isset($dto['id']) ? Donacion::find($dto['id']) : new Donacion();
+  
+      // Guardar objeto original para auditoria
+      $regOri = $reg->toJson();
+  
+      $reg->fill($dto);
+      $guardado = $reg->save();
+      if (!$guardado) 
+         throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
+  
+      // Guardar auditoria
+      $auditoriaDto = [ 'id_recurso' => $reg->id,
+                        'nombre_recurso' => Donacion::class,
+                        'descripcion_recurso' => $reg->persona_id,
+                        'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
+                        'recurso_original' => isset($dto['id']) ? $regOri : $reg->toJson(),
+                        'recurso_resultante' => isset($dto['id']) ? $reg->toJson() : null ];
+  
+      AuditoriaTabla::crear($auditoriaDto);
+  
+      return Donacion::cargar($reg->id);
+   }
+ 
+   public static function eliminar($id)
+   {
+      $regEli = Donacion::find($id);
+ 
+      // Guardar auditoria
+      $auditoriaDto = [ 'id_recurso' => $regEli->id,
+                        'nombre_recurso' => Donacion::class,
+                        'descripcion_recurso' => $regEli->persona_id,
+                        'accion' => AccionAuditoriaEnum::ELIMINAR,
+                        'recurso_original' => $regEli->toJson() ];
+      AuditoriaTabla::crear($auditoriaDto);
+ 
+      return $regEli->delete();
+   }
+  
+   use HasFactory;
 }
