@@ -2,11 +2,15 @@
 
 namespace App\Models\Proyectos;
 
+use Exception;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
+use App\Enum\AccionAuditoriaEnum;
 use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Seguridad\AuditoriaTabla;
 use App\Models\Parametrizacion\TipoDocumentoProyecto;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -41,8 +45,10 @@ class DocumentoProyecto extends Model
             ->join('personas', 'personas.id', 'proyectos.persona_id')
             ->select(
                 'documentos_proyecto.id',
+                'tipos_documentos_proyecto.id AS tipo_documento_proyecto_id',
                 'tipos_documentos_proyecto.tiDoPrDescripcion',
                 'tipos_documentos_proyecto.tiDoPrRequerido',
+                'tipos_documentos_proyecto.tiDoPrEtapa',
                 'proyectos.id AS proyecto_id',
                 'proyectos.proyectosFechaSolicitud AS fechaSolicitud',
                 'proyectos.proyectosEstadoProyecto AS estado',
@@ -77,6 +83,9 @@ class DocumentoProyecto extends Model
                 }
                 if($attribute == 'tiDoPrDescripcion'){
                     $query->orderBy('tipos_documentos_proyecto.tiDoPrDescripcion', $value);
+                }
+                if($attribute == 'tiDoPrRequerido'){
+                    $query->orderBy('tipos_documentos_proyecto.tiDoPrRequerido', $value);
                 }
                 if($attribute == 'docProAplica'){
                     $query->orderBy('documentos_proyecto.docProAplica', $value);
