@@ -2,14 +2,17 @@
 
 namespace App\Models\Proyectos;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Exception;
 use Carbon\Carbon;
 use App\Enum\AccionAuditoriaEnum;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\PersonasEntidades\Persona;
+use App\Models\Parametrizacion\TipoAsesoria;
+use App\Models\PersonasEntidades\Orientador;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Orientacion extends Model
 
@@ -35,24 +38,13 @@ class Orientacion extends Model
         return $this->belongsTo(TipoAsesoria::class, 'tipo_orientacion_id');
     }
 
-    public function orientadores(){
+    public function orientador(){
         return $this->belongsTo(Orientador::class, 'orientador_id');
     }
     
     public function persona(){
         return $this->belongsTo(Persona::class, 'persona_id');
     }
-
-    /*public static function obtenerColeccionLigera($dto){
-        $query = DB::table('orientaciones')
-            ->select(
-                'id',
-                'tipos_orientacion.orientadoresNombre as Nombre',
-                'estado AS estado',
-            );
-        $query->orderBy('orientadoresNombre', 'asc');
-        return $query->get();
-    }*/
 
     public static function obtenerColeccion($dto){
         $query = DB::table('orientaciones')
@@ -171,6 +163,10 @@ class Orientacion extends Model
     public static function cargar($id)
     {
         $orientaciones = Orientacion::find($id);
+        $persona = $orientaciones->persona;
+        $tipoAsesoria = $orientaciones->tipoAsesoria;
+        $orientador = $orientaciones->orientador;
+
         return [
             'id' => $orientaciones->id,
             'tipo_orientacion_id' => $orientaciones->tipo_orientacion_id,
@@ -186,7 +182,21 @@ class Orientacion extends Model
             'usuario_modificacion_id' => $orientaciones->usuario_modificacion_id,
             'usuario_modificacion_nombre' => $orientaciones->usuario_modificacion_nombre,
             'fecha_creacion' => (new Carbon($orientaciones->created_at))->format("Y-m-d H:i:s"),
-            'fecha_modificacion' => (new Carbon($orientaciones->updated_at))->format("Y-m-d H:i:s")
+            'fecha_modificacion' => (new Carbon($orientaciones->updated_at))->format("Y-m-d H:i:s"),
+            'persona' => isset($persona) ? [
+                'id' => $persona->id,
+                'nombre' => $persona->personasNombres.' '.$persona->personasPrimerApellido.' '.$persona->personasSegundoApellido,
+                'identificacion' => $persona->personasIdentificacion
+            ] : null,
+            'tipoAsesoria' => isset($tipoAsesoria) ? [
+                'id' => $tipoAsesoria->id,
+                'nombre' => $tipoAsesoria->tipOriDescripcion
+            ] : null,
+            'orientador' => isset($orientador) ? [
+                'id' => $orientador->id,
+                'nombre' => $orientador->orientadoresNombre,
+                'identificacion' => $orientador->orientadoresIdentificacion
+            ] : null,
         ];
     }
 
