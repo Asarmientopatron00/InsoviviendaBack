@@ -14,6 +14,7 @@ use App\Models\Parametrizacion\Comuna;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
 use App\Models\PersonasEntidades\Persona;
+use App\Models\Proyectos\DocumentoProyecto;
 use App\Models\Parametrizacion\Departamento;
 use App\Models\Parametrizacion\TipoPrograma;
 use App\Models\PersonasEntidades\Orientador;
@@ -531,7 +532,6 @@ class Proyecto extends Model
             throw new Exception("Ocurrió un error al intentar guardar el proyecto.", $proyecto);
         }
 
-
         // Guardar auditoria
         $auditoriaDto = [
             'id_recurso' => $proyecto->id,
@@ -543,6 +543,13 @@ class Proyecto extends Model
         ];
         
         AuditoriaTabla::crear($auditoriaDto);
+
+        if(!isset($dto['id'])){
+            $data['proyecto_id'] = $proyecto->id;
+            $data['usuario_id'] = $usuario->id;
+            $data['usuario_nombre'] = $usuario->nombre;
+            DocumentoProyecto::crearDocumentosDelProyecto($data);
+        }
         
         return Proyecto::cargar($proyecto->id);
     }

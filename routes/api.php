@@ -571,8 +571,8 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:EliminarAplicacion']);
     });
 
-     // Proyectos
-     Route::group(["prefix" => "proyectos"],function(){
+    // Proyectos
+    Route::group(["prefix" => "proyectos"],function(){
         Route::get('/', [Proyectos\ProyectoController::class,'index'])->name('proyectos.index');
         Route::post('/', [Proyectos\ProyectoController::class,'store'])->name('proyectos.store');
             // ->middleware(['permission:CrearAplicacion']);
@@ -582,6 +582,19 @@ Route::group(['middleware' => ['auth:api']], function (){
             // ->middleware(['permission:ModificarAplicacion']);
         Route::delete('/{id}', [Proyectos\ProyectoController::class,'destroy'])->name('proyectos.delete');
             // ->middleware(['permission:EliminarAplicacion']);
+    });
+
+    // Plan Amortizacion
+    Route::group(["prefix" => "plan-amortizacion"],function(){
+        Route::get('/{proyecto_id}', [Proyectos\PlanAmortizacionController::class,'index'])->name('plan-amortizacion.index');
+            // ->middleware(['permission:ListarAplicacion']);
+    });
+
+    // Documentos Proyecto
+    Route::group(["prefix" => "documentos-proyecto"],function(){
+        Route::get('/{proyecto_id}', [Proyectos\DocumentoProyectoController::class,'index'])->name('documentos-proyecto.index');
+        Route::put('/{id}', [Proyectos\DocumentoProyectoController::class,'update'])->name('documentos-proyecto.update');
+            // ->middleware(['permission:ListarAplicacion']);
     });
     
     // Orientación
