@@ -72,7 +72,7 @@ class PersonasEntidadesSeeder extends Seeder
             'updated_at' =>Carbon::now(),
         ]);
         DB::table('opciones_del_sistema')->insert([
-            'nombre'=> 'Asesores',
+            'nombre'=> 'Benefactores',
             'modulo_id'=> 3,
             'posicion'=> 20,
             'icono_menu'=> 'people_alt',
