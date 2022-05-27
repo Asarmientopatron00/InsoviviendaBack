@@ -84,17 +84,17 @@ class Orientacion extends Model
                 'orientaciones.updated_at AS fecha_modificacion',
             );
 
-        if(isset($dto['nombre'])){
-            $query->where('tipos_orientacion.orientadoresNombre', 'like', '%' . $dto['nombre'] . '%');
+        if(isset($dto['tipoAsesoria'])){
+            $query->where('tipos_orientacion.id', '=', $dto['tipoAsesoria']);
         }
-        if(isset($dto['nombreOrientador'])){
-            $query->where('orientadores.orientadoresNombre', 'like', '%' . $dto['nombreOrientador'] . '%');
+        if(isset($dto['identificacionOrientador'])){
+            $query->where('orientadores.orientadoresIdentificacion', '=', $dto['identificacionOrientador']);
         }
         if(isset($dto['fechaOrientacion'])){
             $query->where('orientaciones.orientacionesFechaOrientacion', 'like', '%' . $dto['fechaOrientacion'] . '%');
         }
-        if(isset($dto['nombrePersona'])){
-            $query->where('personas.personasNombres', 'like', '%' . $dto['fechaOrientacion'] . '%');
+        if(isset($dto['identificacionPersona'])){
+            $query->where('personas.personasIdentificacion', '=', $dto['identificacionPersona']);
         }
         if(isset($dto['estado'])){
             $query->where('orientaciones.estado', 'like', '%' . $dto['estado'] . '%');
