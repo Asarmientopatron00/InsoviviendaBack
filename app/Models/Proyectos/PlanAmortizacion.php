@@ -41,7 +41,10 @@ class PlanAmortizacion extends Model
             ->join('personas', 'personas.id', 'proyectos.persona_id')
             ->select(
                 'plan_amortizacion.id',
-                'proyectos.id as numero_proyecto',
+                'proyectos.id AS proyecto_id',
+                'proyectos.proyectosFechaSolicitud AS fechaSolicitud',
+                'proyectos.proyectosEstadoProyecto AS estado',
+                'personas.personasIdentificacion AS identificacion',
                 DB::Raw(
                     "CONCAT(
                         IFNULL(CONCAT(personas.personasNombres), ''),
