@@ -14,6 +14,7 @@ use App\Models\Parametrizacion\Comuna;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
 use App\Models\PersonasEntidades\Persona;
+use App\Models\Proyectos\PlanAmortizacion;
 use App\Models\Proyectos\DocumentoProyecto;
 use App\Models\Parametrizacion\Departamento;
 use App\Models\Parametrizacion\TipoPrograma;
@@ -549,6 +550,15 @@ class Proyecto extends Model
             $data['usuario_id'] = $usuario->id;
             $data['usuario_nombre'] = $usuario->nombre;
             DocumentoProyecto::crearDocumentosDelProyecto($data);
+        }
+
+        if($dto['proyectosEstadoProyecto'] === 'APR' || $dto['proyectosEstadoProyecto'] === 'DES'){
+            $data['numero_proyecto'] = $proyecto->id;
+            $data['tipo_plan'] = 'APR';
+            $data['plan_def'] = 'N';
+            $data['usuario_id'] = $usuario->id;
+            $data['usuario_nombre'] = $usuario->nombre;
+            PlanAmortizacion::calcularPlan($data);
         }
         
         return Proyecto::cargar($proyecto->id);
