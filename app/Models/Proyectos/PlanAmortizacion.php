@@ -160,6 +160,12 @@ class PlanAmortizacion extends Model
         ];
     }
 
+    public static function getHeaders($id){
+        $proyecto = Proyecto::find($id);
+        $persona = $proyecto->solicitante;
+        return $proyecto;
+    }
+
     public static function calcularPlan($params){
         $numeroProyecto = $params['numero_proyecto'];
         $tipoPlan = $params['tipo_plan'];
