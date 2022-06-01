@@ -27,30 +27,35 @@ class BenefactorController extends Controller
     */
    public function index(Request $request)
    {
-      try { $datos = $request->all();
+      try { 
+         $datos = $request->all();
 
-            // valida entrada de parametros a la funcion
-            if (!$request->ligera) {
-               $retVal = Validator::make($datos, ['limite' => 'integer|between:1,500']);
-               if ($retVal->fails())
-                  return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
-            }
-
-            // captura lista de registros de repositorio benefactores
-            if ($request->ligera)
-               $retLista = Benefactor::obtenerColeccionLigera($datos);
-            else {
-               if (isset($datos['ordenar_por']))
-                  $datos['ordenar_por'] = format_order_by_attributes($datos);
-               $retLista = Benefactor::obtenerColeccion($datos);
-            }
-
-            return response($retLista, Response::HTTP_OK);
+         // valida entrada de parametros a la funcion
+         if (!$request->ligera) {
+            $retVal = Validator::make(
+               $datos, 
+               [  'limite' => 
+                  'integer|between:1,500'
+               ]
+            );
+            if ($retVal->fails())
+               return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
          }
-      catch(Exception $e)
-         {
-            return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+
+         // captura lista de registros de repositorio benefactores
+         if ($request->ligera)
+            $retLista = Benefactor::obtenerColeccionLigera($datos);
+         else {
+            if (isset($datos['ordenar_por']))
+               $datos['ordenar_por'] = format_order_by_attributes($datos);
+            $retLista = Benefactor::obtenerColeccion($datos);
          }
+
+         return response($retLista, Response::HTTP_OK);
+      }
+      catch(Exception $e) {
+         return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+      }
    }
 
    /**
@@ -174,7 +179,8 @@ class BenefactorController extends Controller
                   'El departamento seleccionado no existe o está en estado inactivo',
                'ciudad_id.exists' => 
                   'La ciudad seleccionada no existe o está en estado inactivo', 
-            ] );
+            ] 
+         );
          if ($retVal->fails())
             return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
@@ -210,7 +216,8 @@ class BenefactorController extends Controller
             $datos, 
             [  'id' => 
                   'integer|required|exists:benefactores,id'
-            ]);
+            ]
+         );
          if ($retVal->fails())
             return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
@@ -348,7 +355,8 @@ class BenefactorController extends Controller
                   'El departamento seleccionado no existe o está en estado inactivo',
                'ciudad_id.exists' => 
                   'La ciudad seleccionada no existe o está en estado inactivo', 
-            ] );
+            ] 
+         );
          if ($retVal->fails())
                return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
 
