@@ -51,7 +51,7 @@ class Benefactor extends Model
                      IFNULL(CONCAT(' ', benefactoresSegundoApellido), '')) AS nombre"),
             'benefactores.estado', 
       );
-      $query -> orderBy('benefactoresNombres', 'asc');
+      $query -> orderBy('nombre', 'asc');
       return $query -> get();
    }
 
