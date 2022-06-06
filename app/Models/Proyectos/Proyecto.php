@@ -118,6 +118,26 @@ class Proyecto extends Model
         return $this->belongsTo(Orientador::class, 'orientador_id');
     }
 
+    public static function obtenerColeccionLigera($dto) 
+   {
+      $query = DB::table('proyectos')
+         ->join('personas', 'personas.id', '=', 'proyectos.persona_id')
+         ->select(
+            'proyectos.id',
+            DB::Raw("
+                CONCAT(
+                    IFNULL(CONCAT(personas.personasNombres), ''), 
+                    IFNULL(CONCAT(' ', personas.personasPrimerApellido), ''),
+                    IFNULL(CONCAT(' ', personas.personasSegundoApellido), '')
+                ) AS nombre"
+            ),
+            'personas.personasIdentificacion AS identificacion',
+            'proyectos.proyectosEstadoProyecto AS estado', 
+         );
+      $query->orderBy('proyectos.id', 'asc');
+      return $query->get();
+   }
+
     public static function obtenerColeccion($dto){
         $query = DB::table('proyectos')
             ->join('personas', 'proyectos.persona_id', 'personas.id')
