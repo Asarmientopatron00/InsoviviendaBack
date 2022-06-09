@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Factura</title>
+    <title>{{'Recibo de Caja '.$pago->id}}</title>
     <link rel="stylesheet" href="css/app.css">
   </head>
   <body class="antialiased">
@@ -23,21 +23,21 @@
           </div>
           <div class="container-div">
             <div class="pay-container">
-              <h1 class="right">RECIBO DE CAJA</h1>
+              <h1 class="right" style="font-size: 20px">RECIBO DE CAJA</h1>
               <div>
                 <div style="display: inline-block; width: 108px">
-                  <h2 style="color: darkred; font-size: 18px; text-align: left; padding-left: 70px">N°</h2>
+                  <h2 style="color: darkred; font-size: 18px; text-align: left; padding-left: 55px">N°</h2>
                 </div>
                 <div style="display: inline-block; width: 108px" >
-                  <h2 style="color: darkred; font-size: 18px; text-align: right">71</h2>
+                  <h2 style="color: darkred; font-size: 18px; text-align: right">{{$pago->id}}</h2>
                 </div>
               </div>
               <div class="pay-info">
-                <div style="display: inline-block; width: 108px">
-                  <h2 style="font-size: 18px; text-align: left; padding-left: 70px">POR:</h2>
+                <div style="display: inline-block; width: 95px">
+                  <h2 style="font-size: 16px; text-align: left; padding-left: 55px">POR$</h2>
                 </div>
-                <div style="display: inline-block; width: 108px; border-style: solid; border-width: 1px; border-radius: 5px" >
-                  <h2 style="font-size: 18px; text-align: right">{{number_format($pago->pagosValorTotalPago, 2, '.', ',')}}</h2>
+                <div style="display: inline-block; width: 108px; border-style: solid; border-width: 1px; border-radius: 5px; margin-left: 10px" >
+                  <h2 style="font-size: 16px; text-align: right">{{number_format($pago->pagosValorTotalPago, 2, '.', ',')}}</h2>
                 </div>
               </div>
             </div>
@@ -71,7 +71,7 @@
           </div>
           <div class="payment-info">
             <div class="payment-info-div">
-              <h2 style="font-size: 12px; padding-top: 4px">ABONO A CAPITAL:</h2>
+              <h2 style="font-size: 12px; padding-top: 6px">ABONO A CAPITAL:</h2>
               <h2 class="bold bottom">{{number_format($totales->capital, 2, '.', ',')}}</h2>
             </div>
             <div class="payment-info-div taxes">
@@ -106,7 +106,7 @@
             </div>
             <div class="consignment-info-div">
               <h2 style="font-size: 12px">SALDO CARTERA:</h3>
-              <h2 class="bold">$4.800.000</h2>
+              <h2 class="bold">{{number_format($totales->cartera, 2, '.', ',')}}</h2>
             </div>
           </div>
           <div class="sign-info">
@@ -116,11 +116,14 @@
             </div>
             <div class="sign-info-div">
               <h2 style="font-size: 12px">FIRMA AUTORIZADA:</h3>
-              <h2 style="font-size: 12px; padding-top: 10px">___________________________________________________________________________________</h3>
+              <h2 style="font-size: 12px; padding-top: 15px">__________________________________________________________________________</h3>
             </div>
           </div>
         </div>
       </main>
+      <div style="font-size: 11px; margin: 8px 10px">
+        Elaborador por {{$pago->usuario_creacion_nombre}}, Fecha y hora de impresión: {{$totales->fecha}}
+      </div>
     </body>
   </body>
 </html>

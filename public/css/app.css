@@ -1,14 +1,17 @@
 /* General */
+body {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
 
 h2, h3 {
   margin: 0;
-  font-size: 5vm;
+  font-size: 15px;
   font-weight: normal;
 }
 
 h1 {
   margin: 10px 0px;
-  font-size: 19px;
+  font-size: 18px;
   font-weight: normal;
 }
 
@@ -16,7 +19,7 @@ h1 {
 
 .header, .main {
   border-style: solid;
-  border-radius: 20px;
+  border-radius: 10px;
   border-width: 1px;
 }
 
@@ -60,9 +63,9 @@ h1 {
 
 /* Main */
 
-.main-container {
-  padding: 10px 0px;
-}
+/* .main-container {
+  padding: 0px 0px;
+} */
 
 .customer, .customer-id, .payment, .concept, .payment-info, .consignment-info, .sign-info {
   border-bottom-style: solid;
@@ -84,13 +87,13 @@ h1 {
 .payment-info-div, .consignment-info-div, .sign-info-div {
   display: inline-block;
   vertical-align: middle;
-  width: 140px;
+  width: 130px;
   height: 45px;
   padding-top: 4px;
 }
 
 .taxes {
-  width: 266px;
+  width: 250px;
 }
 
 .taxes-div, .consignment-info-div, .sign-info-div {
@@ -109,30 +112,31 @@ h1 {
 }
 
 .consignment-info-div {
-  width: 230px;
+  width: 204px;
   height: 44px;
 }
 
 .taxes-div, .taxes-div-first {
   display: inline-block;
-  width: 110px;
+  width: 96px;
   height: 45px;
   vertical-align: middle;
 }
 
 .taxes-div-first {
-  width: 130px;
+  width: 127px;
 }
 
 .sign-info {
   padding-top: 0;
   padding-bottom: 0;
   border-bottom: none;
+  height: 55px;
 }
 
 .sign-info-div {
   width: 230px;
-  height: 44px;
+  height: 50px;
 }
 
 .sign-info-div-first {
@@ -152,7 +156,7 @@ h1 {
 
 .bold {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 15px;
 }
 
 .bottom {

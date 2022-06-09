@@ -19,6 +19,7 @@ use App\Models\Proyectos\DocumentoProyecto;
 use App\Models\Parametrizacion\Departamento;
 use App\Models\Parametrizacion\TipoPrograma;
 use App\Models\PersonasEntidades\Orientador;
+use App\Models\Proyectos\PlanAmortizacionDefinitivo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Proyecto extends Model
@@ -116,6 +117,14 @@ class Proyecto extends Model
 
     public function orientador(){
         return $this->belongsTo(Orientador::class, 'orientador_id');
+    }
+
+    public function planAmortizacion(){
+        return $this->hasMany(PlanAmortizacion::class, 'proyecto_id');
+    }
+
+    public function planAmortizacionDefinitivo(){
+        return $this->hasMany(PlanAmortizacionDefinitivo::class, 'proyecto_id');
     }
 
     public static function obtenerColeccionLigera($dto) 
