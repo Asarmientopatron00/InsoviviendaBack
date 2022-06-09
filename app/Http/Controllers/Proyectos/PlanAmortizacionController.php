@@ -5,9 +5,10 @@ namespace App\Http\Controllers\Proyectos;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Exports\Proyectos\PlanAmortizacionExport;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
 use App\Models\Proyectos\PlanAmortizacion;
+use Illuminate\Support\Facades\Validator;
 
 class PlanAmortizacionController extends Controller
 {
@@ -46,5 +47,11 @@ class PlanAmortizacionController extends Controller
         }catch(Exception $e){
             return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function descargaPlanAmortizacion(Request $request)
+    {
+        $nombreArchivo = 'PlanAmortizacion-' . time() . '.xlsx';
+        return (new PlanAmortizacionExport($request->all()))->download($nombreArchivo);
     }
 }
