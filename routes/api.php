@@ -7,7 +7,6 @@ use App\Http\Controllers\Seguridad;
 use App\Http\Controllers\PersonasEntidades;
 use App\Http\Controllers\Parametrizacion;
 use App\Http\Controllers\Proyectos;
-use App\Http\Controllers\Benefactores;
 
 /*
 |--------------------------------------------------------------------------
@@ -587,6 +586,12 @@ Route::group(['middleware' => ['auth:api']], function (){
     // Plan Amortizacion
     Route::group(["prefix" => "plan-amortizacion"],function(){
         Route::get('/{proyecto_id}', [Proyectos\PlanAmortizacionController::class,'index'])->name('plan-amortizacion.index');
+            // ->middleware(['permission:ListarAplicacion']);
+    });
+
+    // Plan Amortizacion definitivo
+    Route::group(["prefix" => "plan-amortizacion-definitivo"],function(){
+        Route::get('/{proyecto_id}', [Proyectos\PlanAmortizacionDefinitivoController::class,'index'])->name('plan-amortizacion-definitivo.index');
             // ->middleware(['permission:ListarAplicacion']);
     });
 

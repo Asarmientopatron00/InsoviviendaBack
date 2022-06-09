@@ -28,3 +28,10 @@ Route::group(["prefix" => "pagos"],function(){
     Route::get('/{id}', [Proyectos\PagoController::class,'factura'])->name('pagos.factura');
         // ->middleware(['permission:ListarColaborador']);
 });
+
+Route::group(["prefix" => "proyectos"],function(){
+    Route::get('/plan-amortizacion', [Proyectos\PlanAmortizacionController::class,'descargaPlanAmortizacion'])->name('plan-amortizacion.descargaPlanAmortizacion');
+    Route::get('/plan-amortizacion-definitivo', [Proyectos\PlanAmortizacionDefinitivoController::class,'descargaPlanAmortizacionDefinitivo'])->name('plan-amortizacion-definitivo.descargaPlanAmortizacionDefinitivo');
+        // ->middleware(['permission:ListarColaborador']);
+});
+
