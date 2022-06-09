@@ -38,7 +38,11 @@ class ProyectoController extends Controller
             if(isset($datos['ordenar_por'])){
                 $datos['ordenar_por'] = format_order_by_attributes($datos);
             }
-            $proyectos = Proyecto::obtenerColeccion($datos);
+            if($request->ligera){
+                $proyectos = Proyecto::obtenerColeccionLigera($datos);
+            } else {
+                $proyectos = Proyecto::obtenerColeccion($datos);
+            }
             return response($proyectos, Response::HTTP_OK);
         }catch(Exception $e){
             return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);

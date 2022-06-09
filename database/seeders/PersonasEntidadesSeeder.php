@@ -71,6 +71,20 @@ class PersonasEntidadesSeeder extends Seeder
             'created_at' =>Carbon::now(),
             'updated_at' =>Carbon::now(),
         ]);
+        DB::table('opciones_del_sistema')->insert([
+            'nombre'=> 'Benefactores',
+            'modulo_id'=> 3,
+            'posicion'=> 20,
+            'icono_menu'=> 'people_alt',
+            'url'=> '/benefactores',
+            'estado'=> true,
+            'usuario_creacion_id' =>1,
+            'usuario_creacion_nombre'=>'SuperUser',
+            'usuario_modificacion_id' =>1,
+            'usuario_modificacion_nombre' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
         DB::table('permissions')->insert([
             'name'=> 'CrearPersona',
             'guard_name'=> 'api',
@@ -227,6 +241,54 @@ class PersonasEntidadesSeeder extends Seeder
             'created_at' =>Carbon::now(),
             'updated_at' =>Carbon::now(),
         ]);
+        DB::table('permissions')->insert([
+            'name'=> 'CrearBenefactor',
+            'guard_name'=> 'api',
+            'option_id' => 41,
+            'title'=> 'Crear',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'ModificarBenefactor',
+            'guard_name'=> 'api',
+            'option_id' => 41,
+            'title'=> 'Modificar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'EliminarBenefactor',
+            'guard_name'=> 'api',
+            'option_id' => 41,
+            'title'=> 'Eliminar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'ListarBenefactor',
+            'guard_name'=> 'api',
+            'option_id' => 41,
+            'title'=> 'Listar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
         DB::table('role_has_permissions')->insert([
             'permission_id'=> 144,
             'role_id'=> 1,
@@ -277,6 +339,22 @@ class PersonasEntidadesSeeder extends Seeder
         ]);
         DB::table('role_has_permissions')->insert([
             'permission_id'=> 156,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 157,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 158,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 159,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 160,
             'role_id'=> 1,
         ]);
     }

@@ -622,4 +622,17 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [Proyectos\OrientacionController::class,'destroy'])->name('orientacion.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
+
+    // Desembolso
+    Route::group(["prefix" => "desembolsos"],function(){
+        Route::get('/', [Proyectos\DesembolsoController::class,'index'])->name('desembolsos.index');
+        Route::post('/', [Proyectos\DesembolsoController::class,'store'])->name('desembolsos.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Proyectos\DesembolsoController::class,'show'])->name('desembolsos.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [Proyectos\DesembolsoController::class,'update'])->name('desembolsos.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Proyectos\DesembolsoController::class,'destroy'])->name('desembolsos.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
 });

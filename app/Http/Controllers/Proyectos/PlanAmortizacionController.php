@@ -37,55 +37,14 @@ class PlanAmortizacionController extends Controller
             if(isset($datos['ordenar_por'])){
                 $datos['ordenar_por'] = format_order_by_attributes($datos);
             }
-            $planAmortizacion = PlanAmortizacion::obtenerColeccion($datos);
+            if($request->headerInfo){
+                $planAmortizacion = PlanAmortizacion::getHeaders($proyecto_id);
+            } else {
+                $planAmortizacion = PlanAmortizacion::obtenerColeccion($datos);
+            }
             return response($planAmortizacion, Response::HTTP_OK);
         }catch(Exception $e){
             return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Proyectos\PlanAmortizacion  $planAmortizacion
-     * @return \Illuminate\Http\Response
-     */
-    public function show(PlanAmortizacion $planAmortizacion)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Proyectos\PlanAmortizacion  $planAmortizacion
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, PlanAmortizacion $planAmortizacion)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Proyectos\PlanAmortizacion  $planAmortizacion
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(PlanAmortizacion $planAmortizacion)
-    {
-        //
     }
 }

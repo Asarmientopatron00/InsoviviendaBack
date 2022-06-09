@@ -14,14 +14,14 @@ class PlanAmortizacion extends Model
     protected $fillable = [ // nombres de los campos
         'proyecto_id',
         'plaAmoNumeroCuota',
-        'plaAmoFechaVencimiento',
+        'plaAmoFechaVencimientoCuota',
         'plaAmoValorSaldoCapital',
         'plaAmoValorCapitalCuota',
         'plaAmoValorInteresCuota',
         'plaAmoValorSeguroCuota',
         'plaAmoValorInteresMora',
         'plaAmoDiasMora',
-        'plaAmoFechaUltimoPago',
+        'plaAmoFechaUltimoPagoCuota',
         'plaAmoCuotaCancelada',
         'plaAmoEstadoPlanAmortizacion',
         'plaAmoEstado',
@@ -41,7 +41,10 @@ class PlanAmortizacion extends Model
             ->join('personas', 'personas.id', 'proyectos.persona_id')
             ->select(
                 'plan_amortizacion.id',
-                'proyectos.id as numero_proyecto',
+                'proyectos.id AS proyecto_id',
+                'proyectos.proyectosFechaSolicitud AS fechaSolicitud',
+                'proyectos.proyectosEstadoProyecto AS estado',
+                'personas.personasIdentificacion AS identificacion',
                 DB::Raw(
                     "CONCAT(
                         IFNULL(CONCAT(personas.personasNombres), ''),
@@ -51,14 +54,14 @@ class PlanAmortizacion extends Model
                     AS solicitante"
                 ),
                 'plan_amortizacion.plaAmoNumeroCuota',
-                'plan_amortizacion.plaAmoFechaVencimiento',
+                'plan_amortizacion.plaAmoFechaVencimientoCuota',
                 'plan_amortizacion.plaAmoValorSaldoCapital',
                 'plan_amortizacion.plaAmoValorCapitalCuota',
                 'plan_amortizacion.plaAmoValorInteresCuota',
                 'plan_amortizacion.plaAmoValorSeguroCuota',
                 'plan_amortizacion.plaAmoValorInteresMora',
                 'plan_amortizacion.plaAmoDiasMora',
-                'plan_amortizacion.plaAmoFechaUltimoPago',
+                'plan_amortizacion.plaAmoFechaUltimoPagoCuota',
                 'plan_amortizacion.plaAmoCuotaCancelada',
                 'plan_amortizacion.plaAmoEstadoPlanAmortizacion',
                 'plan_amortizacion.plaAmoEstado',
@@ -82,8 +85,8 @@ class PlanAmortizacion extends Model
                 if($attribute == 'plaAmoNumeroCuota'){
                     $query->orderBy('plan_amortizacion.plaAmoNumeroCuota', $value);
                 }
-                if($attribute == 'plaAmoFechaVencimiento'){
-                    $query->orderBy('plan_amortizacion.plaAmoFechaVencimiento', $value);
+                if($attribute == 'plaAmoFechaVencimientoCuota'){
+                    $query->orderBy('plan_amortizacion.plaAmoFechaVencimientoCuota', $value);
                 }
                 if($attribute == 'plaAmoValorSaldoCapital'){
                     $query->orderBy('plan_amortizacion.plaAmoValorSaldoCapital', $value);
@@ -103,8 +106,8 @@ class PlanAmortizacion extends Model
                 if($attribute == 'plaAmoDiasMora'){
                     $query->orderBy('plan_amortizacion.plaAmoDiasMora', $value);
                 }
-                if($attribute == 'plaAmoFechaUltimoPago'){
-                    $query->orderBy('plan_amortizacion.plaAmoFechaUltimoPago', $value);
+                if($attribute == 'plaAmoFechaUltimoPagoCuota'){
+                    $query->orderBy('plan_amortizacion.plaAmoFechaUltimoPagoCuota', $value);
                 }
                 if($attribute == 'plaAmoCuotaCancelada'){
                     $query->orderBy('plan_amortizacion.plaAmoCuotaCancelada', $value);
@@ -157,11 +160,17 @@ class PlanAmortizacion extends Model
         ];
     }
 
+    public static function getHeaders($id){
+        $proyecto = Proyecto::find($id);
+        $persona = $proyecto->solicitante;
+        return $proyecto;
+    }
+
     public static function calcularPlan($params){
         $numeroProyecto = $params['numero_proyecto'];
-        $tipoPlan = $params['numero_proyecto'];
-        $planDef = $params['numero_proyecto'];
-        $transaccion = 'PROCESO';
+        $tipoPlan = $params['tipo_plan'];
+        $planDef = $params['plan_def'];
+        $transaccion = 'CalcularPlanAmortizacion';
         $usuario = $params['usuario_nombre'];
         $usuarioId = $params['usuario_id'];
         $procedure = DB::select(
