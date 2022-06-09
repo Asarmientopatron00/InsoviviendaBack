@@ -596,6 +596,19 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::put('/{id}', [Proyectos\DocumentoProyectoController::class,'update'])->name('documentos-proyecto.update');
             // ->middleware(['permission:ListarAplicacion']);
     });
+
+    // Bitacoras Proyecto
+    Route::group(["prefix" => "bitacoras-proyecto"],function(){
+        Route::get('/{proyecto_id}', [Proyectos\BitacoraProyectoController::class,'index'])->name('bitacoras-proyecto.index');
+        Route::post('/{proyecto_id}', [Proyectos\BitacoraProyectoController::class,'store'])->name('bitacoras-proyecto.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::put('/{id}', [Proyectos\BitacoraProyectoController::class,'update'])->name('bitacoras-proyecto.update');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::get('/{proyecto_id}/{id}', [Proyectos\OrientacionController::class,'show'])->name('orientacion.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::delete('/{id}', [Proyectos\OrientacionController::class,'destroy'])->name('orientacion.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
     
     // Orientación
     Route::group(["prefix" => "orientaciones"],function(){
