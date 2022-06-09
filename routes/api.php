@@ -622,4 +622,18 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [Proyectos\DesembolsoController::class,'destroy'])->name('desembolsos.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
+
+    // Pago
+    Route::group(["prefix" => "pagos"],function(){
+        Route::get('/', [Proyectos\PagoController::class,'index'])->name('pagos.index');
+        Route::post('/', [Proyectos\PagoController::class,'store'])->name('pagos.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [Proyectos\PagoController::class,'show'])->name('pagos.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/reversar/{id}', [Proyectos\PagoController::class,'reversar'])->name('pagos.reversar');
+        Route::put('/{id}', [Proyectos\PagoController::class,'update'])->name('pagos.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [Proyectos\PagoController::class,'destroy'])->name('pagos.delete');
+            // ->middleware(['permission:EliminarAplicacion']);
+    });
 });

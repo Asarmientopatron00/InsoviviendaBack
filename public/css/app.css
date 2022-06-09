@@ -1,0 +1,160 @@
+/* General */
+
+h2, h3 {
+  margin: 0;
+  font-size: 5vm;
+  font-weight: normal;
+}
+
+h1 {
+  margin: 10px 0px;
+  font-size: 19px;
+  font-weight: normal;
+}
+
+/* Header */
+
+.header, .main {
+  border-style: solid;
+  border-radius: 20px;
+  border-width: 1px;
+}
+
+.container {
+  width: 900px;
+}
+
+.container-div {
+  display: inline-block;
+  vertical-align: middle;
+  width: 230px;
+  padding-top: 20px;
+  padding-bottom: 5px;
+}
+
+.main-logo {
+  width: 150px;
+  padding-left: 8px;
+}
+
+.slogan {
+  width: 200px;
+  padding-bottom: 10px;
+}
+
+.main-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.pay-container {
+  padding-right: 8px;
+}
+
+.pay-info {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Main */
+
+.main-container {
+  padding: 10px 0px;
+}
+
+.customer, .customer-id, .payment, .concept, .payment-info, .consignment-info, .sign-info {
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+  padding-bottom: 8px;
+  padding-top: 6px;
+  padding-left: 20px;
+}
+
+.payment-info, .consignment-info, .sign-info {
+  padding-bottom: 0; 
+  height: 50px;
+}
+
+.consignment-info {
+  padding-top: 5px;
+}
+
+.payment-info-div, .consignment-info-div, .sign-info-div {
+  display: inline-block;
+  vertical-align: middle;
+  width: 140px;
+  height: 45px;
+  padding-top: 4px;
+}
+
+.taxes {
+  width: 266px;
+}
+
+.taxes-div, .consignment-info-div, .sign-info-div {
+  padding-left: 5px;
+  padding-right: 5px;
+  border-left-style: solid;
+  border-left-width: 1px;
+  padding-top: 12px;
+  padding-bottom: 0px;
+}
+
+.consignment-info-div-first {
+  border-left: none;
+  width: 160px;
+  padding-left: 0;
+}
+
+.consignment-info-div {
+  width: 230px;
+  height: 44px;
+}
+
+.taxes-div, .taxes-div-first {
+  display: inline-block;
+  width: 110px;
+  height: 45px;
+  vertical-align: middle;
+}
+
+.taxes-div-first {
+  width: 130px;
+}
+
+.sign-info {
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.sign-info-div {
+  width: 230px;
+  height: 44px;
+}
+
+.sign-info-div-first {
+  border-left: none;
+  width: 160px;
+  padding-left: 0;
+}
+/* GENERICOS */
+
+.center {
+  text-align: center;
+}
+
+.right {
+  text-align: right;
+}
+
+.bold {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.bottom {
+  vertical-align: bottom;
+}

@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonasEntidades;
+use App\Http\Controllers\Proyectos;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,5 +21,10 @@ Route::get('/', function () {
 
 Route::group(["prefix" => "personas"],function(){
     Route::get('/informe-personas', [PersonasEntidades\PersonaController::class,'informePersonas'])->name('personas.informeParticipantes');
+        // ->middleware(['permission:ListarColaborador']);
+});
+
+Route::group(["prefix" => "pagos"],function(){
+    Route::get('/{id}', [Proyectos\PagoController::class,'factura'])->name('pagos.factura');
         // ->middleware(['permission:ListarColaborador']);
 });
