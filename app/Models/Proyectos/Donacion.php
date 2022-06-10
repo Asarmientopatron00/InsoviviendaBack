@@ -4,12 +4,13 @@ namespace App\Models\Proyectos;
 
 use Exception;
 use Carbon\Carbon;
+use App\Enum\AccionAuditoriaEnum;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Enum\AccionAuditoriaEnum;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\PersonasEntidades\Persona;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Donacion extends Model
 {
@@ -34,6 +35,10 @@ class Donacion extends Model
       'usuario_modificacion_id',
       'usuario_modificacion_nombre', 
    ];
+
+   public function persona(){
+      return $this->belongsTo(Persona::class, 'persona_id');
+   }
  
    public static function obtenerColeccionLigera($dto) 
    {
@@ -142,6 +147,11 @@ class Donacion extends Model
                ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
          }
       }
+
+      //Filtro por identificacion persona 
+      if(isset($dto['identificacion'])){
+         $query->where('personas.personasIdentificacion', 'like', '%' . $dto['identificacion'] . '%');
+     }
 
       // Filtro por benefactor
       if (isset($dto['benefactor'])) {
@@ -278,6 +288,7 @@ class Donacion extends Model
    public static function cargar($id)
    {
       $regCargar = Donacion::find($id);
+      $persona = $regCargar->persona;
       return [ 
          'id' => $regCargar->id,
          'persona_id' => $regCargar->persona_id,
@@ -298,7 +309,12 @@ class Donacion extends Model
          'usuario_modificacion_id' => $regCargar->usuario_modificacion_id,
          'usuario_modificacion_nombre' => $regCargar->usuario_modificacion_nombre,
          'fecha_creacion' => (new Carbon($regCargar->created_at))->format("Y-m-d H:i:s"),
-         'fecha_modificacion' => (new Carbon($regCargar->updated_at))->format("Y-m-d H:i:s") 
+         'fecha_modificacion' => (new Carbon($regCargar->updated_at))->format("Y-m-d H:i:s"),
+         'persona' => isset($persona) ? [
+            'id' => $persona->id,
+            'nombre' => $persona->personasNombres.' '.$persona->personasPrimerApellido.' '.$persona->personasSegundoApellido,
+            'identificacion' => $persona->personasIdentificacion
+        ] : null,
       ];
    }
   
