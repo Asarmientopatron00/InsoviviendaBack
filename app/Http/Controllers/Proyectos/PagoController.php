@@ -12,7 +12,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
-use App\Models\Proyectos\PlanAmortizacionDefinitivo;
 
 class PagoController extends Controller
 {
@@ -97,7 +96,7 @@ class PagoController extends Controller
             }
         }catch (Exception $e){
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
-            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -271,7 +270,6 @@ class PagoController extends Controller
             return;
         }
         $numberToWord = Pago::numberToWord($pago->pagosValorTotalPago);
-        $planAmortizacionDef = PlanAmortizacionDefinitivo::where('proyecto_id', $pago->proyecto_id)->where('plAmDeCuotaCancelada', 'N')->first();
         $pagosDetalle = $pago->pagosDetalle;
         $totales = (object)[];
         $totales->capital = 0;
@@ -279,15 +277,16 @@ class PagoController extends Controller
         $totales->interesMora = 0;
         $totales->seguro = 0;
         $totales->fecha = Carbon::now();
-        $totales->cartera = $planAmortizacionDef ? $planAmortizacionDef->plAmDeValorSaldoCapital : 0;
+        $totales->cartera = 0;
         foreach($pagosDetalle as $pagoDetalle){
             $totales->capital = $totales->capital + $pagoDetalle->pagDetValorCapitalCuotaPagado + $pagoDetalle->pagDetValorSaldoCuotaPagado; 
             $totales->interesCuota = $totales->interesCuota + $pagoDetalle->pagDetValorInteresCuotaPagado; 
             $totales->interesMora = $totales->interesMora + $pagoDetalle->pagDetValorInteresMoraPagado; 
             $totales->seguro = $totales->seguro + $pagoDetalle->pagDetValorSeguroCuotaPagado; 
+            $totales->cartera = $totales->cartera + $pagoDetalle->pagDetSaldoCartera??0;
         }
         $pdf = PDF::loadView('factura', compact(['pago', 'numberToWord', 'totales']));
-        return $pdf->download('recibo-de-caja-'.$pago->id.'-'.time().'.pdf');
+        return $pdf->download('recibo-de-caja-'.$pago->pagosConsecutivo.'-'.time().'.pdf');
         // return $pdf->stream('recibo-de-caja-'.$pago->id.'-'.time().'.pdf');
     }
 }

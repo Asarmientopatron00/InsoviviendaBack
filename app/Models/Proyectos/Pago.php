@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\Parametrizacion\ParametroConstante;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pago extends Model
@@ -21,6 +22,7 @@ class Pago extends Model
         'pagosFechaPago',
         'pagosValorTotalPago',
         'pagosDescripcionPago',
+        'pagosConsecutivo',
         'pagosEstado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',
@@ -60,6 +62,7 @@ class Pago extends Model
                 'pagos.pagosValorTotalPago',
                 'pagos.pagosFechaPago',
                 'pagos.pagosDescripcionPago',
+                'pagos.pagosConsecutivo',
                 'pagos.pagosEstado',
                 'pagos.usuario_creacion_id',
                 'pagos.usuario_creacion_nombre',
@@ -95,6 +98,9 @@ class Pago extends Model
                 }
                 if($attribute == 'pagosDescripcionPago'){
                     $query->orderBy('pagos.pagosDescripcionPago', $value);
+                }
+                if($attribute == 'pagosConsecutivo'){
+                    $query->orderBy('pagos.pagosConsecutivo', $value);
                 }
                 if($attribute == 'pagosEstado'){
                     $query->orderBy('pagos.pagosEstado', $value);
@@ -150,6 +156,7 @@ class Pago extends Model
             'proyecto_id' => $pago->proyecto_id,
             'pagosValorTotalPago' => $pago->pagosValorTotalPago,
             'pagosDescripcionPago' => $pago->pagosDescripcionPago,
+            'pagosConsecutivo' => $pago->pagosConsecutivo,
             'pagosFechaPago' => $pago->pagosFechaPago,
             'pagosEstado' => $pago->pagosEstado,
             'usuario_creacion_id' => $pago->usuario_creacion_id,
@@ -183,11 +190,37 @@ class Pago extends Model
 
         // Guardar objeto original para auditoria
         $pagoOriginal = $pago->toJson();
+        
+        $ultimoConsecutivo = 0;
+        if(!isset($dto['id'])){
+            $lastPago = Pago::where('proyecto_id', '>', 0)->max('pagosConsecutivo');
+            $ultimoConsecutivo = $lastPago??0;
+            $dto['pagosConsecutivo'] = $ultimoConsecutivo+1;
+        }
 
         $pago->fill($dto);
         $guardado = $pago->save();
         if(!$guardado){
             throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $pago);
+        }
+
+        if(!isset($dto['id'])){
+            $parametro = ParametroConstante::where('codigo_parametro', 'CONSECUTIVO_RECIBO_CAJA')->first();
+            if(isset($parametro)){
+                $parametro->valor_parametro = $ultimoConsecutivo+1;
+                $parametro->save();
+            } else {
+                $create = ParametroConstante::create([
+                    'codigo_parametro' => 'CONSECUTIVO_RECIBO_CAJA',
+                    'descripcion_parametro' => 'Último valor del consecutivo del recibo de caja',
+                    'valor_parametro' => $ultimoConsecutivo+1,
+                    'estado' => 1,
+                    'usuario_creacion_id' => $usuario->id,
+                    'usuario_creacion_nombre' => $usuario->nombre,
+                    'usuario_modificacion_id' => $usuario->id,
+                    'usuario_modificacion_nombre' => $usuario->nombre,
+                ]);
+            }
         }
 
         // Guardar auditoria

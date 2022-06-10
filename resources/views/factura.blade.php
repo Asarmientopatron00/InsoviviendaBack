@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{'Recibo de Caja '.$pago->id}}</title>
+    <title>{{'Recibo de Caja '.$pago->pagosConsecutivo}}</title>
     <link rel="stylesheet" href="css/app.css">
   </head>
   <body class="antialiased">
@@ -29,7 +29,7 @@
                   <h2 style="color: darkred; font-size: 18px; text-align: left; padding-left: 55px">N°</h2>
                 </div>
                 <div style="display: inline-block; width: 108px" >
-                  <h2 style="color: darkred; font-size: 18px; text-align: right">{{$pago->id}}</h2>
+                  <h2 style="color: darkred; font-size: 18px; text-align: right">{{$pago->pagosConsecutivo}}</h2>
                 </div>
               </div>
               <div class="pay-info">

@@ -23,6 +23,7 @@ class PagoDetalle extends Model
         'pagDetValorSeguroCuotaPagado',
         'pagDetValorInteresMoraPagado',
         'pagDetDiasMora',
+        'pagDetSaldoCartera',
         'pagDetEstado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',
@@ -42,80 +43,109 @@ class PagoDetalle extends Model
         $query = DB::table('pagos_detalle')
             ->join('proyectos', 'pagos.proyecto_id', 'proyectos.id')
             ->select(
-                'pagos.id',
+                'pagos_detalle.id',
                 'proyectos.id AS proyecto_id',
                 'proyectos.proyectosFechaSolicitud AS fecha_solicitud',
-                'pagos.pagosValorTotalPago',
-                'pagos.pagosFechaPago',
-                'pagos.pagosEstado AS estado',
+                'pagos_detalle.pagDetNumeroCuota',
+                'pagos_detalle.pagDetFechaPago',
+                'pagos_detalle.pagDetEstado AS estado',
             );
-        $query->orderBy('pagos.id', 'asc');
+        $query->orderBy('pagos_detalle.id', 'asc');
         return $query->get();
     }
 
     public static function obtenerColeccion($dto){
-        $query = DB::table('pagos')
-            ->join('proyectos', 'pagos.proyecto_id', 'proyectos.id')
+        $query = DB::table('pagos_detalle')
+            ->join('proyectos', 'pagos_detalle.proyecto_id', 'proyectos.id')
+            ->join('pagos', 'pagos_detalle.pago_id', 'pagos.id')
             ->select(
-                'pagos.id',
+                'pagos_detalle.id',
                 'proyectos.id AS proyecto_id',
-                'pagos.pagosValorTotalPago',
-                'pagos.pagosFechaPago',
-                'pagos.pagosDescripcionPago',
-                'pagos.pagosEstado',
-                'pagos.usuario_creacion_id',
-                'pagos.usuario_creacion_nombre',
-                'pagos.usuario_modificacion_id',
-                'pagos.usuario_modificacion_nombre',
-                'pagos.created_at AS fecha_creacion',
-                'pagos.updated_at AS fecha_modificacion',
+                'pagos_detalle.pagDetFechaPago',
+                'pagos_detalle.pagDetNumeroCuota',
+                'pagos_detalle.pagDetFechaVencimientoCuota',
+                'pagos_detalle.pagDetValorCapitalCuotaPagado',
+                'pagos_detalle.pagDetValorSaldoCuotaPagado',
+                'pagos_detalle.pagDetValorInteresCuotaPagado',
+                'pagos_detalle.pagDetValorSeguroCuotaPagado',
+                'pagos_detalle.pagDetValorInteresMoraPagado',
+                'pagos_detalle.pagDetDiasMora',
+                'pagos_detalle.pagDetSaldoCartera',
+                'pagos_detalle.pagDetEstado',
+                'pagos_detalle.usuario_creacion_id',
+                'pagos_detalle.usuario_creacion_nombre',
+                'pagos_detalle.usuario_modificacion_id',
+                'pagos_detalle.usuario_modificacion_nombre',
+                'pagos_detalle.created_at AS fecha_creacion',
+                'pagos_detalle.updated_at AS fecha_modificacion',
             );
 
         if(isset($dto['proyecto'])){
             $query->where('proyectos.id', '>=', $dto['proyecto']);
         }
         if(isset($dto['fechaDesde'])){
-            $query->where('pagos.pagosFechaPago', '>=', $dto['fechaDesde'].' 00:00:00');
+            $query->where('pagos_detalle.pagDetFechaPago', '>=', $dto['fechaDesde'].' 00:00:00');
         }
         if(isset($dto['fechaHasta'])){
-            $query->where('pagos.pagosFechaPago', '<=', $dto['fechaHasta'] . ' 23:59:59');
+            $query->where('pagos_detalle.pagDetFechaPago', '<=', $dto['fechaHasta'] . ' 23:59:59');
         }
         if(isset($dto['estado'])){
-            $query->where('pagos.pagosEstado', $dto['estado']);
+            $query->where('pagos_detalle.pagDetEstado', $dto['estado']);
         }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
             foreach ($dto['ordenar_por'] as $attribute => $value){
                 if($attribute == 'proyecto_id'){
-                    $query->orderBy('pagos.proyecto_id', $value);
+                    $query->orderBy('pagos_detalle.proyecto_id', $value);
                 }
-                if($attribute == 'pagosValorTotalPago'){
-                    $query->orderBy('pagos.pagosValorTotalPago', $value);
+                if($attribute == 'pagDetFechaPago'){
+                    $query->orderBy('pagos_detalle.pagDetFechaPago', $value);
                 }
-                if($attribute == 'pagosFechaPago'){
-                    $query->orderBy('pagos.pagosFechaPago', $value);
+                if($attribute == 'pagDetNumeroCuota'){
+                    $query->orderBy('pagos_detalle.pagDetNumeroCuota', $value);
                 }
-                if($attribute == 'pagosDescripcionPago'){
-                    $query->orderBy('pagos.pagosDescripcionPago', $value);
+                if($attribute == 'pagDetFechaVencimientoCuota'){
+                    $query->orderBy('pagos_detalle.pagDetFechaVencimientoCuota', $value);
                 }
-                if($attribute == 'pagosEstado'){
-                    $query->orderBy('pagos.pagosEstado', $value);
+                if($attribute == 'pagDetValorCapitalCuotaPagado'){
+                    $query->orderBy('pagos_detalle.pagDetValorCapitalCuotaPagado', $value);
+                }
+                if($attribute == 'pagDetValorSaldoCuotaPagado'){
+                    $query->orderBy('pagos_detalle.pagDetValorSaldoCuotaPagado', $value);
+                }
+                if($attribute == 'pagDetValorInteresCuotaPagado'){
+                    $query->orderBy('pagos_detalle.pagDetValorInteresCuotaPagado', $value);
+                }
+                if($attribute == 'pagDetValorSeguroCuotaPagado'){
+                    $query->orderBy('pagos_detalle.pagDetValorSeguroCuotaPagado', $value);
+                }
+                if($attribute == 'pagDetValorInteresMoraPagado'){
+                    $query->orderBy('pagos_detalle.pagDetValorInteresMoraPagado', $value);
+                }
+                if($attribute == 'pagDetDiasMora'){
+                    $query->orderBy('pagos_detalle.pagDetDiasMora', $value);
+                }
+                if($attribute == 'pagDetSaldoCartera'){
+                    $query->orderBy('pagos_detalle.pagDetSaldoCartera', $value);
+                }
+                if($attribute == 'pagDetEstado'){
+                    $query->orderBy('pagos_detalle.pagDetEstado', $value);
                 }
                 if($attribute == 'usuario_creacion_nombre'){
-                    $query->orderBy('pagos.usuario_creacion_nombre', $value);
+                    $query->orderBy('pagos_detalle.usuario_creacion_nombre', $value);
                 }
                 if($attribute == 'usuario_modificacion_nombre'){
-                    $query->orderBy('pagos.usuario_modificacion_nombre', $value);
+                    $query->orderBy('pagos_detalle.usuario_modificacion_nombre', $value);
                 }
                 if($attribute == 'fecha_creacion'){
-                    $query->orderBy('pagos.created_at', $value);
+                    $query->orderBy('pagos_detalle.created_at', $value);
                 }
                 if($attribute == 'fecha_modificacion'){
-                    $query->orderBy('pagos.updated_at', $value);
+                    $query->orderBy('pagos_detalle.updated_at', $value);
                 }
             }
         }else{
-            $query->orderBy("pagos.updated_at", "desc");
+            $query->orderBy("pagos_detalle.updated_at", "desc");
         }
 
         $pagos = $query->paginate($dto['limite'] ?? 100);
