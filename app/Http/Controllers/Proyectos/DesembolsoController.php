@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Proyectos;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Exports\Proyectos\DesembolsoExport;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -244,5 +245,11 @@ class DesembolsoController extends Controller
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function descargaDesembolso(Request $request)
+    {
+        $nombreArchivo = 'Desembolso-' . time() . '.xlsx';
+        return (new DesembolsoExport($request->all()))->download($nombreArchivo);
     }
 }
