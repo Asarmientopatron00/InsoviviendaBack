@@ -27,14 +27,28 @@ class PlanAmortizacionExport implements FromQuery, WithHeadings, ShouldAutoSize,
    public function query()
    {
       $query = DB::table('plan_amortizacion')
+         ->join('proyectos', 'proyectos.id', 'plan_amortizacion.proyecto_id')
+         ->join('personas', 'personas.id', 'proyectos.persona_id')
          ->select(
             'plan_amortizacion.proyecto_id',   
+            'personas.personasIdentificacion',
+            DB::Raw(
+               "CONCAT(
+                  IFNULL(CONCAT(personas.personasNombres), ''),
+                  IFNULL(CONCAT(' ',personas.personasPrimerApellido),''),
+                  IFNULL(CONCAT(' ',personas.personasSegundoApellido), '')
+                  )
+                  AS nombre"
+            ),
             'plan_amortizacion.plaAmoNumeroCuota', 
             DB::Raw("DATE(plan_amortizacion.plaAmoFechaVencimientoCuota) AS plaAmoFechaVencimientoCuota"),  
             'plan_amortizacion.plaAmoValorSaldoCapital', 
             'plan_amortizacion.plaAmoValorCapitalCuota', 
             'plan_amortizacion.plaAmoValorInteresCuota', 
-            'plan_amortizacion.plaAmoValorSeguroCuota', 
+            'plan_amortizacion.plaAmoValorSeguroCuota',
+            DB::Raw("(plan_amortizacion.plaAmoValorCapitalCuota + 
+                      plan_amortizacion.plaAmoValorInteresCuota + 
+                      plan_amortizacion.plaAmoValorSeguroCuota) AS ValorCuotaMensual"),
             'plan_amortizacion.plaAmoValorInteresMora', 
             'plan_amortizacion.plaAmoDiasMora', 
             DB::Raw("DATE(plan_amortizacion.plaAmoFechaUltimoPagoCuota) AS plaAmoFechaUltimoPagoCuota"),  
@@ -54,24 +68,28 @@ class PlanAmortizacionExport implements FromQuery, WithHeadings, ShouldAutoSize,
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:Q1')->getFont()->setBold(true);
-      $sheet->getStyle('D')->getNumberFormat()->setFormatCode('$ #,##0');   
-      $sheet->getStyle('E')->getNumberFormat()->setFormatCode('$ #,##0');   
+      $sheet->getStyle('A1:T1')->getFont()->setBold(true);
       $sheet->getStyle('F')->getNumberFormat()->setFormatCode('$ #,##0');   
       $sheet->getStyle('G')->getNumberFormat()->setFormatCode('$ #,##0');   
       $sheet->getStyle('H')->getNumberFormat()->setFormatCode('$ #,##0');   
+      $sheet->getStyle('I')->getNumberFormat()->setFormatCode('$ #,##0');   
+      $sheet->getStyle('J')->getNumberFormat()->setFormatCode('$ #,##0');   
+      $sheet->getStyle('K')->getNumberFormat()->setFormatCode('$ #,##0');   
    }
-
+   
    public function headings(): array
    {
       return [
-         "Numero Proyecto",   
+         "Número Proyecto",   
+         "Identificación Solicitante",
+         "Nombre solicitante",
          "Número Cuota", 
          "Fecha Vencimiento Cuota",  
          "Valor Saldo Capital", 
          "Valor Capital Cuota", 
          "Valor Interes Cuota", 
          "Valor Seguro Cuota", 
+         "Valor Cuota Mensual", 
          "Valor Interes Mora", 
          "Dias Mora", 
          "Fecha Ultimo Pago Cuota",  
@@ -83,5 +101,5 @@ class PlanAmortizacionExport implements FromQuery, WithHeadings, ShouldAutoSize,
          "Usuario Creación",
          "Fecha Creación",
       ];
-   }
+   } 
 }

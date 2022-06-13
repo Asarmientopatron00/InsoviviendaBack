@@ -32,6 +32,7 @@ Route::group(["prefix" => "pagos"],function(){
 Route::group(["prefix" => "proyectos"],function(){
     Route::get('/plan-amortizacion', [Proyectos\PlanAmortizacionController::class,'descargaPlanAmortizacion'])->name('plan-amortizacion.descargaPlanAmortizacion');
     Route::get('/plan-amortizacion-definitivo', [Proyectos\PlanAmortizacionDefinitivoController::class,'descargaPlanAmortizacionDefinitivo'])->name('plan-amortizacion-definitivo.descargaPlanAmortizacionDefinitivo');
+    Route::get('/desembolso', [Proyectos\DesembolsoController::class,'descargaDesembolso'])->name('desembolso.descargaDesembolso');
         // ->middleware(['permission:ListarColaborador']);
 });
 
