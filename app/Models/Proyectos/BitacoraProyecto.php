@@ -2,6 +2,7 @@
 
 namespace App\Models\Proyectos;
 
+use Exception;
 use Illuminate\Http\Response;
 use App\Enum\AccionAuditoriaEnum;
 use App\Models\Seguridad\AuditoriaTabla;
@@ -37,7 +38,7 @@ class BitacoraProyecto extends Model
             ->join('personas', 'personas.id', 'proyectos.persona_id')
             ->select(
                 'bitacoras.id',
-                'proyectos.id AS  ',
+                'proyectos.id AS proyecto_id',
                 'proyectos.proyectosFechaSolicitud AS fechaSolicitud',
                 'proyectos.proyectosEstadoProyecto AS estado',
                 'personas.personasIdentificacion AS identificacion',
@@ -120,7 +121,7 @@ class BitacoraProyecto extends Model
         ];
     }
 
-    public static function cargar($id)
+    public static function cargar($proyecto_id, $id)
     {
         $bitacoraProyecto = BitacoraProyecto::find($id);
         $proyecto = $bitacoraProyecto->proyecto;
@@ -142,7 +143,7 @@ class BitacoraProyecto extends Model
         ];
     }
 
-    public static function modificarOCrear($dto)
+    public static function modificarOCrear($proyecto_id, $dto)
     {
         $user = Auth::user();
         $usuario = $user->usuario();
@@ -180,8 +181,24 @@ class BitacoraProyecto extends Model
         
         AuditoriaTabla::crear($auditoriaDto);
         
-        return BitacoraProyecto::cargar($bitacorasProyecto->id);
+        return BitacoraProyecto::cargar($proyecto_id, $bitacorasProyecto->id);
     }
 
+    public static function eliminar($id)
+    {
+        $bitacorasProyecto = BitacoraProyecto::find($id);
+
+        // Guardar auditoria
+        $auditoriaDto = [
+            'id_recurso' => $bitacorasProyecto->id,
+            'nombre_recurso' => BitacoraProyecto::class,
+            'descripcion_recurso' => $bitacorasProyecto->bitacorasObservaciones,
+            'accion' => AccionAuditoriaEnum::ELIMINAR,
+            'recurso_original' => $bitacorasProyecto->toJson()
+        ];
+        AuditoriaTabla::crear($auditoriaDto);
+
+        return $bitacorasProyecto->delete();
+    }
     use HasFactory;
 }

@@ -602,11 +602,11 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::get('/{proyecto_id}', [Proyectos\BitacoraProyectoController::class,'index'])->name('bitacoras-proyecto.index');
         Route::post('/{proyecto_id}', [Proyectos\BitacoraProyectoController::class,'store'])->name('bitacoras-proyecto.store');
             // ->middleware(['permission:CrearAplicacion']);
-        Route::put('/{id}', [Proyectos\BitacoraProyectoController::class,'update'])->name('bitacoras-proyecto.update');
+        Route::put('/{proyecto_id}/{id}', [Proyectos\BitacoraProyectoController::class,'update'])->name('bitacoras-proyecto.update');
             // ->middleware(['permission:ListarAplicacion']);
-        Route::get('/{proyecto_id}/{id}', [Proyectos\OrientacionController::class,'show'])->name('orientacion.show');
+        Route::get('/{proyecto_id}/{id}', [Proyectos\BitacoraProyectoController::class,'show'])->name('bitacoras-proyecto.show');
             // ->middleware(['permission:ListarAplicacion']);
-        Route::delete('/{id}', [Proyectos\OrientacionController::class,'destroy'])->name('orientacion.delete');
+        Route::delete('/{id}', [Proyectos\BitacoraProyectoController::class,'destroy'])->name('bitacoras-proyecto.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
     
