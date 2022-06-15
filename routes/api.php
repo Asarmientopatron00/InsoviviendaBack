@@ -654,4 +654,9 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [Proyectos\PagoController::class,'destroy'])->name('pagos.delete');
             // ->middleware(['permission:EliminarAplicacion']);
     });
+
+    // Pagos Detalle
+    Route::group(["prefix" => "pagos-detalle"],function(){
+        Route::get('/{pago_id}', [Proyectos\PagoDetalleController::class,'index'])->name('pagos-detalle.index');
+    });
 });
