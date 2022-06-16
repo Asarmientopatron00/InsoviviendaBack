@@ -7,6 +7,7 @@ use App\Http\Controllers\Seguridad;
 use App\Http\Controllers\PersonasEntidades;
 use App\Http\Controllers\Parametrizacion;
 use App\Http\Controllers\Proyectos;
+use App\Http\Controllers\Procesos;
 
 /*
 |--------------------------------------------------------------------------
@@ -658,5 +659,12 @@ Route::group(['middleware' => ['auth:api']], function (){
     // Pagos Detalle
     Route::group(["prefix" => "pagos-detalle"],function(){
         Route::get('/{pago_id}', [Proyectos\PagoDetalleController::class,'index'])->name('pagos-detalle.index');
+    });
+
+    // ---------------------- Procesos -------------------------- //
+    // Calculo Mora
+    Route::group(["prefix" => "calcular-mora"],function(){
+        Route::post('/', [Procesos\ProcesoMoraController::class,'calculoProcesoMora'])->name('calcular-mora.calculoProcesoMora');
+            // ->middleware(['permission:ListarAplicacion']);
     });
 });

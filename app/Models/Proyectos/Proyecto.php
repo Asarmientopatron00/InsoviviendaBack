@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Enum\AccionAuditoriaEnum;
 use Illuminate\Support\Facades\DB;
 use App\Models\Parametrizacion\Pais;
+use App\Models\Proyectos\Desembolso;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Parametrizacion\Banco;
 use App\Models\Parametrizacion\Barrio;
@@ -125,6 +126,10 @@ class Proyecto extends Model
 
     public function planAmortizacionDefinitivo(){
         return $this->hasMany(PlanAmortizacionDefinitivo::class, 'proyecto_id');
+    }
+
+    public function desembolsos(){
+        return $this->hasMany(Desembolso::class, 'proyecto_id');
     }
 
     public static function obtenerColeccionLigera($dto) 

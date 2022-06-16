@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Proyectos;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Exports\Proyectos\DesembolsoExport;
+use App\Rules\DesembolsoMaximo;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Proyectos\Desembolso;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\Proyectos\DesembolsoExport;
 
 class DesembolsoController extends Controller
 {
@@ -67,7 +68,14 @@ class DesembolsoController extends Controller
                     }),
                 ],
                 'desembolsosFechaDesembolso' => 'date|required',
-                'desembolsosValorDesembolso' => 'numeric|required',
+                'desembolsosValorDesembolso' => [
+                    'numeric',
+                    'required', 
+                    new DesembolsoMaximo(
+                        $datos['proyecto_id'], 
+                        0,
+                        $datos['desembolsosValorDesembolso']
+                )],
                 'desembolsosFechaNormalizacionP' => 'date|required',
                 'desembolsosDescripcionDes' => 'string|required',
                 'banco_id' => [
@@ -164,7 +172,14 @@ class DesembolsoController extends Controller
                     }),
                 ],
                 'desembolsosFechaDesembolso' => 'date|required',
-                'desembolsosValorDesembolso' => 'numeric|required',
+                'desembolsosValorDesembolso' => [
+                    'numeric',
+                    'required', 
+                    new DesembolsoMaximo(
+                        $datos['proyecto_id'], 
+                        $datos['id'],
+                        $datos['desembolsosValorDesembolso']
+                )],
                 'desembolsosFechaNormalizacionP' => 'date|required',
                 'desembolsosDescripcionDes' => 'string|required',
                 'banco_id' => [

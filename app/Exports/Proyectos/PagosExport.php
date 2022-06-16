@@ -29,13 +29,28 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
    {
       $query = DB::table('pagos')
          ->join('pagos_detalle', 'pagos_detalle.pago_id', 'pagos.id')
+         ->join('proyectos', 'proyectos.id', 'pagos.proyecto_id')
+         ->join('personas', 'personas.id', 'proyectos.persona_id')
          ->select(
-            'pagos.proyecto_id',
             'pagos.pagosConsecutivo',
+            'pagos.proyecto_id',
+            'personas.personasIdentificacion',
+            DB::Raw(
+               "CONCAT(
+                   IFNULL(CONCAT(personasNombres), ''),
+                   IFNULL(CONCAT(' ',personasPrimerApellido),''),
+                   IFNULL(CONCAT(' ',personasSegundoApellido), '')
+                   )
+               AS nombre"
+           ),
             'pagos.pagosFechaPago',
             'pagos.pagosValorTotalPago',
             'pagos.pagosDescripcionPago',
-            'pagos.pagosEstado',
+            DB::Raw('CASE pagos.pagosEstado
+                     WHEN 0 THEN "Inactivo"
+                     WHEN 1 THEN "Activo"
+                     ELSE "" END AS pagosEstado'
+            ),
             'pagos_detalle.pagDetNumeroCuota',
             'pagos_detalle.pagDetFechaVencimientoCuota',
             'pagos_detalle.pagDetValorCapitalCuotaPagado',
@@ -75,16 +90,18 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:R1')->getFont()->setBold(true);
-      $sheet->getStyle('D')->getNumberFormat()->setFormatCode('$#,##0');   
-      $sheet->getStyle('I:M')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('A1:T1')->getFont()->setBold(true);
+      $sheet->getStyle('F')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('K:O')->getNumberFormat()->setFormatCode('$#,##0');   
    }
    
    public function headings(): array
    {
       return [
-         "Proyecto N.",   
          "Consecutivo", 
+         "Proyecto N.",   
+         "Identificación Solicitante",   
+         "Nombre Solicitante",   
          "Fecha Pago", 
          "Valor Pago",  
          "Descripción Pago", 

@@ -8,6 +8,7 @@ use App\Enum\AccionAuditoriaEnum;
 use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Proyectos\PagoDetalle;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
 use App\Models\Parametrizacion\ParametroConstante;
@@ -202,7 +203,7 @@ class Pago extends Model
         $pago->fill($dto);
         $guardado = $pago->save();
         if(!$guardado){
-            throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $pago);
+            throw new Exception("Ocurrió un error al intentar guardar el pago.", $pago);
         }
 
         if(!isset($dto['id'])){
@@ -236,21 +237,38 @@ class Pago extends Model
         
         AuditoriaTabla::crear($auditoriaDto);
 
+        $registroInicial = json_decode($pagoOriginal);
+        $params['numero_proyecto'] = $dto['proyecto_id'];
+        $params['pago_id'] = $pago->id;
+        $params['fecha_pago'] = $dto['pagosFechaPago'];
+        $params['valor_pago'] = $dto['pagosValorTotalPago'];
+        $params['usuario_id'] = $usuario->id;
+        $params['usuario_nombre'] = $usuario->nombre;
+
         if(!isset($dto['id'])){
-            $params['numero_proyecto'] = $dto['proyecto_id'];
-            $params['pago_id'] = $pago->id;
-            $params['fecha_pago'] = $dto['pagosFechaPago'];
-            $params['valor_pago'] = $dto['pagosValorTotalPago'];
-            $params['usuario_id'] = $usuario->id;
-            $params['usuario_nombre'] = $usuario->nombre;
             Pago::pagosAplicar($params);
         } else {
             if($dto['pagosEstado'] == 0){
-                $params['numero_proyecto'] = $dto['proyecto_id'];
-                $params['fecha_pago'] = $dto['pagosFechaPago'];
-                $params['usuario_id'] = $usuario->id;
-                $params['usuario_nombre'] = $usuario->nombre;
                 Pago::pagosReversar($params);
+            } else {
+                if($registroInicial->pagosValorTotalPago !== $pago->pagosValorTotalPago){
+                    Pago::pagosReversar($params);
+                    $pagosDetalle = $pago->pagosDetalle;
+                    foreach($pagosDetalle as $pagoDetalle){
+                       $delete = PagoDetalle::destroy($pagoDetalle->id);
+                       if(!$delete){
+                            throw new Exception("Ocurrió un error al intentar eliminar los pagos detalle.", $pagoDetalle);
+                       }
+                    }
+                    $newPago = Pago::find($pago->id);
+                    $newPago->pagosEstado = 1;
+                    $save = $newPago->save();
+                    if($save){
+                        Pago::pagosAplicar($params);
+                    } else {
+                        throw new Exception("Ocurrió un error al intentar guardar el pago.", $newPago);
+                    }
+                }
             }
         }
         
