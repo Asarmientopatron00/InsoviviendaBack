@@ -780,6 +780,12 @@ return new class extends Migration
                 FROM DESEMBOLSOS 
                 WHERE PROYECTO_ID = P_NUMEROPROYECTO
                 LIMIT 1;
+
+                SELECT MAX(DESEMBOLSOSFECHANORMALIZACIONP) 
+                INTO V_FECHANORMALIZACION 
+                FROM DESEMBOLSOS 
+                WHERE PROYECTO_ID = P_NUMEROPROYECTO 
+                LIMIT 1;
                 
                 -- SE BUSCA ULTIMA CUOTA PAGADA
                 SELECT MAX(PLAMDENUMEROCUOTA) 
@@ -906,7 +912,7 @@ return new class extends Migration
                     SET V_VALORCAPITALMES = V_VALORSALDOMES;
                 END IF;
 
-                IF V_NCUOTAMES = 1 AND P_TIPOPLAN <> 'REG' THEN
+                IF V_NCUOTAMES = 1 THEN
                     SET V_VALORINTERESMES = V_VALORINTERESMES + V_TOTALINTERESNORMALIZACION;
                     IF V_TOTALINTERESNORMALIZACION > 0 THEN
                         SET V_FECHAVENCIMIENTO = V_FECHANORMALIZACION;
@@ -1009,6 +1015,7 @@ return new class extends Migration
                         );
 
                     SET V_ULTIMACUOTA = V_ULTIMACUOTA + 1;
+                    SET V_NCUOTAMES = V_NCUOTAMES + 1;
                 END IF;
 
                 IF V_VALORSALDOMES <= V_VALORCAPITALMES THEN
