@@ -25,6 +25,7 @@ Route::group(["prefix" => "personas"],function(){
 });
 
 Route::group(["prefix" => "pagos"],function(){
+    Route::get('/', [Proyectos\PagoController::class,'listaPagos'])->name('pagos.listaPagos');
     Route::get('/{id}', [Proyectos\PagoController::class,'factura'])->name('pagos.factura');
         // ->middleware(['permission:ListarColaborador']);
 });

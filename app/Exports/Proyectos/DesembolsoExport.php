@@ -11,8 +11,9 @@ use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithStrictNullComparison;
 
-class DesembolsoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
+class DesembolsoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles, WithStrictNullComparison
 {
    /**
    * @return \Illuminate\Support\Collection

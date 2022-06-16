@@ -11,6 +11,7 @@ use App\Models\Proyectos\Pago;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Exports\Proyectos\PagosExport;
 use Illuminate\Support\Facades\Validator;
 
 class PagoController extends Controller
@@ -287,5 +288,11 @@ class PagoController extends Controller
         $pdf = PDF::loadView('factura', compact(['pago', 'numberToWord', 'totales']));
         return $pdf->download('recibo-de-caja-'.$pago->pagosConsecutivo.'-'.time().'.pdf');
         // return $pdf->stream('recibo-de-caja-'.$pago->id.'-'.time().'.pdf');
+    }
+
+    public function listaPagos(Request $request)
+    {
+        $nombreArchivo = 'pagos-' . time() . '.xlsx';
+        return (new PagosExport($request->all()))->download($nombreArchivo);
     }
 }
