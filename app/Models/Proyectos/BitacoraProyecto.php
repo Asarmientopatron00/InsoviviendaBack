@@ -121,6 +121,12 @@ class BitacoraProyecto extends Model
         ];
     }
 
+    public static function getHeaders($id){
+        $proyecto = Proyecto::find($id);
+        $persona = $proyecto->solicitante;
+        return $proyecto;
+    }
+
     public static function cargar($proyecto_id, $id)
     {
         $bitacoraProyecto = BitacoraProyecto::find($id);

@@ -39,7 +39,11 @@ class BitacoraProyectoController extends Controller
             if(isset($datos['ordenar_por'])){
                 $datos['ordenar_por'] = format_order_by_attributes($datos);
             }
-            $bitacoraProyecto = BitacoraProyecto::obtenerColeccion($datos);
+            if($request->headerInfo){
+                $bitacoraProyecto = BitacoraProyecto::getHeaders($proyecto_id);
+            } else {
+                $bitacoraProyecto = BitacoraProyecto::obtenerColeccion($datos);
+            }
             return response($bitacoraProyecto, Response::HTTP_OK);
         }catch(Exception $e){
             return response($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
