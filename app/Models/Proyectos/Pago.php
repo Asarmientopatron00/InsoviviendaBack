@@ -23,6 +23,7 @@ class Pago extends Model
         'pagosValorTotalPago',
         'pagosDescripcionPago',
         'pagosConsecutivo',
+        'pagosSaldoDespPago',
         'pagosEstado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',

@@ -26,7 +26,6 @@ class PagoDetalle extends Model
         'pagDetValorSeguroCuotaPagado',
         'pagDetValorInteresMoraPagado',
         'pagDetDiasMora',
-        'pagDetSaldoCartera',
         'pagDetEstado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',
@@ -87,7 +86,6 @@ class PagoDetalle extends Model
                 'pagos_detalle.pagDetValorSeguroCuotaPagado',
                 'pagos_detalle.pagDetValorInteresMoraPagado',
                 'pagos_detalle.pagDetDiasMora',
-                'pagos_detalle.pagDetSaldoCartera',
                 'pagos_detalle.pagDetEstado',
                 'pagos_detalle.usuario_creacion_id',
                 'pagos_detalle.usuario_creacion_nombre',
@@ -129,9 +127,6 @@ class PagoDetalle extends Model
                 }
                 if($attribute == 'pagDetDiasMora'){
                     $query->orderBy('pagos_detalle.pagDetDiasMora', $value);
-                }
-                if($attribute == 'pagDetSaldoCartera'){
-                    $query->orderBy('pagos_detalle.pagDetSaldoCartera', $value);
                 }
                 if($attribute == 'pagDetEstado'){
                     $query->orderBy('pagos_detalle.pagDetEstado', $value);
@@ -194,7 +189,6 @@ class PagoDetalle extends Model
             'pagDetValorSeguroCuotaPagado' => $pagoDetalle->pagDetValorSeguroCuotaPagado,
             'pagDetValorInteresMoraPagado' => $pagoDetalle->pagDetValorInteresMoraPagado,
             'pagDetDiasMora' => $pagoDetalle->pagDetDiasMora,
-            'pagDetSaldoCartera' => $pagoDetalle->pagDetSaldoCartera,
             'pagDetEstado' => $pagoDetalle->pagDetEstado,
             'usuario_creacion_id' => $pagoDetalle->usuario_creacion_id,
             'usuario_creacion_nombre' => $pagoDetalle->usuario_creacion_nombre,

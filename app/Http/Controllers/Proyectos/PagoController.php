@@ -277,13 +277,12 @@ class PagoController extends Controller
         $totales->interesMora = 0;
         $totales->seguro = 0;
         $totales->fecha = Carbon::now();
-        $totales->cartera = 0;
+        $totales->cartera = $pago->pagosSaldoDespPago;
         foreach($pagosDetalle as $pagoDetalle){
             $totales->capital = $totales->capital + $pagoDetalle->pagDetValorCapitalCuotaPagado + $pagoDetalle->pagDetValorSaldoCuotaPagado; 
             $totales->interesCuota = $totales->interesCuota + $pagoDetalle->pagDetValorInteresCuotaPagado; 
             $totales->interesMora = $totales->interesMora + $pagoDetalle->pagDetValorInteresMoraPagado; 
             $totales->seguro = $totales->seguro + $pagoDetalle->pagDetValorSeguroCuotaPagado; 
-            $totales->cartera = $totales->cartera + $pagoDetalle->pagDetSaldoCartera??0;
         }
         $pdf = PDF::loadView('factura', compact(['pago', 'numberToWord', 'totales']));
         return $pdf->download('recibo-de-caja-'.$pago->pagosConsecutivo.'-'.time().'.pdf');
