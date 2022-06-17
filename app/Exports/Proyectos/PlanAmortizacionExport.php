@@ -53,9 +53,17 @@ class PlanAmortizacionExport implements FromQuery, WithHeadings, ShouldAutoSize,
             'plan_amortizacion.plaAmoValorInteresMora', 
             'plan_amortizacion.plaAmoDiasMora', 
             DB::Raw("DATE(plan_amortizacion.plaAmoFechaUltimoPagoCuota) AS plaAmoFechaUltimoPagoCuota"),  
-            'plan_amortizacion.plaAmoCuotaCancelada', 
-            'plan_amortizacion.plaAmoEstadoPlanAmortizacion', 
-            'plan_amortizacion.plaAmoEstado', 
+            DB::Raw("CASE plan_amortizacion.plaAmoCuotaCancelada 
+                     WHEN 'S' THEN 'Si'
+                     ELSE 'No' END AS plaAmoCuotaCancelada"), 
+            DB::Raw("CASE plan_amortizacion.plaAmoEstadoPlanAmortizacion
+                     WHEN 'DES' THEN 'Desembolso'
+                     WHEN 'DEF' THEN 'Definitivo'
+                     WHEN 'REG' THEN 'Regenerado'
+                     ELSE '' END AS plaAmoEstadoPlanAmortizacion"), 
+            DB::Raw("CASE plan_amortizacion.plaAmoEstado 
+                     WHEN 0 THEN 'Inactivo'
+                     ELSE 'Activo' END AS plaAmoEstado"),  
             'plan_amortizacion.usuario_modificacion_nombre',
             'plan_amortizacion.updated_at AS fecha_modificacion',
             'plan_amortizacion.usuario_creacion_nombre',

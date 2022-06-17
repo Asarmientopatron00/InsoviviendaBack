@@ -53,9 +53,17 @@ class PlanAmortizacionDefinitivoExport implements FromQuery, WithHeadings, Shoul
             'plan_amortizacion_def.plAmDeValorInteresMora', 
             'plan_amortizacion_def.plAmDeDiasMora', 
             DB::Raw("DATE(plan_amortizacion_def.plAmDeFechaUltimoPagoCuota) AS plAmDeFechaUltimoPagoCuota"),  
-            'plan_amortizacion_def.plAmDeCuotaCancelada', 
-            'plan_amortizacion_def.plAmDeEstadoPlanAmortizacion', 
-            'plan_amortizacion_def.plAmDeEstado', 
+            DB::Raw("CASE plan_amortizacion_def.plAmDeCuotaCancelada 
+                     WHEN 'S' THEN 'Si'
+                     ELSE 'No' END AS plAmDeCuotaCancelada"), 
+            DB::Raw("CASE plan_amortizacion_def.plAmDeEstadoPlanAmortizacion
+                     WHEN 'DES' THEN 'Desembolso'
+                     WHEN 'DEF' THEN 'Definitivo'
+                     WHEN 'REG' THEN 'Regenerado'
+                     ELSE '' END AS plAmDeEstadoPlanAmortizacion"), 
+            DB::Raw("CASE plan_amortizacion_def.plAmDeEstado 
+                     WHEN 0 THEN 'Inactivo'
+                     ELSE 'Activo' END AS plAmDeEstado"),  
             'plan_amortizacion_def.usuario_modificacion_nombre',
             'plan_amortizacion_def.updated_at AS fecha_modificacion',
             'plan_amortizacion_def.usuario_creacion_nombre',

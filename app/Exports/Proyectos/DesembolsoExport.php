@@ -45,17 +45,24 @@ class DesembolsoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithS
             ),
             'desembolsos.desembolsosDescripcionDes',
             DB::Raw("IFNULL(bancos.bancosDescripcion, '') AS bancosDescripcion"),
-            'desembolsos.desembolsosTipoCuentaDes',
+            DB::Raw("CASE desembolsos.desembolsosTipoCuentaDes 
+                     WHEN 'AH' THEN 'Ahorro'
+                     WHEN 'CO' THEN 'Corriente' 
+                     ELSE '' END AS desembolsosTipoCuentaDes"),
             'desembolsos.desembolsosNumeroCuentaDes',
             'desembolsos.desembolsosNumeroComEgreso',
             'desembolsos.desembolsosValorDesembolso',
             'desembolsos.desembolsosFechaNormalizacionP',
-            'desembolsos.desembolsosPlanDefinitivo',
-            'desembolsos.desembolsosEstado',
-            'desembolsos.usuario_creacion_nombre',
+            DB::Raw("CASE desembolsos.desembolsosPlanDefinitivo
+                     WHEN 1 THEN 'Si'
+                     ELSE 'No' END AS desembolsosPlanDefinitivo"),
+            DB::Raw("CASE desembolsos.desembolsosEstado
+                     WHEN 0 THEN 'Inactivo'
+                     ELSE 'Activo' END AS desembolsosEstado"),
             'desembolsos.usuario_modificacion_nombre',
-            'desembolsos.created_at AS fecha_creacion',
             'desembolsos.updated_at AS fecha_modificacion',
+            'desembolsos.usuario_creacion_nombre',
+            'desembolsos.created_at AS fecha_creacion',
          );
 
       if (isset($this->dto['proyecto']))
