@@ -594,6 +594,20 @@ class Proyecto extends Model
             $data['usuario_nombre'] = $usuario->nombre;
             PlanAmortizacion::calcularPlan($data);
         }
+
+        $registroInicial = json_decode($proyectoOriginal);
+        if($registroInicial->proyectosValorSeguroVida > 0 && 
+            $registroInicial->proyectosValorSeguroVida != $proyecto->proyectosValorSeguroVida){
+                $desembolsosDefinitivo = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosPlanDefinitivo', 1)->count();
+                if($desembolsosDefinitivo > 0){
+                    $data['numero_proyecto'] = $proyecto->id;
+                    $data['tipo_plan'] = 'REG';
+                    $data['plan_def'] = 'N';
+                    $data['usuario_id'] = $usuario->id;
+                    $data['usuario_nombre'] = $usuario->nombre;
+                    PlanAmortizacion::calcularPlan($data); 
+                }
+            }
         
         return Proyecto::cargar($proyecto->id);
     }
