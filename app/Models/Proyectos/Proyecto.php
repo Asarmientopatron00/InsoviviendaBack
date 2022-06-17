@@ -596,8 +596,17 @@ class Proyecto extends Model
         }
 
         $registroInicial = json_decode($proyectoOriginal);
-        if($registroInicial->proyectosValorSeguroVida > 0 && 
-            $registroInicial->proyectosValorSeguroVida != $proyecto->proyectosValorSeguroVida){
+        if(isset($dto['id']) && 
+            ((   
+                $registroInicial->proyectosValorSeguroVida > 0 && 
+                $registroInicial->proyectosValorSeguroVida != $proyecto->proyectosValorSeguroVida
+            ) 
+                || 
+            (   
+                $registroInicial->proyectosValorCuotaAprobada > 0 && 
+                $registroInicial->proyectosValorCuotaAprobada != $proyecto->proyectosValorCuotaAprobada
+            ))
+            ){
                 $desembolsosDefinitivo = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosPlanDefinitivo', 1)->count();
                 if($desembolsosDefinitivo > 0){
                     $data['numero_proyecto'] = $proyecto->id;

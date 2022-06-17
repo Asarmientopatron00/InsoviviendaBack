@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Validator;
 use GuzzleHttp\Exception\RequestException;
+use App\Models\Parametrizacion\ParametroCorreo;
+use App\Models\Parametrizacion\ParametroConstante;
 
 class UserController extends Controller
 {
