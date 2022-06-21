@@ -26,6 +26,18 @@ class ParametroConstante extends Model
         'usuario_modificacion_nombre'
     ];
 
+    public static function obtenerColeccionLigera($dto){
+        $query = DB::table('parametros_constantes')
+            ->select(
+                'id',
+                'codigo_parametro AS codigo',
+                'valor_parametro AS valor',
+                'estado',
+            );
+        $query->orderBy('id', 'asc');
+        return $query->get();
+    }
+
     public static function obtenerColeccion($dto){
         $query = DB::table('parametros_constantes')
             ->select(

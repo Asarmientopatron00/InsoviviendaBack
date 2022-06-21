@@ -28,7 +28,11 @@ class ParametroConstanteController extends Controller
             if (isset($datos['ordenar_por'])) {
                 $datos['ordenar_por'] = format_order_by_attributes($datos);
             }
-            $parametros = ParametroConstante::obtenerColeccion($datos);
+            if($request->ligera){
+                $parametros = ParametroConstante::obtenerColeccionLigera($datos);
+            } else {
+                $parametros = ParametroConstante::obtenerColeccion($datos);
+            }
 
             return response($parametros, Response::HTTP_OK);
         }catch(Exception $e){
