@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Proyectos;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Exports\Proyectos\ProyectoExport;
 use Illuminate\Validation\Rule;
 use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
@@ -433,4 +434,11 @@ class ProyectoController extends Controller
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function descargarProyectos(Request $request)
+    {
+        $nombreArchivo = 'Proyectos-' . time() . '.xlsx';
+        return (new ProyectoExport($request->all()))->download($nombreArchivo);
+    }
+
 }
