@@ -219,20 +219,55 @@ class Persona extends Model
 
     public static function obtenerColeccionLigera($dto){
         $query = DB::table('personas')
+            ->join('departamentos','departamentos.id','=','personas.departamento_id')
+            ->join('paises','paises.id','=','departamentos.pais_id')
+            ->join('ciudades','ciudades.id','=','personas.ciudad_id')
+            ->leftJoin('comunas','comunas.id','=','personas.comuna_id')
+            ->leftJoin('barrios','barrios.id','=','personas.barrio_id')
+            ->join('tipos_vivienda','tipos_vivienda.id','=','personas.tipo_vivienda_id')
+            ->join('tipos_techo','tipos_techo.id','=','personas.tipo_techo_id')
+            ->join('tipos_piso','tipos_piso.id','=','personas.tipo_piso_id')
+            ->join('tipos_division','tipos_division.id','=','personas.tipo_division_id')
             ->select(
-                'id',
-                'personasIdentificacion As identificacion',
-                'personasEstadoRegistro AS estado',
+                'personas.id',
+                'personas.personasIdentificacion As identificacion',
+                'personas.personasEstadoRegistro AS estado',
                 DB::Raw(
                     "CONCAT(
-                        IFNULL(CONCAT(personasNombres), ''),
-                        IFNULL(CONCAT(' ',personasPrimerApellido),''),
-                        IFNULL(CONCAT(' ',personasSegundoApellido), '')
+                        IFNULL(CONCAT(personas.personasNombres), ''),
+                        IFNULL(CONCAT(' ',personas.personasPrimerApellido),''),
+                        IFNULL(CONCAT(' ',personas.personasSegundoApellido), '')
                         )
                     AS nombre"
                 ),
+                'paises.id AS pais_id',
+                'departamentos.id AS departamento_id',
+                'ciudades.id AS ciudad_id',
+                'comunas.id AS comuna_id',
+                'barrios.id AS barrio_id',
+                'personas.personasDireccion',
+                'personas.personasZona',
+                'personas.personasEstrato',
+                'personas.personasTelefonoCasa',
+                'personas.personasTelefonoCelular',
+                'tipos_vivienda.id AS tipo_vivienda_id',
+                'personas.personasTipoPropiedad',
+                'personas.personasNumeroEscritura',
+                'personas.personasNotariaEscritura',
+                'personas.personasFechaEscritura',
+                'personas.personasIndicativoPC',
+                'personas.personasNumeroHabitaciones',
+                'personas.personasNumeroBanos',
+                'tipos_techo.id AS tipo_techo_id',
+                'tipos_piso.id AS tipo_piso_id',
+                'tipos_division.id AS tipo_division_id',
+                'personas.personasSala',
+                'personas.personasComedor',
+                'personas.personasCocina',
+                'personas.personasPatio',
+                'personas.personasTerraza',
             );
-        $query->orderBy('personasNombres', 'asc');
+        $query->orderBy('personas.personasNombres', 'asc');
         return $query->get();
     }
 

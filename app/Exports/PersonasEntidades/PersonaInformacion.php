@@ -58,6 +58,7 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
                     WHEN "AG" THEN "Aportante Grupo Familiar"
                     WHEN "NG" THEN "No Aportante Grupo Familiar"
                     WHEN "CO" THEN "Codeudor"
+                    WHEN "OT" THEN "Otro"
                     ELSE "" END AS personasCategoriaAportes'
             ),
             DB::Raw(
