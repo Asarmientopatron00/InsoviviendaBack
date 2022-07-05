@@ -281,7 +281,7 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
             $query->where('personas.personasEstadoRegistro', $this->dto['estado']);
         }
         if(isset($this->dto['familia'])){
-            $query->where('personas.familia_id', $this->dto['familia']);
+            $query->where('familias.identificacion_persona', $this->dto['familia']);
         }
 
         $query->orderBy('personas.personasNombres', 'asc');
