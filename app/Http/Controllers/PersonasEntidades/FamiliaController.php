@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\PersonasEntidades\Familia;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\PersonasEntidades\FamiliasExport;
 
 class FamiliaController extends Controller
 {
@@ -282,5 +283,11 @@ class FamiliaController extends Controller
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function familiaExport(Request $request)
+    {
+        $nombreArchivo = 'familias-' . time() . '.xlsx';
+        return (new FamiliasExport($request->all()))->download($nombreArchivo);
     }
 }

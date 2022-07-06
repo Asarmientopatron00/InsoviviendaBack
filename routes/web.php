@@ -20,7 +20,7 @@ Route::get('/', function () {
 });
 
 Route::group(["prefix" => "personas"],function(){
-    Route::get('/informe-personas', [PersonasEntidades\PersonaController::class,'informePersonas'])->name('personas.informeParticipantes');
+    Route::get('/informe-personas', [PersonasEntidades\PersonaController::class,'informePersonas'])->name('personas.informePersonas');
         // ->middleware(['permission:ListarColaborador']);
 });
 
@@ -35,6 +35,11 @@ Route::group(["prefix" => "proyectos"],function(){
     Route::get('/plan-amortizacion', [Proyectos\PlanAmortizacionController::class,'descargaPlanAmortizacion'])->name('plan-amortizacion.descargaPlanAmortizacion');
     Route::get('/plan-amortizacion-definitivo', [Proyectos\PlanAmortizacionDefinitivoController::class,'descargaPlanAmortizacionDefinitivo'])->name('plan-amortizacion-definitivo.descargaPlanAmortizacionDefinitivo');
     Route::get('/desembolso', [Proyectos\DesembolsoController::class,'descargaDesembolso'])->name('desembolso.descargaDesembolso');
+        // ->middleware(['permission:ListarColaborador']);
+});
+
+Route::group(["prefix" => "familias"],function(){
+    Route::get('/informe-familias', [PersonasEntidades\FamiliaController::class,'familiaExport'])->name('familias.familiaExport');
         // ->middleware(['permission:ListarColaborador']);
 });
 
