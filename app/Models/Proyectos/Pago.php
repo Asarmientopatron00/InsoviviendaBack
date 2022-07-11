@@ -75,7 +75,7 @@ class Pago extends Model
             );
 
         if(isset($dto['proyecto'])){
-            $query->where('proyectos.id', '>=', $dto['proyecto']);
+            $query->where('proyectos.id', $dto['proyecto']);
         }
         if(isset($dto['fechaDesde'])){
             $query->where('pagos.pagosFechaPago', '>=', $dto['fechaDesde'].' 00:00:00');
