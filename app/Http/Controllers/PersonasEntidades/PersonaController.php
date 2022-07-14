@@ -114,14 +114,14 @@ class PersonaController extends Controller
                 ],
                 'tipo_poblacion_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('tipos_poblacion','id')->where(function ($query) {
                         $query->where('tipPobEstado', 1);
                     }),
                 ],
                 'tipo_discapacidad_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('tipos_discapacidad','id')->where(function ($query) {
                         $query->where('tipDisEstado', 1);
                     }),
@@ -436,14 +436,14 @@ class PersonaController extends Controller
                 ],
                 'tipo_poblacion_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('tipos_poblacion','id')->where(function ($query) {
                         $query->where('tipPobEstado', 1);
                     }),
                 ],
                 'tipo_discapacidad_id' => [
                     'integer',
-                    'required',
+                    'nullable',
                     Rule::exists('tipos_discapacidad','id')->where(function ($query) {
                         $query->where('tipDisEstado', 1);
                     }),
