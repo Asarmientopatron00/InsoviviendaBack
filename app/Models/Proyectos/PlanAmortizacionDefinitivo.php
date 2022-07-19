@@ -2,6 +2,7 @@
 
 namespace App\Models\Proyectos;
 
+use Carbon\Carbon;
 use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
@@ -76,6 +77,10 @@ class PlanAmortizacionDefinitivo extends Model
          )
          ->where('proyectos.id', $dto['proyecto_id']);
 
+      if (isset($dto['vencidas'])){
+         $query->where('plan_amortizacion_def.plAmDeCuotaCancelada', 'N')
+            ->where('plan_amortizacion_def.plAmDeFechaVencimientoCuota', '<', Carbon::now()->format('Y-m-d'));
+      }
       if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)  
          foreach ($dto['ordenar_por'] as $attribute => $value) {
 

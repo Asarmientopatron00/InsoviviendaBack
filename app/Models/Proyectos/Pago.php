@@ -25,6 +25,9 @@ class Pago extends Model
         'pagosDescripcionPago',
         'pagosConsecutivo',
         'pagosSaldoDespPago',
+        'pagosObservacionesAnulacion',
+        'pagosObservacionesPagoEspecial',
+        'pagosTipo',
         'pagosEstado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',
@@ -65,6 +68,9 @@ class Pago extends Model
                 'pagos.pagosFechaPago',
                 'pagos.pagosDescripcionPago',
                 'pagos.pagosConsecutivo',
+                'pagos.pagosObservacionesAnulacion',
+                'pagos.pagosObservacionesPagoEspecial',
+                'pagos.pagosTipo',
                 'pagos.pagosEstado',
                 'pagos.usuario_creacion_id',
                 'pagos.usuario_creacion_nombre',
@@ -103,6 +109,15 @@ class Pago extends Model
                 }
                 if($attribute == 'pagosConsecutivo'){
                     $query->orderBy('pagos.pagosConsecutivo', $value);
+                }
+                if($attribute == 'pagosObservacionesAnulacion'){
+                    $query->orderBy('pagos.pagosObservacionesAnulacion', $value);
+                }
+                if($attribute == 'pagosObservacionesPagoEspecial'){
+                    $query->orderBy('pagos.pagosObservacionesPagoEspecial', $value);
+                }
+                if($attribute == 'pagosTipo'){
+                    $query->orderBy('pagos.pagosTipo', $value);
                 }
                 if($attribute == 'pagosEstado'){
                     $query->orderBy('pagos.pagosEstado', $value);
@@ -160,6 +175,9 @@ class Pago extends Model
             'pagosDescripcionPago' => $pago->pagosDescripcionPago,
             'pagosConsecutivo' => $pago->pagosConsecutivo,
             'pagosFechaPago' => $pago->pagosFechaPago,
+            'pagosObservacionesAnulacion' => $pago->pagosObservacionesAnulacion,
+            'pagosObservacionesPagoEspecial' => $pago->pagosObservacionesPagoEspecial,
+            'pagosTipo' => $pago->pagosTipo,
             'pagosEstado' => $pago->pagosEstado,
             'usuario_creacion_id' => $pago->usuario_creacion_id,
             'usuario_creacion_nombre' => $pago->usuario_creacion_nombre,
@@ -245,33 +263,42 @@ class Pago extends Model
         $params['usuario_id'] = $usuario->id;
         $params['usuario_nombre'] = $usuario->nombre;
 
-        if(!isset($dto['id'])){
-            Pago::pagosAplicar($params);
+        if(isset($dto['especial']) && $dto['especial'] == true){
+            $params['cuota_inicial'] = $dto['cuotaInicial'];
+            $params['cuota_final'] = $dto['cuotaFinal'];
+            $params['valor_capital'] = $dto['valorCapital']??0;
+            $params['valor_intereses'] = $dto['valorInteres']??0;
+            $params['valor_seguro'] = $dto['valorSeguro']??0;
+            $params['valor_mora'] = $dto['valorMora']??0;
+            Pago::pagoEspecialAplicar($params);
         } else {
-            if($dto['pagosEstado'] == 0){
-                Pago::pagosReversar($params);
+            if(!isset($dto['id'])){
+                Pago::pagosAplicar($params);
             } else {
-                if($registroInicial->pagosValorTotalPago !== $pago->pagosValorTotalPago){
+                if($dto['pagosEstado'] == 0){
                     Pago::pagosReversar($params);
-                    $pagosDetalle = $pago->pagosDetalle;
-                    foreach($pagosDetalle as $pagoDetalle){
-                       $delete = PagoDetalle::destroy($pagoDetalle->id);
-                       if(!$delete){
-                            throw new Exception("Ocurrió un error al intentar eliminar los pagos detalle.", $pagoDetalle);
-                       }
-                    }
-                    $newPago = Pago::find($pago->id);
-                    $newPago->pagosEstado = 1;
-                    $save = $newPago->save();
-                    if($save){
-                        Pago::pagosAplicar($params);
-                    } else {
-                        throw new Exception("Ocurrió un error al intentar guardar el pago.", $newPago);
+                } else {
+                    if($registroInicial->pagosValorTotalPago !== $pago->pagosValorTotalPago){
+                        Pago::pagosReversar($params);
+                        $pagosDetalle = $pago->pagosDetalle;
+                        foreach($pagosDetalle as $pagoDetalle){
+                           $delete = PagoDetalle::destroy($pagoDetalle->id);
+                           if(!$delete){
+                                throw new Exception("Ocurrió un error al intentar eliminar los pagos detalle.", $pagoDetalle);
+                           }
+                        }
+                        $newPago = Pago::find($pago->id);
+                        $newPago->pagosEstado = 1;
+                        $save = $newPago->save();
+                        if($save){
+                            Pago::pagosAplicar($params);
+                        } else {
+                            throw new Exception("Ocurrió un error al intentar guardar el pago.", $newPago);
+                        }
                     }
                 }
-            }
+            }    
         }
-        
         return Pago::cargar($pago->id);
     }
 
@@ -345,6 +372,37 @@ class Pago extends Model
             ));
 
         return true;
+    }
+
+    public static function pagoEspecialAplicar($params){
+        $numeroProyecto = $params['numero_proyecto'];
+        $pagoId = $params['pago_id'];
+        $fechaPago = $params['fecha_pago'];
+        $cuotaInicial = $params['cuota_inicial'];
+        $cuotaFinal = $params['cuota_final'];
+        $valorCapital = $params['valor_capital'];
+        $valorIntereses = $params['valor_intereses'];
+        $valorSeguro = $params['valor_seguro'];
+        $valorMora = $params['valor_mora'];
+        $transaccion = 'AplicarPagosEspeciales';
+        $usuarioId = $params['usuario_id'];
+        $usuario = $params['usuario_nombre'];
+        $procedure = DB::select(
+            'CALL SP_PagosAplicarEspecial(?,?,?,?,?,?,?,?,?,?,?,?)', 
+            array(
+                $numeroProyecto,
+                $pagoId,
+                $fechaPago,
+                $cuotaInicial,
+                $cuotaFinal,
+                $valorCapital,
+                $valorIntereses,
+                $valorSeguro,
+                $valorMora,
+                $transaccion,
+                $usuarioId,
+                $usuario
+            ));
     }
 
     public static function numberToWord($num){

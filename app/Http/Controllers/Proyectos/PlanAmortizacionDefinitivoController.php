@@ -25,7 +25,7 @@ class PlanAmortizacionDefinitivoController extends Controller
          if (!$request->ligera) {
             $validator = Validator::make($datos, [
                'limite' => 'integer|between:1,500',
-               'proyecto_id' => 'integer|required|exists:proyectos,id'
+               'proyecto_id' => 'integer|required'
             ]);
 
             if ($validator->fails()) 
