@@ -73,7 +73,6 @@ class PagoController extends Controller
                 'pagosDescripcionPago' => 'string|required',
                 'pagosEstado' => 'boolean|required',
                 'pagosObservacionesAnulacion' => 'string|nullable',
-                'pagosObservacionesPagoEspecial' => 'string|nullable',
                 'pagosTipo' => 'string|required',
             ], $messages = [
                 'proyecto_id.exists'=>'El proyecto seleccionado no existe, fue cancelado, rechazado o está congelado',
@@ -160,7 +159,6 @@ class PagoController extends Controller
                 'pagosDescripcionPago' => 'string|required',
                 'pagosEstado' => 'boolean|required',
                 'pagosObservacionesAnulacion' => 'string|nullable',
-                'pagosObservacionesPagoEspecial' => 'string|nullable',
                 'pagosTipo' => 'string|required',
             ], $messages = [
                 'proyecto_id.exists'=>'El proyecto seleccionado no existe, fue cancelado, rechazado o está congelado',

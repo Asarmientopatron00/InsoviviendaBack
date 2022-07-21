@@ -89,6 +89,10 @@ class PagoDetalle extends Model
                 'pagos_detalle.pagDetValorInteresCuotaPagado',
                 'pagos_detalle.pagDetValorSeguroCuotaPagado',
                 'pagos_detalle.pagDetValorInteresMoraPagado',
+                'pagos_detalle.pagDetValorInteresMoraCondonado',
+                'pagos_detalle.pagDetValorSeguroCuotaCondonado',
+                'pagos_detalle.pagDetValorInteresCuotaCondonado',
+                'pagos_detalle.pagDetValorCapitalCuotaCondonado',
                 'pagos_detalle.pagDetDiasMora',
                 'pagos_detalle.pagDetEstado',
                 'pagos_detalle.usuario_creacion_id',
@@ -122,6 +126,18 @@ class PagoDetalle extends Model
                 }
                 if($attribute == 'pagDetValorInteresCuotaPagado'){
                     $query->orderBy('pagos_detalle.pagDetValorInteresCuotaPagado', $value);
+                }
+                if($attribute == 'pagDetValorInteresMoraCondonado'){
+                    $query->orderBy('pagos_detalle.pagDetValorInteresMoraCondonado', $value);
+                }
+                if($attribute == 'pagDetValorSeguroCuotaCondonado'){
+                    $query->orderBy('pagos_detalle.pagDetValorSeguroCuotaCondonado', $value);
+                }
+                if($attribute == 'pagDetValorInteresCuotaCondonado'){
+                    $query->orderBy('pagos_detalle.pagDetValorInteresCuotaCondonado', $value);
+                }
+                if($attribute == 'pagDetValorCapitalCuotaCondonado'){
+                    $query->orderBy('pagos_detalle.pagDetValorCapitalCuotaCondonado', $value);
                 }
                 if($attribute == 'pagDetValorSeguroCuotaPagado'){
                     $query->orderBy('pagos_detalle.pagDetValorSeguroCuotaPagado', $value);

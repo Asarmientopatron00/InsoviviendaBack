@@ -26,7 +26,6 @@ class Pago extends Model
         'pagosConsecutivo',
         'pagosSaldoDespPago',
         'pagosObservacionesAnulacion',
-        'pagosObservacionesPagoEspecial',
         'pagosTipo',
         'pagosEstado',
         'usuario_creacion_id',
@@ -69,7 +68,6 @@ class Pago extends Model
                 'pagos.pagosDescripcionPago',
                 'pagos.pagosConsecutivo',
                 'pagos.pagosObservacionesAnulacion',
-                'pagos.pagosObservacionesPagoEspecial',
                 'pagos.pagosTipo',
                 'pagos.pagosEstado',
                 'pagos.usuario_creacion_id',
@@ -112,9 +110,6 @@ class Pago extends Model
                 }
                 if($attribute == 'pagosObservacionesAnulacion'){
                     $query->orderBy('pagos.pagosObservacionesAnulacion', $value);
-                }
-                if($attribute == 'pagosObservacionesPagoEspecial'){
-                    $query->orderBy('pagos.pagosObservacionesPagoEspecial', $value);
                 }
                 if($attribute == 'pagosTipo'){
                     $query->orderBy('pagos.pagosTipo', $value);
@@ -176,7 +171,6 @@ class Pago extends Model
             'pagosConsecutivo' => $pago->pagosConsecutivo,
             'pagosFechaPago' => $pago->pagosFechaPago,
             'pagosObservacionesAnulacion' => $pago->pagosObservacionesAnulacion,
-            'pagosObservacionesPagoEspecial' => $pago->pagosObservacionesPagoEspecial,
             'pagosTipo' => $pago->pagosTipo,
             'pagosEstado' => $pago->pagosEstado,
             'usuario_creacion_id' => $pago->usuario_creacion_id,
