@@ -253,11 +253,16 @@ class Desembolso extends Model
         
         AuditoriaTabla::crear($auditoriaDto);
 
+        $pagos = Pago::where('proyecto_id', $dto['proyecto_id'])->where('pagosEstado', 1)->count();
         $data['numero_proyecto'] = $dto['proyecto_id'];
         $data['tipo_plan'] = 'DES';
-        $data['plan_def'] = $dto['desembolsosPlanDefinitivo'] == 1 ? 'S' : 'N';
+        $data['plan_def'] = 'S';
         $data['usuario_id'] = $usuario->id;
         $data['usuario_nombre'] = $usuario->nombre;
+        if($pagos > 0){
+            $data['tipo_plan'] = 'REG';
+            $data['plan_def'] = 'N';
+        }
         PlanAmortizacion::calcularPlan($data);
         
         return Desembolso::cargar($desembolso->id);

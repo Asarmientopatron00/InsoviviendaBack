@@ -14,7 +14,7 @@ class ProcesoMora extends Model
         $usuario = $user->usuario();
         
         $proyecto_id = null;
-        $reiniciarMora = 1;
+        $reiniciarMora = 0;
         $transaccion = 'CalcularInteresMora';
         $usuarioId = $usuario->id;
         $usuario = $usuario->nombre;

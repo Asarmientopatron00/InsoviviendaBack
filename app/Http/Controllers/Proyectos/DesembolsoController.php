@@ -116,7 +116,7 @@ class DesembolsoController extends Controller
             }
         }catch (Exception $e){
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
-            return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+            return response($e, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 

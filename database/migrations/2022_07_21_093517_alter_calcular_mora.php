@@ -213,8 +213,8 @@ return new class extends Migration
         
                         IF V_DIAS_DE_MORA IS NOT NULL AND V_VALOR_INTERES_MORA IS NOT NULL THEN
                             UPDATE PLAN_AMORTIZACION_DEF
-                            SET PLAMDEVALORINTERESMORA = V_VALOR_INTERES_MORA,
-                            PLAMDEDIASMORA = V_DIAS_DE_MORA
+                            SET PLAMDEVALORINTERESMORA = PLAMDEVALORINTERESMORA + V_VALOR_INTERES_MORA,
+                            PLAMDEDIASMORA = PLAMDEDIASMORA + V_DIAS_DE_MORA
                             WHERE PROYECTO_ID = V_NUMERO_PROYECTO
                             AND PLAMDENUMEROCUOTA = V_NUMERO_CUOTA;
                         END IF;
