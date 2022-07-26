@@ -39,8 +39,14 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
          ->select(
             'proyectos.id', 
             'personas.personasIdentificacion',
-            'personas.personasNombres',
-            'personas.personasPrimerApellido',
+            DB::Raw(
+               "CONCAT(
+                   IFNULL(CONCAT(personas.personasNombres), ''),
+                   IFNULL(CONCAT(' ',personas.personasPrimerApellido),''),
+                   IFNULL(CONCAT(' ',personas.personasSegundoApellido), '')
+                   )
+               AS nombre"
+           ),
             DB::Raw("CASE proyectos.proyectosEstadoProyecto
                      WHEN 'SOL' THEN 'Solicitud'
                      WHEN 'EST' THEN 'Estudio'
@@ -106,12 +112,23 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
                      WHEN 'CO' THEN 'Corriente'
                      ELSE '' END AS proyectosTipoCuentaRecaudo"),
             'proyectos.proyectosNumCuentaRecaudo', 
-            'proyectos.proyectosEstadoFormalizacion', 
+            DB::Raw("CASE proyectos.proyectosEstadoFormalizacion 
+                     WHEN 'AN' THEN 'Autorización Notaria'
+                     WHEN 'FI' THEN 'Firma'
+                     WHEN 'IR' THEN 'Ingreso Reg'
+                     WHEN 'SR' THEN 'Salida Reg'
+                     WHEN 'PA' THEN 'Pagaré'
+                     ELSE '' END 
+            AS proyectosEstadoFormalizacion"),
             'proyectos.proyectosFechaAutNotaria', 
             'proyectos.proyectosFechaFirEscrituras', 
             'proyectos.proyectosFechaIngresoReg', 
             'proyectos.proyectosFechaSalidaReg', 
-            'proyectos.proyectosAutorizacionDes', 
+            DB::Raw("CASE proyectos.proyectosAutorizacionDes 
+                     WHEN 'S' THEN 'Sí'
+                     WHEN 'N' THEN 'No'
+                     ELSE '' END 
+            AS proyectosAutorizacionDes"),
             'proyectos.proyectosFechaAutDes', 
             'proyectos.proyectosFechaCancelacion',
             DB::Raw("IFNULL(orientadores.orientadoresIdentificacion, '') AS orientadoresIdentificacion"),
@@ -144,7 +161,7 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
    
    public function styles(Worksheet $sheet){
       $sheet->getStyle('A1:BE1')->getFont()->setBold(true);
-      $sheet->getStyle('AA:AI')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('Z:AH')->getNumberFormat()->setFormatCode('$#,##0');   
    }
 
    public function headings(): array
@@ -152,8 +169,7 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
       return [
          "Número Proyecto",
          "Identificación",
-         "Nombres",
-         "Primer Apellido",
+         "Nombre Solicitante",
          "Estado Proyecto",
          "Fecha Solicitud",
          "Tipo Proyecto",
@@ -202,7 +218,6 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
          "Identificación Asesor",
          "Nombre Asesor",
          "Observaciones",
-         "Estado",
          "Usuario Creación",
          "Fecha Creación",
          "Usuario Modificación",
