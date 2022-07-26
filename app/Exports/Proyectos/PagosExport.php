@@ -69,7 +69,7 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
          );
 
       if (isset($this->dto['proyecto'])){
-         $query->where('pagos.proyecto_id', '>=', $this->dto['proyecto']);
+         $query->where('pagos.proyecto_id', '=', $this->dto['proyecto']);
       }
 
       if(isset($this->dto['fechaDesde'])){
@@ -95,7 +95,7 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
    {
       $sheet->getStyle('A1:T1')->getFont()->setBold(true);
       $sheet->getStyle('F')->getNumberFormat()->setFormatCode('$#,##0');   
-      $sheet->getStyle('K:O')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('K:R')->getNumberFormat()->setFormatCode('$#,##0');   
    }
    
    public function headings(): array
