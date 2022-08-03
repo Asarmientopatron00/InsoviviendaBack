@@ -59,9 +59,9 @@ class Benefactor extends Model
    {
       $query = DB::table('benefactores') 
          ->join('tipos_benefactor', 'tipos_benefactor.id', '=', 'benefactores.tipo_benefactor_id')
-         ->join('paises', 'paises.id', '=', 'benefactores.pais_id')
-         ->join('departamentos', 'departamentos.id', '=','benefactores.departamento_id')
-         ->join('ciudades', 'ciudades.id', '=', 'benefactores.ciudad_id')
+         ->leftJoin('paises', 'paises.id', '=', 'benefactores.pais_id')
+         ->leftJoin('departamentos', 'departamentos.id', '=','benefactores.departamento_id')
+         ->leftJoin('ciudades', 'ciudades.id', '=', 'benefactores.ciudad_id')
          ->leftJoin('comunas', 'comunas.id', '=', 'benefactores.comuna_id')
          ->leftJoin('barrios', 'barrios.id', '=', 'benefactores.barrio_id')
          ->leftJoin('benefactores AS benefactoresRef', 'benefactoresRef.id', '=', 'benefactores.benefactor_id')

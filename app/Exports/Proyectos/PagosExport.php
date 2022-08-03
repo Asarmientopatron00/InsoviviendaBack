@@ -84,6 +84,10 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
          $query->where('pagos.pagosEstado', $this->dto['estado']);
       }
 
+      if(isset($this->dto['persona'])){
+         $query->where('personas.personasIdentificacion', $this->dto['persona']);
+     }
+
       $query->orderBy('pagos.proyecto_id', 'asc');
       $query->orderBy('pagos.pagosConsecutivo', 'asc');
       $query->orderBy('pagos_detalle.pagDetNumeroCuota', 'asc');
@@ -93,7 +97,7 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:T1')->getFont()->setBold(true);
+      $sheet->getStyle('A1:W1')->getFont()->setBold(true);
       $sheet->getStyle('F')->getNumberFormat()->setFormatCode('$#,##0');   
       $sheet->getStyle('K:R')->getNumberFormat()->setFormatCode('$#,##0');   
    }

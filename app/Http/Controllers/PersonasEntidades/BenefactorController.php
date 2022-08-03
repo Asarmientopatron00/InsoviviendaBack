@@ -107,7 +107,7 @@ class BenefactorController extends Controller
 
                'pais_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('paises','id') ->
                         where(function ($query) { 
                            $query -> where('paisesEstado', 1); 
@@ -116,7 +116,7 @@ class BenefactorController extends Controller
 
                'departamento_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('departamentos','id') ->
                         where(function ($query) { 
                            $query -> where('departamentosEstado', 1); 
@@ -125,7 +125,7 @@ class BenefactorController extends Controller
 
                'ciudad_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('ciudades','id') ->
                         where(function ($query) { 
                            $query -> where('ciudadesEstado', 1); 
@@ -151,7 +151,7 @@ class BenefactorController extends Controller
                   ],
 
                'benefactoresDireccion' => 
-                  'string|required|max:128',
+                  'string|nullable|max:128',
 
                'benefactoresTelefonoFijo' => 
                   'string|nullable|max:128',
@@ -163,7 +163,7 @@ class BenefactorController extends Controller
                   'string|required|max:128',
 
                'benefactoresNotas' => 
-                  'string|required|max:512',
+                  'string|nullable|max:512',
 
                'estado' => 
                   'boolean|required',
@@ -281,9 +281,9 @@ class BenefactorController extends Controller
                         }), 
                   ],
 
-               'pais_id' => 
+                  'pais_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('paises','id') ->
                         where(function ($query) { 
                            $query -> where('paisesEstado', 1); 
@@ -292,7 +292,7 @@ class BenefactorController extends Controller
 
                'departamento_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('departamentos','id') ->
                         where(function ($query) { 
                            $query -> where('departamentosEstado', 1); 
@@ -301,7 +301,7 @@ class BenefactorController extends Controller
 
                'ciudad_id' => 
                   [  'integer', 
-                     'required', 
+                     'nullable', 
                      Rule::exists('ciudades','id') ->
                         where(function ($query) { 
                            $query -> where('ciudadesEstado', 1); 
@@ -327,7 +327,7 @@ class BenefactorController extends Controller
                   ],
 
                'benefactoresDireccion' => 
-                  'string|required|max:128',
+                  'string|nullable|max:128',
 
                'benefactoresTelefonoFijo' => 
                   'string|nullable|max:128',
@@ -339,7 +339,7 @@ class BenefactorController extends Controller
                   'string|required|max:128',
 
                'benefactoresNotas' => 
-                  'string|required|max:512',
+                  'string|nullable|max:512',
 
                'estado' => 
                   'boolean|required',

@@ -60,9 +60,19 @@ class Pago extends Model
     public static function obtenerColeccion($dto){
         $query = DB::table('pagos')
             ->join('proyectos', 'pagos.proyecto_id', 'proyectos.id')
+            ->join('personas', 'proyectos.persona_id', 'personas.id')
             ->select(
                 'pagos.id',
                 'proyectos.id AS proyecto_id',
+                'personas.personasIdentificacion AS identificacion',
+                DB::Raw(
+                    "CONCAT(
+                        IFNULL(CONCAT(personas.personasNombres), ''),
+                        IFNULL(CONCAT(' ',personas.personasPrimerApellido),''),
+                        IFNULL(CONCAT(' ',personas.personasSegundoApellido), '')
+                        )
+                    AS persona"
+                ),
                 'pagos.pagosValorTotalPago',
                 'pagos.pagosFechaPago',
                 'pagos.pagosDescripcionPago',
@@ -90,6 +100,9 @@ class Pago extends Model
         if(isset($dto['estado'])){
             $query->where('pagos.pagosEstado', $dto['estado']);
         }
+        if(isset($dto['persona'])){
+            $query->where('personas.personasIdentificacion', $dto['persona']);
+        }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
             foreach ($dto['ordenar_por'] as $attribute => $value){
@@ -98,6 +111,12 @@ class Pago extends Model
                 }
                 if($attribute == 'pagosValorTotalPago'){
                     $query->orderBy('pagos.pagosValorTotalPago', $value);
+                }
+                if($attribute == 'identificacion'){
+                    $query->orderBy('personas.personasIdentificacion', $value);
+                }
+                if($attribute == 'persona'){
+                    $query->orderBy('personas.personasNombres', $value);
                 }
                 if($attribute == 'pagosFechaPago'){
                     $query->orderBy('pagos.pagosFechaPago', $value);

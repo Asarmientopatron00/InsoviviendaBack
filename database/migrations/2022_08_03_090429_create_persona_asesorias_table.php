@@ -24,6 +24,13 @@ return new class extends Migration
             $table->foreignId('departamento_id')->nullable()->references('id')->on('departamentos');
             $table->foreignId('ciudad_id')->nullable()->references('id')->on('ciudades');
             $table->string('observaciones', 128)->nullable(); 
+            $table->boolean('estado')->default(true);
+
+            // Auditoria datos
+            $table->bigInteger('usuario_creacion_id');
+            $table->string('usuario_creacion_nombre');
+            $table->bigInteger('usuario_modificacion_id');
+            $table->string('usuario_modificacion_nombre');
             $table->timestamps();
         });
     }
