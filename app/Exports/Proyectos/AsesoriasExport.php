@@ -39,7 +39,7 @@ class AsesoriasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSt
             'orientaciones.orientacionesSolicitud',
             'orientaciones.orientacionesNota',
             'orientaciones.orientacionesRespuesta', 
-            'orientaciones.estado',
+            DB::raw("CASE WHEN orientaciones.estado = 1 THEN 'Activo' ELSE 'Inactivo' END as estado"),
             'orientaciones.usuario_creacion_nombre',
             'orientaciones.created_at',
             'orientaciones.usuario_modificacion_nombre',
