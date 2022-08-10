@@ -307,6 +307,18 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::delete('/{id}', [PersonasEntidades\OrientadorController::class,'destroy'])->name('orientadores.delete');
     });
     
+    // Tipos personas asesorias
+    Route::group(["prefix" => "personas-asesorias"],function(){
+        Route::get('/', [PersonasEntidades\PersonaAsesoriaController::class,'index'])->name('personas-asesorias.index');
+        Route::post('/', [PersonasEntidades\PersonaAsesoriaController::class,'store'])->name('personas-asesorias.store');
+            // ->middleware(['permission:CrearAplicacion']);
+        Route::get('/{id}', [PersonasEntidades\PersonaAsesoriaController::class,'show'])->name('personas-asesorias.show');
+            // ->middleware(['permission:ListarAplicacion']);
+        Route::put('/{id}', [PersonasEntidades\PersonaAsesoriaController::class,'update'])->name('personas-asesorias.update');
+            // ->middleware(['permission:ModificarAplicacion']);
+        Route::delete('/{id}', [PersonasEntidades\PersonaAsesoriaController::class,'destroy'])->name('personas-asesorias.delete');
+    });
+    
     // Estados Civil
     Route::group(["prefix" => "estados-civil"],function(){
         Route::get('/', [Parametrizacion\EstadoCivilController::class,'index'])->name('estado_civil.index');

@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
-use App\Models\PersonasEntidades\Persona;
 use App\Models\Parametrizacion\TipoAsesoria;
 use App\Models\PersonasEntidades\Orientador;
+use App\Models\PersonasEntidades\PersonaAsesoria;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Orientacion extends Model
@@ -23,7 +23,7 @@ class Orientacion extends Model
         'tipo_orientacion_id',
         'orientador_id',
         'orientacionesFechaOrientacion',
-        'persona_id',
+        'persona_asesoria_id',
         'orientacionesSolicitud',
         'orientacionesNota',
         'orientacionesRespuesta',
@@ -42,28 +42,21 @@ class Orientacion extends Model
         return $this->belongsTo(Orientador::class, 'orientador_id');
     }
     
-    public function persona(){
-        return $this->belongsTo(Persona::class, 'persona_id');
+    public function personaAsesoria(){
+        return $this->belongsTo(PersonaAsesoria::class, 'persona_asesoria_id');
     }
 
     public static function obtenerColeccion($dto){
         $query = DB::table('orientaciones')
             ->join('tipos_orientacion','tipos_orientacion.id','=','orientaciones.tipo_orientacion_id')
             ->join('orientadores','orientadores.id','=','orientaciones.orientador_id')
-            ->join('personas','personas.id','=','orientaciones.persona_id')
+            ->join('personas_asesorias','personas_asesorias.id','=','orientaciones.persona_asesoria_id')
             ->select(
                 'orientaciones.id',
                 'tipos_orientacion.tipOriDescripcion as nombre',
                 'orientadores.orientadoresNombre as nombreOrientador',
                 'orientaciones.orientacionesFechaOrientacion as fechaOrientacion',
-                DB::Raw(
-                    "CONCAT(
-                        IFNULL(CONCAT(personas.personasNombres), ''),
-                        IFNULL(CONCAT(' ',personas.personasPrimerApellido),''),
-                        IFNULL(CONCAT(' ',personas.personasSegundoApellido), '')
-                        )
-                    AS nombrePersona"
-                ),
+                'personas_asesorias.nombre as nombrePersona',
                 'orientaciones.orientacionesSolicitud',
                 'orientaciones.orientacionesNota',
                 'orientaciones.orientacionesRespuesta',
@@ -86,7 +79,7 @@ class Orientacion extends Model
             $query->where('orientaciones.orientacionesFechaOrientacion', 'like', '%' . $dto['fechaOrientacion'] . '%');
         }
         if(isset($dto['identificacionPersona'])){
-            $query->where('personas.personasIdentificacion', '=', $dto['identificacionPersona']);
+            $query->where('personas_asesorias.numero_documento', '=', $dto['identificacionPersona']);
         }
         if(isset($dto['estado'])){
             $query->where('orientaciones.estado', 'like', '%' . $dto['estado'] . '%');
@@ -104,7 +97,7 @@ class Orientacion extends Model
                     $query->orderBy('orientaciones.orientacionesFechaOrientacion', $value);
                 }
                 if($attribute == 'nombrePersona'){
-                    $query->orderBy('personas.personasNombres', $value);
+                    $query->orderBy('personas_asesorias.nombre', $value);
                 }
                 if($attribute == 'orientacionesSolicitud'){
                     $query->orderBy('orientaciones.orientacionesSolicitud', $value);
@@ -163,16 +156,16 @@ class Orientacion extends Model
     public static function cargar($id)
     {
         $orientaciones = Orientacion::find($id);
-        $persona = $orientaciones->persona;
         $tipoAsesoria = $orientaciones->tipoAsesoria;
         $orientador = $orientaciones->orientador;
+        $personaAsesoria = $orientaciones->personaAsesoria;
 
         return [
             'id' => $orientaciones->id,
             'tipo_orientacion_id' => $orientaciones->tipo_orientacion_id,
             'orientador_id' => $orientaciones->orientador_id,
             'orientacionesFechaOrientacion' => $orientaciones->orientacionesFechaOrientacion,
-            'persona_id' => $orientaciones->persona_id,
+            'persona_asesoria_id' => $orientaciones->persona_asesoria_id,
             'orientacionesSolicitud' => $orientaciones->orientacionesSolicitud,
             'orientacionesNota' => $orientaciones->orientacionesNota,
             'orientacionesRespuesta' => $orientaciones->orientacionesRespuesta,
@@ -183,11 +176,6 @@ class Orientacion extends Model
             'usuario_modificacion_nombre' => $orientaciones->usuario_modificacion_nombre,
             'fecha_creacion' => (new Carbon($orientaciones->created_at))->format("Y-m-d H:i:s"),
             'fecha_modificacion' => (new Carbon($orientaciones->updated_at))->format("Y-m-d H:i:s"),
-            'persona' => isset($persona) ? [
-                'id' => $persona->id,
-                'nombre' => $persona->personasNombres.' '.$persona->personasPrimerApellido.' '.$persona->personasSegundoApellido,
-                'identificacion' => $persona->personasIdentificacion
-            ] : null,
             'tipoAsesoria' => isset($tipoAsesoria) ? [
                 'id' => $tipoAsesoria->id,
                 'nombre' => $tipoAsesoria->tipOriDescripcion
@@ -196,6 +184,11 @@ class Orientacion extends Model
                 'id' => $orientador->id,
                 'nombre' => $orientador->orientadoresNombre,
                 'identificacion' => $orientador->orientadoresIdentificacion
+            ] : null,
+            'personaAsesoria' => isset($personaAsesoria) ? [
+                'id' => $personaAsesoria->id,
+                'nombre' => $personaAsesoria->nombre,
+                'identificacion' => $personaAsesoria->numero_documento
             ] : null,
         ];
     }
@@ -257,7 +250,6 @@ class Orientacion extends Model
 
         return $orientaciones->delete();
     }
-
 
     use HasFactory;
 }

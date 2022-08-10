@@ -10,6 +10,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use App\Exports\Proyectos\AsesoriasExport;
 
 class OrientacionController extends Controller
 {
@@ -77,11 +78,11 @@ class OrientacionController extends Controller
                     }),
                 ],
                 'orientacionesFechaOrientacion' => 'date|required',
-                'persona_id' => [
+                'persona_asesoria_id' => [
                     'integer',
                     'required',
-                    Rule::exists('personas','id')->where(function ($query) {
-                        $query->where('personasEstadoRegistro', 'AC');
+                    Rule::exists('personas_asesorias','id')->where(function ($query) {
+                        $query->where('estado', 1);
                     }),
                 ],
                 'orientacionesSolicitud' => 'string|required|max:512',
@@ -92,7 +93,7 @@ class OrientacionController extends Controller
             $messages = [
                 'tipo_orientacion_id.exists'=>'El tipo de orientación seleccionado no existe o está en estado inactivo',
                 'orientador_id.exists'=>'El orientador seleccionado no existe o está en estado inactivo',
-                'persona_id.exists'=>'La persona seleccionada no existe o está en estado inactivo',
+                'persona_asesoria_id.exists'=>'La persona asesorada seleccionada no existe o está en estado inactivo',
             ]);
 
             if ($validator->fails()) {
@@ -177,11 +178,11 @@ class OrientacionController extends Controller
                     }),
                 ],
                 'orientacionesFechaOrientacion' => 'date|required',
-                'persona_id' => [
+                'persona_asesoria_id' => [
                     'integer',
                     'required',
-                    Rule::exists('personas','id')->where(function ($query) {
-                        $query->where('personasEstadoRegistro', 'AC');
+                    Rule::exists('personas_asesorias','id')->where(function ($query) {
+                        $query->where('estado', 1);
                     }),
                 ],
                 'orientacionesSolicitud' => 'string|required|max:512',
@@ -192,7 +193,7 @@ class OrientacionController extends Controller
             $messages = [
                 'tipo_orientacion_id.exists'=>'El tipo de orientación seleccionado no existe o está en estado inactivo',
                 'orientador_id.exists'=>'El orientador seleccionado no existe o está en estado inactivo',
-                'persona_id.exists'=>'La persona seleccionada no existe o está en estado inactivo',
+                'persona_asesoria_id.exists'=>'La persona asesorada seleccionada no existe o está en estado inactivo',
             ]);
 
             if($validator->fails()) {
@@ -256,5 +257,11 @@ class OrientacionController extends Controller
             DB::rollback(); // Se devuelven los cambios, por que la transacción falla
             return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function asesoriasExport(Request $request)
+    {
+        $nombreArchivo = 'Asesorias-' . time() . '.xlsx';
+        return (new AsesoriasExport($request->all()))->download($nombreArchivo);
     }
 }

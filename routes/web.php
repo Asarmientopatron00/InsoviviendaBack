@@ -43,3 +43,7 @@ Route::group(["prefix" => "familias"],function(){
         // ->middleware(['permission:ListarColaborador']);
 });
 
+Route::group(["prefix" => "asesorias"],function(){
+    Route::get('/', [Proyectos\OrientacionController::class,'asesoriasExport'])->name('asesorias.asesoriasExport');
+        // ->middleware(['permission:ListarColaborador']);
+});
