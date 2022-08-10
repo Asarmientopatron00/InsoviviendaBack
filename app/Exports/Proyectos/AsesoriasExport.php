@@ -46,20 +46,20 @@ class AsesoriasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSt
             'orientaciones.updated_at',
          );
 
-      if (isset($dto['tipoAsesoria']))
-         $query->where('tipos_orientacion.id', '=', $dto['tipoAsesoria']);
+      if (isset($this->dto['tipoAsesoria']))
+         $query->where('tipos_orientacion.id', '=', $this->dto['tipoAsesoria']);
         
-      if (isset($dto['identificacionOrientador']))
-         $query->where('orientadores.orientadoresIdentificacion', '=', $dto['identificacionOrientador']);
+      if (isset($this->dto['identificacionOrientador']))
+         $query->where('orientadores.orientadoresIdentificacion', '=', $this->dto['identificacionOrientador']);
         
-      if (isset($dto['fechaOrientacion']))
-         $query->where('orientaciones.orientacionesFechaOrientacion', 'like', '%' . $dto['fechaOrientacion'] . '%');
+      if (isset($this->dto['fechaOrientacion']))
+         $query->where('orientaciones.orientacionesFechaOrientacion', 'like', '%' . $this->dto['fechaOrientacion'] . '%');
         
-      if (isset($dto['identificacionPersona']))
-         $query->where('personas_asesorias.numero_documento', '=', $dto['identificacionPersona']);
+      if (isset($this->dto['identificacionPersona']))
+         $query->where('personas_asesorias.numero_documento', '=', $this->dto['identificacionPersona']);
         
-      if (isset($dto['estado']))
-         $query->where('orientaciones.estado', 'like', '%' . $dto['estado'] . '%');
+      if (isset($this->dto['estado']))
+         $query->where('orientaciones.estado', 'like', '%' . $this->dto['estado'] . '%');
         
       $query->orderBy('orientadores.orientadoresNombre', 'asc');
       
