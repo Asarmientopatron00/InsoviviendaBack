@@ -286,7 +286,11 @@ class Pago extends Model
             Pago::pagoEspecialAplicar($params);
         } else {
             if(!isset($dto['id'])){
-                Pago::pagosAplicar($params);
+                if(isset($dto['abono_extra']) && $dto['abono_extra']){
+                    Pago::aplicarAbonoExtra($params);
+                } else {
+                    Pago::pagosAplicar($params);
+                }
             } else {
                 if($dto['pagosEstado'] == 0){
                     Pago::pagosReversar($params);
@@ -304,7 +308,11 @@ class Pago extends Model
                         $newPago->pagosEstado = 1;
                         $save = $newPago->save();
                         if($save){
-                            Pago::pagosAplicar($params);
+                            if(isset($dto['abono_extra']) && $dto['abono_extra']){
+                                Pago::aplicarAbonoExtra($params);
+                            } else {
+                                Pago::pagosAplicar($params);
+                            }
                         } else {
                             throw new Exception("Ocurrió un error al intentar guardar el pago.", $newPago);
                         }
@@ -541,6 +549,27 @@ class Pago extends Model
                 $numAsString = strval($num);
             }
         endwhile;
+    }
+
+    public static function aplicarAbonoExtra($params){
+        $numeroProyecto = $params['numero_proyecto'];
+        $pagoId = $params['pago_id'];
+        $fechaPago = $params['fecha_pago'];
+        $valorPago = $params['valor_pago'];
+        $transaccion = 'AplicarAbonoExtra';
+        $usuarioId = $params['usuario_id'];
+        $usuario = $params['usuario_nombre'];
+        $procedure = DB::select(
+            'CALL SP_PagosAplicarAbonoExtra(?,?,?,?,?,?,?)', 
+            array(
+                $numeroProyecto,
+                $pagoId,
+                $fechaPago,
+                $valorPago,
+                $transaccion,
+                $usuarioId,
+                $usuario
+            ));
     }
 
     use HasFactory;

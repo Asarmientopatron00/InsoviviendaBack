@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Proyectos;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Exports\Proyectos\ProyectoExport;
 use Illuminate\Validation\Rule;
 use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Exports\Proyectos\ProyectoExport;
 use Illuminate\Support\Facades\Validator;
+use App\Exports\Proyectos\InformeGestionCartera;
 
 class ProyectoController extends Controller
 {
@@ -439,6 +440,12 @@ class ProyectoController extends Controller
     {
         $nombreArchivo = 'Proyectos-' . time() . '.xlsx';
         return (new ProyectoExport($request->all()))->download($nombreArchivo);
+    }
+
+    public function informeCartera(Request $request)
+    {
+        $nombreArchivo = 'Informe-Gestion-Cartera-' . time() . '.xlsx';
+        return (new InformeGestionCartera($request->all()))->download($nombreArchivo);
     }
 
 }

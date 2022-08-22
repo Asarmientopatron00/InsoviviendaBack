@@ -45,11 +45,12 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
            ),
             'pagos.pagosFechaPago',
             'pagos.pagosValorTotalPago',
+            'pagos.pagosSaldoDespPago',
             'pagos.pagosDescripcionPago',
             DB::Raw('CASE pagos.pagosEstado
-                     WHEN 0 THEN "Inactivo"
-                     WHEN 1 THEN "Activo"
-                     ELSE "" END AS pagosEstado'
+               WHEN 0 THEN "Inactivo"
+               WHEN 1 THEN "Activo"
+               ELSE "" END AS pagosEstado'
             ),
             'pagos_detalle.pagDetNumeroCuota',
             'pagos_detalle.pagDetFechaVencimientoCuota',
@@ -97,9 +98,9 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:W1')->getFont()->setBold(true);
-      $sheet->getStyle('F')->getNumberFormat()->setFormatCode('$#,##0');   
-      $sheet->getStyle('K:R')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('A1:X1')->getFont()->setBold(true);
+      $sheet->getStyle('F:G')->getNumberFormat()->setFormatCode('$#,##0');   
+      $sheet->getStyle('L:S')->getNumberFormat()->setFormatCode('$#,##0');   
    }
    
    public function headings(): array
@@ -111,6 +112,7 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
          "Nombre Solicitante",   
          "Fecha Pago", 
          "Valor Pago",  
+         "Saldo Después de Pago", 
          "Descripción Pago", 
          "Estado Pago", 
          "Cuota N.", 
