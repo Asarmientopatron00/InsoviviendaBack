@@ -285,5 +285,53 @@ class Desembolso extends Model
         return $desembolso->delete();
     }
 
+    public static function reajustarFechaPago($dto)
+    {
+        $user = Auth::user();
+        $usuario = $user->usuario();
+        $ultimaCuotaPagada = PlanAmortizacionDefinitivo::where('proyecto_id', $dto['proyecto_id'])
+            ->where('plAmDeCuotaCancelada', 'S')
+            ->orderBy('plAmDeNumeroCuota', 'desc')
+            ->first()
+            ??
+            PlanAmortizacionDefinitivo::where('proyecto_id', $dto['proyecto_id'])
+            ->where('plAmDeCuotaCancelada', 'N')
+            ->first();
+        
+        $dto['desembolsosFechaDesembolso'] = $ultimaCuotaPagada->plAmDeFechaVencimientoCuota;
+        $dto['desembolsosValorDesembolso'] = 0;
+        $dto['desembolsosDescripcionDes'] = 'Reajuste Fecha de Pago';
+        $dto['desembolsosPlanDefinitivo'] = 1;
+        $dto['usuario_creacion_id'] = $usuario->id;
+        $dto['usuario_creacion_nombre'] = $usuario->nombre;
+        $dto['usuario_modificacion_id'] = $usuario->id;
+        $dto['usuario_modificacion_nombre'] = $usuario->nombre;
+
+        $desembolso = new Desembolso();
+        $desembolso->fill($dto);
+        $desembolso->save();
+
+        // Guardar auditoria
+        $auditoriaDto = [
+            'id_recurso' => $desembolso->id,
+            'nombre_recurso' => Desembolso::class,
+            'descripcion_recurso' => $desembolso->desembolsosDescripcionDes,
+            'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
+            'recurso_original' => isset($dto['id']) ? $desembolsoOriginal : $desembolso->toJson(),
+            'recurso_resultante' => isset($dto['id']) ? $desembolso->toJson() : null
+        ];
+        
+        AuditoriaTabla::crear($auditoriaDto);
+
+        $data['numero_proyecto'] = $dto['proyecto_id'];
+        $data['tipo_plan'] = 'REG';
+        $data['plan_def'] = 'N';
+        $data['usuario_id'] = $usuario->id;
+        $data['usuario_nombre'] = $usuario->nombre;
+        PlanAmortizacion::calcularPlan($data);
+        
+        return Desembolso::cargar($desembolso->id);
+    }
+
     use HasFactory;
 }

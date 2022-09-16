@@ -679,4 +679,10 @@ Route::group(['middleware' => ['auth:api']], function (){
         Route::post('/', [Procesos\ProcesoMoraController::class,'calculoProcesoMora'])->name('calcular-mora.calculoProcesoMora');
             // ->middleware(['permission:ListarAplicacion']);
     });
+
+    // Reajuste Fecha Normalizacion
+    Route::group(["prefix" => "reajustar-fecha-pago"],function(){
+        Route::post('/', [Proyectos\DesembolsoController::class,'reajustarFechaPago'])->name('desembolsos.reajustarFechaPago');
+            // ->middleware(['permission:CrearAplicacion']);
+    });
 });

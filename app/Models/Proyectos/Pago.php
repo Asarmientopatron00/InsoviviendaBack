@@ -103,6 +103,9 @@ class Pago extends Model
         if(isset($dto['persona'])){
             $query->where('personas.personasIdentificacion', $dto['persona']);
         }
+        if(isset($dto['abonoExtra']) && $dto['abonoExtra']=='true'){
+            $query->where('pagos.pagosTipo', 'A');
+        }
 
         if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0){
             foreach ($dto['ordenar_por'] as $attribute => $value){

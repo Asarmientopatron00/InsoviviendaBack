@@ -31,7 +31,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
          ->join('personas AS t2', 't2.id', 't1.persona_id')
          ->join('tipos_identificacion AS t3', 't3.id', 't2.tipo_identificacion_id')
          ->select(
-            DB::raw("(SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%d %H:%i')) AS fecha"),
+            DB::raw("(SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%d')) AS fecha"),
             't3.tipIdeDescripcion AS tipo_identificacion',
             't2.personasIdentificacion',
             DB::raw(
@@ -47,7 +47,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
             't1.proyectosValorCuotaAprobada',
             DB::raw("
                (
-                  SELECT MAX(t4.plAmDeFechaVencimientoCuota)
+                  SELECT DATE_FORMAT(MAX(t4.plAmDeFechaVencimientoCuota), '%Y-%m-%d')
                   FROM plan_amortizacion_def t4
                   WHERE t4.proyecto_id = t1.id
                   AND t4.plAmDeCuotaCancelada = 'S'
@@ -55,7 +55,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
             "),
             DB::raw("
                (
-                  SELECT MAX(t4.plAmDeFechaUltimoPagoCuota)
+                  SELECT DATE_FORMAT(MAX(t4.plAmDeFechaUltimoPagoCuota), '%Y-%m-%d')
                   FROM plan_amortizacion_def t4
                   WHERE t4.proyecto_id = t1.id
                   AND t4.plAmDeCuotaCancelada = 'S'
@@ -73,7 +73,9 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
                      FROM pagos t5
                      WHERE t5.proyecto_id = t1.id
                      AND t5.pagosEstado = 1
-                  ) 
+                  )
+                  ORDER BY t4.id DESC
+                  LIMIT 1 
                ) IS NULL 
                   THEN
                   (
@@ -93,7 +95,9 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
                         FROM pagos t5
                         WHERE t5.proyecto_id = t1.id
                         AND t5.pagosEstado = 1
-                     ) 
+                     )
+                     ORDER BY t4.id DESC
+                     LIMIT 1 
                   )
                 END AS saldo
             "),

@@ -68,7 +68,16 @@ class PagoController extends Controller
                             ->whereNot('proyectosEstadoProyecto', 'REC');
                     }),
                 ],
-                'pagosFechaPago' => 'date|required',
+                'pagosFechaPago' => [
+                    'date',
+                    'required',
+                    // Rule::unique('pagos')
+                    //     ->where(fn ($query) => 
+                    //         $query->where('proyecto_id', $datos['proyecto_id'])
+                    //             ->where('pagosFechaPago', $datos['pagosFechaPago']) 
+                    //             ->where('pagosEstadoPago', 1) 
+                    //     )
+                ],
                 'pagosValorTotalPago' => 'numeric|required',
                 'pagosDescripcionPago' => 'string|required',
                 'pagosEstado' => 'boolean|required',
@@ -154,7 +163,16 @@ class PagoController extends Controller
                             ->whereNot('proyectosEstadoProyecto', 'REC');
                     }),
                 ],
-                'pagosFechaPago' => 'date|required',
+                'pagosFechaPago' => [
+                    'date',
+                    'required',
+                    // Rule::unique('pagos')
+                    //     ->where(fn ($query) => 
+                    //         $query->where('proyecto_id', $datos['proyecto_id'])
+                    //             ->where('pagosFechaPago', $datos['pagosFechaPago']) 
+                    //             ->where('pagosEstadoPago', 1) 
+                    //     )->ignore(Pago::find($id))
+                ],
                 'pagosValorTotalPago' => 'numeric|required',
                 'pagosDescripcionPago' => 'string|required',
                 'pagosEstado' => 'boolean|required',

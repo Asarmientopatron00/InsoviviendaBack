@@ -72,22 +72,21 @@ class PagosExport implements FromQuery, WithHeadings, ShouldAutoSize, WithStyles
       if (isset($this->dto['proyecto'])){
          $query->where('pagos.proyecto_id', '=', $this->dto['proyecto']);
       }
-
       if(isset($this->dto['fechaDesde'])){
          $query->where('pagos.pagosFechaPago', '>=', $this->dto['fechaDesde'].' 00:00:00');
-      }
-        
+      } 
       if(isset($this->dto['fechaHasta'])){
          $query->where('pagos.pagosFechaPago', '<=', $this->dto['fechaHasta'] . ' 23:59:59');
-      }
-        
+      } 
       if(isset($this->dto['estado'])){
          $query->where('pagos.pagosEstado', $this->dto['estado']);
       }
-
       if(isset($this->dto['persona'])){
          $query->where('personas.personasIdentificacion', $this->dto['persona']);
-     }
+      }
+      if(isset($this->dto['abonoExtra']) && $this->dto['abonoExtra'] == 'true'){
+         $query->where('pagos.pagosTipo', 'A');
+      }
 
       $query->orderBy('pagos.proyecto_id', 'asc');
       $query->orderBy('pagos.pagosConsecutivo', 'asc');
