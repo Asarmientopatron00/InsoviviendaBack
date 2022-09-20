@@ -31,7 +31,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
          ->join('personas AS t2', 't2.id', 't1.persona_id')
          ->join('tipos_identificacion AS t3', 't3.id', 't2.tipo_identificacion_id')
          ->select(
-            DB::raw("(SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%d')) AS fecha"),
+            DB::raw("(SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%d %H:%i')) AS fecha"),
             't3.tipIdeDescripcion AS tipo_identificacion',
             't2.personasIdentificacion',
             DB::raw(
