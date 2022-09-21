@@ -32,10 +32,8 @@ class UpToDateProject implements Rule
             ->first();
         
         if(!$proximaCuotaAPagar) return false;
-
-        $today = Carbon::now()->format('Y-m-d');
         
-        return $proximaCuotaAPagar->plAmDeFechaVencimientoCuota >= $today;
+        return $proximaCuotaAPagar->plAmDeValorInteresMora <= 0;
     }
 
     /**
