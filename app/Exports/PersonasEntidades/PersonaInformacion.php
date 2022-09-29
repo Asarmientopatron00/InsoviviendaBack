@@ -161,13 +161,15 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
                     WHEN "FO" THEN "Formal"
                     WHEN "IN" THEN "Informal"
                     WHEN "PE" THEN "Pensionado"
+                    WHEN "NA" THEN "No aplica"
                     ELSE "" END AS personasTipoTrabajo'
-            ),
-            DB::Raw('CASE personas.personasTipoContrato
+                ),
+                DB::Raw('CASE personas.personasTipoContrato
                     WHEN "IN" THEN "Indefinidio"
                     WHEN "TF" THEN "Término Fijo"
                     WHEN "OL" THEN "Por Obra Labor"
                     WHEN "PS" THEN "Prestación de Servicios"
+                    WHEN "NA" THEN "No aplica"
                     ELSE "" END AS personasTipoContrato'
             ),
             'personas.personasNombreEmpresa',
