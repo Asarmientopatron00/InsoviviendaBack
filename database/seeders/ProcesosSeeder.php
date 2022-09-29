@@ -43,5 +43,21 @@ class ProcesosSeeder extends Seeder
             'created_at' =>Carbon::now(),
             'updated_at' =>Carbon::now(),
         ]);
+        DB::table('permissions')->insert([
+            'name'=> 'EjecutarProcesoCalculoMora',
+            'guard_name'=> 'api',
+            'option_id'=> 52,
+            'title'=> 'Ejecutar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 208,
+            'role_id'=> 1,
+        ]);
     }
 }

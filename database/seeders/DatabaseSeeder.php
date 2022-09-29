@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Database\Seeders\UserSeed;
 use Illuminate\Database\Seeder;
+use Database\Seeders\ProcesosSeeder;
 use Database\Seeders\ProyectosSeeder;
 use Database\Seeders\SeguridadSeeder;
 use Database\Seeders\DataForPersonSeeder;
@@ -26,6 +27,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(DataForPersonSeeder::class);
         $this->call(ParametrizacionSeeder::class);
         $this->call(PersonasEntidadesSeeder::class);
+        $this->call(ProcesosSeeder::class);
         // $this->call(ProyectosSeeder::class);
     }
 }
