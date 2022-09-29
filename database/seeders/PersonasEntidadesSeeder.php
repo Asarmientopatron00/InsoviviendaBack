@@ -85,6 +85,20 @@ class PersonasEntidadesSeeder extends Seeder
             'created_at' =>Carbon::now(),
             'updated_at' =>Carbon::now(),
         ]);
+        DB::table('opciones_del_sistema')->insert([
+            'nombre'=> 'Personas para Asesorías',
+            'modulo_id'=> 3,
+            'posicion'=> 25,
+            'icono_menu'=> 'people',
+            'url'=> '/personas-asesorias',
+            'estado'=> true,
+            'usuario_creacion_id' =>1,
+            'usuario_creacion_nombre'=>'SuperUser',
+            'usuario_modificacion_id' =>1,
+            'usuario_modificacion_nombre' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
         DB::table('permissions')->insert([
             'name'=> 'CrearPersona',
             'guard_name'=> 'api',
@@ -194,6 +208,18 @@ class PersonasEntidadesSeeder extends Seeder
             'updated_at' =>Carbon::now(),
         ]);
         DB::table('permissions')->insert([
+            'name'=> 'ExportarFamilia',
+            'guard_name'=> 'api',
+            'option_id'=> 39,
+            'title'=> 'Exportar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
             'name'=> 'CrearAsesor',
             'guard_name'=> 'api',
             'option_id'=> 40,
@@ -289,6 +315,54 @@ class PersonasEntidadesSeeder extends Seeder
             'created_at' =>Carbon::now(),
             'updated_at' =>Carbon::now(),
         ]);
+        DB::table('permissions')->insert([
+            'name'=> 'CrearPersonaAsesoria',
+            'guard_name'=> 'api',
+            'option_id' => 42,
+            'title'=> 'Crear',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'ModificarPersonaAsesoria',
+            'guard_name'=> 'api',
+            'option_id' => 42,
+            'title'=> 'Modificar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'EliminarPersonaAsesoria',
+            'guard_name'=> 'api',
+            'option_id' => 42,
+            'title'=> 'Eliminar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
+        DB::table('permissions')->insert([
+            'name'=> 'ListarPersonaAsesoria',
+            'guard_name'=> 'api',
+            'option_id' => 42,
+            'title'=> 'Listar',
+            'user_creation_id' =>1,
+            'user_creation_name'=>'SuperUser',
+            'user_modification_id' =>1,
+            'user_modification_name' =>'SuperUser',
+            'created_at' =>Carbon::now(),
+            'updated_at' =>Carbon::now(),
+        ]);
         DB::table('role_has_permissions')->insert([
             'permission_id'=> 144,
             'role_id'=> 1,
@@ -355,6 +429,26 @@ class PersonasEntidadesSeeder extends Seeder
         ]);
         DB::table('role_has_permissions')->insert([
             'permission_id'=> 160,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 161,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 162,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 163,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 164,
+            'role_id'=> 1,
+        ]);
+        DB::table('role_has_permissions')->insert([
+            'permission_id'=> 165,
             'role_id'=> 1,
         ]);
     }

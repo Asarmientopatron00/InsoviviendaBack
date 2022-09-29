@@ -296,7 +296,7 @@ class Persona extends Model
             ->leftJoin('ciudades AS ciudad_cor','ciudad_cor.id','=','personas.ciudad_correspondencia_id')
             ->leftJoin('comunas AS comuna_cor','comuna_cor.id','=','personas.comuna_correspondencia_id')
             ->leftJoin('barrios AS barrio_cor','barrio_cor.id','=','personas.barrio_correspondencia_id')
-            ->Leftjoin('familias','familias.id','=','personas.familia_id')
+            ->leftJoin('familias','familias.id','=','personas.familia_id')
             ->select(
                 'personas.id',
                 'personas.personasIdentificacion',
