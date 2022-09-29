@@ -22,12 +22,12 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         // \App\Models\User::factory(10)->create();
-        // $this->call(UserSeed::class);
+        $this->call(UserSeed::class);
         $this->call(SeguridadSeeder::class);
         // $this->call(DataForPersonSeeder::class);
         $this->call(ParametrizacionSeeder::class);
         $this->call(PersonasEntidadesSeeder::class);
+        $this->call(ProyectosSeeder::class);
         $this->call(ProcesosSeeder::class);
-        // $this->call(ProyectosSeeder::class);
     }
 }
