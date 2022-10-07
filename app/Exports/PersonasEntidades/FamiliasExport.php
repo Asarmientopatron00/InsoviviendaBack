@@ -43,7 +43,7 @@ class FamiliasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
             ),
             'tipos_familia.tipFamDescripcion',
             'condiciones_familia.conFamDescripcion',
-            'familias.familiasFechaVisitaDomici',
+            DB::raw("DATE_FORMAT(familias.familiasFechaVisitaDomici, '%Y-%m-%d') AS familiasFechaVisitaDomici"),
             'familias.familiasAportesFormales',
             'familias.familiasAportesInformales',
             'familias.familiasAportesArriendo',
@@ -58,6 +58,7 @@ class FamiliasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
             'familias.familiasEgresosSerPublicos',
             'familias.familiasEgresosAlimentacion',
             'familias.familiasEgresosVivienda',
+            'familias.familiasEgresosOtros',
             DB::Raw('CASE familias.familiasEstado
                      WHEN 0 THEN "Inactivo"
                      WHEN 1 THEN "Activo"
@@ -94,8 +95,8 @@ class FamiliasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:Y1')->getFont()->setBold(true);
-      $sheet->getStyle('F:S')->getNumberFormat()->setFormatCode('$#,##0');
+      $sheet->getStyle('A1:Z1')->getFont()->setBold(true);
+      $sheet->getStyle('F:T')->getNumberFormat()->setFormatCode('$#,##0');
    }
    
    public function headings(): array
@@ -120,6 +121,7 @@ class FamiliasExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
          "Egresos Serv. Públicos",  
          "Egresos Alimentación",  
          "Egresos Vivienda",  
+         "Egresos Otros",  
          "Estado",  
          "Observaciones",  
          "Usuario Creación",

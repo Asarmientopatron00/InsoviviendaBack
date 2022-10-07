@@ -37,6 +37,7 @@ class Familia extends Model
         'familiasEgresosSerPublicos',
         'familiasEgresosAlimentacion',
         'familiasEgresosVivienda',
+        'familiasEgresosOtros',
         'familiasEstado',
         'familiasObservaciones',
         'usuario_creacion_id',
@@ -110,6 +111,7 @@ class Familia extends Model
                 'familias.familiasEgresosSerPublicos',
                 'familias.familiasEgresosAlimentacion',
                 'familias.familiasEgresosVivienda',
+                'familias.familiasEgresosOtros',
                 'familias.familiasObservaciones',
                 'familias.familiasEstado AS estado',
                 'familias.usuario_creacion_id',
@@ -195,6 +197,9 @@ class Familia extends Model
                 if($attribute == 'familiasEgresosVivienda'){
                     $query->orderBy('familias.familiasEgresosVivienda', $value);
                 }
+                if($attribute == 'familiasEgresosOtros'){
+                    $query->orderBy('familias.familiasEgresosOtros', $value);
+                }
                 if($attribute == 'familiasObservaciones'){
                     $query->orderBy('familias.familiasObservaciones', $value);
                 }
@@ -270,6 +275,7 @@ class Familia extends Model
             'familiasEgresosSerPublicos' => $familia->familiasEgresosSerPublicos,
             'familiasEgresosAlimentacion' => $familia->familiasEgresosAlimentacion,
             'familiasEgresosVivienda' => $familia->familiasEgresosVivienda,
+            'familiasEgresosOtros' => $familia->familiasEgresosOtros,
             'familiasEstado' => $familia->familiasEstado,
             'familiasObservaciones' => $familia->familiasObservaciones,
             'estado' => $familia->familiasEstado,

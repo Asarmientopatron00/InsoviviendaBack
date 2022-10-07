@@ -96,7 +96,7 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
                     ELSE "" END AS personasVehiculo'
             ),
             'personas.personasCorreo',
-            'personas.personasFechaVinculacion',
+            DB::raw("DATE_FORMAT(personas.personasFechaVinculacion, '%Y-%m-%d') AS fecha_vinculacion"),
             'departamentos.departamentosDescripcion',
             'ciudades.ciudadesDescripcion',
             'comunas.comunasDescripcion',
@@ -120,8 +120,9 @@ class PersonaInformacion implements FromQuery, WithHeadings, ShouldAutoSize, Wit
             ),
             'personas.personasNumeroEscritura',
             'personas.personasNotariaEscritura',
-            'personas.personasFechaEscritura',
+            DB::raw("DATE_FORMAT(personas.personasFechaEscritura, '%Y-%m-%d') AS fecha_escritura"),
             DB::Raw('CASE personas.personasIndicativoPC
+                    WHEN "ES" THEN "Escritura"
                     WHEN "PO" THEN "Posesión"
                     WHEN "CV" THEN "Compraventa"
                     ELSE "" END AS personasIndicativoPC'
