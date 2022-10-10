@@ -4,12 +4,14 @@ namespace App\Models\Parametrizacion;
 
 use Exception;
 use Carbon\Carbon;
+use App\Enum\AccionAuditoriaEnum;
+use App\Models\Proyectos\Proyecto;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Enum\AccionAuditoriaEnum;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\Proyectos\DocumentoProyecto;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class TipoDocumentoProyecto extends Model
 {
@@ -134,6 +136,20 @@ class TipoDocumentoProyecto extends Model
         $guardado = $reg->save();
         if (!$guardado) 
             throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
+
+        if(!isset($dto['id'])){
+            $proyectos = Proyecto::whereNotIn('proyectosEstadoProyecto', ['REC', 'CAN', 'CON'])->get();
+            foreach($proyectos as $proyecto){
+                DocumentoProyecto::create([
+                    'proyecto_id' => $proyecto->id,
+                    'tipo_documento_proyecto_id' => $reg->id,
+                    'usuario_creacion_id' => $usuario->id,
+                    'usuario_creacion_nombre' => $usuario->nombre,
+                    'usuario_modificacion_id' => $usuario->id,
+                    'usuario_modificacion_nombre' => $usuario->nombre,
+                ]);
+            }
+        }
  
         // Guardar auditoria
         $auditoriaDto = ['id_recurso' => $reg->id,
