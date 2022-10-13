@@ -284,9 +284,7 @@ class PersonaController extends Controller
                 'familia_id' => [
                     'integer',
                     'nullable',
-                    Rule::exists('familias','id')->where(function ($query) {
-                        $query->where('familiasEstado', 1);
-                    }),
+                    Rule::exists('familias','id'),
                 ],
             ],
                 $messages = [
@@ -606,9 +604,7 @@ class PersonaController extends Controller
                 'familia_id' => [
                     'integer',
                     'nullable',
-                    Rule::exists('familias','id')->where(function ($query) {
-                        $query->where('familiasEstado', 1);
-                    }),
+                    Rule::exists('familias','id'),
                 ],
             ],
                 $messages = [
