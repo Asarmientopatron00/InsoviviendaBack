@@ -228,8 +228,8 @@ class PersonaController extends Controller
                 'personasTipoContrato' => 'string|required',
                 'personasNombreEmpresa' => 'string|nullable',
                 'personasTelefonoEmpresa' => 'string|nullable',
-                'personasPuntajeProcredito' => 'integer|required',
-                'personasPuntajeDatacredito' => 'integer|required',
+                'personasPuntajeProcredito' => 'integer|nullable',
+                'personasPuntajeDatacredito' => 'integer|nullable',
                 'departamento_correspondencia_id' => [
                     'integer',
                     'nullable',
@@ -550,8 +550,8 @@ class PersonaController extends Controller
                 'personasTipoContrato' => 'string|required',
                 'personasNombreEmpresa' => 'string|nullable',
                 'personasTelefonoEmpresa' => 'string|nullable',
-                'personasPuntajeProcredito' => 'integer|required',
-                'personasPuntajeDatacredito' => 'integer|required',
+                'personasPuntajeProcredito' => 'integer|nullable',
+                'personasPuntajeDatacredito' => 'integer|nullable',
                 'departamento_correspondencia_id' => [
                     'integer',
                     'nullable',
