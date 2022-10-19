@@ -63,6 +63,7 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
                      WHEN 'MEJ' THEN 'Mejora'
                      WHEN 'CON' THEN 'Construcción'
                      WHEN 'COM' THEN 'Compra'
+                     WHEN 'LHO' THEN 'Línea Hogar'
                      ELSE '' END AS proyectosTipoProyecto"),
             DB::Raw("IFNULL(tipos_programa.tipProDescripcion, '') AS tipoProgramaDescripcion"),
             DB::Raw("CASE proyectos.proyectosRemitido
