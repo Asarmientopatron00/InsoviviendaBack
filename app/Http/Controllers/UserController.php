@@ -10,7 +10,9 @@ use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
 use Illuminate\Http\Response;
 use App\Enum\AccionAuditoriaEnum;
+use App\Models\Seguridad\Usuario;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -277,7 +279,7 @@ class UserController extends Controller
                 , Response::HTTP_BAD_REQUEST
             );
         }
-
+        $appFront = env('APP_FRONT_URL', 'http://192.168.88.10:3000');
         $parametroCorreo->texto = str_replace('&amp;1', env('APP_FRONT_URL'),$parametroCorreo->texto);
         $parametroCorreo->texto = str_replace('&amp;2',  env('APP_FRONT_URL') . '/reset-password/' . $token,$parametroCorreo->texto);
     
