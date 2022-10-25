@@ -280,8 +280,8 @@ class UserController extends Controller
             );
         }
         $appFront = env('APP_FRONT_URL', 'http://192.168.88.10:3000');
-        $parametroCorreo->texto = str_replace('&amp;1', env('APP_FRONT_URL'),$parametroCorreo->texto);
-        $parametroCorreo->texto = str_replace('&amp;2',  env('APP_FRONT_URL') . '/reset-password/' . $token,$parametroCorreo->texto);
+        $parametroCorreo->texto = str_replace('&amp;1', $appFront,$parametroCorreo->texto);
+        $parametroCorreo->texto = str_replace('&amp;2',  $appFront . '/reset-password/' . $token,$parametroCorreo->texto);
     
         Mail::send('mail.reset-password',
             ['texto' => $parametroCorreo->texto],
