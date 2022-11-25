@@ -17,7 +17,7 @@
             <div class="main-info center">
               <img class="slogan" src="img/logo-slogan.png"/>
               <h3>NIT: 890908956-3</h3>
-              <h3>TELÉFONOS: 2314342 - 2316841</h3>
+              <h3 style="font-size: 13px">TELÉFONOS: 5407880 - 3126012080</h3>
               <h3>MEDELLÍN</h3>
             </div>
           </div>
