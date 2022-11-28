@@ -14,14 +14,16 @@ class ProcesoMora extends Model
         $usuario = $user->usuario();
         
         $proyecto_id = null;
+        $fechaEjecucion = $dto['fechaEjecucion'];
         $reiniciarMora = 0;
         $transaccion = 'CalcularInteresMora';
         $usuarioId = $usuario->id;
         $usuario = $usuario->nombre;
         $procedure = DB::select(
-            'CALL SP_CalcularValorInteresMora(?,?,?,?,?)', 
+            'CALL SP_CalcularValorInteresMora(?,?,?,?,?,?)', 
             array(
                 $proyecto_id, 
+                $fechaEjecucion, 
                 $reiniciarMora, 
                 $transaccion,
                 $usuarioId,
