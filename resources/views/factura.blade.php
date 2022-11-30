@@ -120,6 +120,11 @@
             </div>
           </div>
         </div>
+        @if ($pago->pagosEstado === 0)
+          <div class="watermark">
+            ANULADO
+          </div>
+        @endif
       </main>
       <div style="font-size: 11px; margin: 8px 10px">
         Elaborador por {{$pago->usuario_creacion_nombre}}, Fecha y hora de impresión: {{$totales->fecha}}

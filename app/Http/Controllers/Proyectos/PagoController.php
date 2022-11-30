@@ -289,7 +289,7 @@ class PagoController extends Controller
 
     public function factura(Request $request, $id){
         $pago = Pago::find($id);
-        if(!$pago || $pago->pagosEstado === 0){
+        if(!$pago){
             return;
         }
         $numberToWord = Pago::numberToWord($pago->pagosValorTotalPago);

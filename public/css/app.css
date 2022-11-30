@@ -144,6 +144,17 @@ h1 {
   width: 160px;
   padding-left: 0;
 }
+
+.watermark {
+  opacity: 0.2;
+  color: 'blue';
+  font-size: 70;
+  position: absolute;
+  top: 195;
+  left: 90;
+  z-index: 90;
+  transform: rotate(-30deg);
+}
 /* GENERICOS */
 
 .center {
