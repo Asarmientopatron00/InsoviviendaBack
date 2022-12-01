@@ -30,6 +30,12 @@ Route::group(["prefix" => "pagos"],function(){
         // ->middleware(['permission:ListarColaborador']);
 });
 
+Route::group(["prefix" => "donaciones"],function(){
+    Route::get('/', [Proyectos\DonacionController::class,'listaDonaciones'])->name('donaciones.listaDonaciones');
+    Route::get('/{id}', [Proyectos\DonacionController::class,'recibo'])->name('donaciones.recibo');
+        // ->middleware(['permission:ListarColaborador']);
+});
+
 Route::group(["prefix" => "proyectos"],function(){
     Route::get('/proyecto', [Proyectos\ProyectoController::class,'descargarProyectos'])->name('proyecto.descargarProyectos');
     Route::get('/plan-amortizacion', [Proyectos\PlanAmortizacionController::class,'descargaPlanAmortizacion'])->name('plan-amortizacion.descargaPlanAmortizacion');

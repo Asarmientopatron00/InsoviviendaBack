@@ -294,22 +294,36 @@ class PagoController extends Controller
         }
         $numberToWord = Pago::numberToWord($pago->pagosValorTotalPago);
         $pagosDetalle = $pago->pagosDetalle;
-        $totales = (object)[];
-        $totales->capital = 0;
-        $totales->interesCuota = 0;
-        $totales->interesMora = 0;
-        $totales->seguro = 0;
-        $totales->fecha = Carbon::now();
-        $totales->cartera = $pago->pagosSaldoDespPago;
+        $registro = (object)[];
+        $registro->consecutivo = $pago->pagosConsecutivo;
+        $registro->valor = $pago->pagosValorTotalPago;
+        $registro->persona = 
+            $pago->proyecto->solicitante->personasNombres.' '
+            .$pago->proyecto->solicitante->personasPrimerApellido.' '
+            .$pago->proyecto->solicitante->personasSegundoApellido.' ';
+        $registro->identificacion = $pago->proyecto->solicitante->personasIdentificacion;
+        $registro->concepto = $pago->pagosDescripcionPago;
+        $registro->banco = $pago->proyecto->banco->bancosDescripcion;
+        $registro->fechaC = $pago->pagosFechaPago;
+        $registro->fechaE = date_format($pago->created_at, 'Y-m-d');
+        $registro->elaboradoPor = $pago->usuario_creacion_nombre;
+        $registro->estado = $pago->pagosEstado;
+        $registro->numberToWord = $numberToWord;
+        $registro->capital = 0;
+        $registro->interesCuota = 0;
+        $registro->interesMora = 0;
+        $registro->seguro = 0;
+        $registro->fecha = Carbon::now();
+        $registro->cartera = $pago->pagosSaldoDespPago;
         foreach($pagosDetalle as $pagoDetalle){
-            $totales->capital = $totales->capital + $pagoDetalle->pagDetValorCapitalCuotaPagado + $pagoDetalle->pagDetValorSaldoCuotaPagado; 
-            $totales->interesCuota = $totales->interesCuota + $pagoDetalle->pagDetValorInteresCuotaPagado; 
-            $totales->interesMora = $totales->interesMora + $pagoDetalle->pagDetValorInteresMoraPagado; 
-            $totales->seguro = $totales->seguro + $pagoDetalle->pagDetValorSeguroCuotaPagado; 
+            $registro->capital = $registro->capital + $pagoDetalle->pagDetValorCapitalCuotaPagado + $pagoDetalle->pagDetValorSaldoCuotaPagado; 
+            $registro->interesCuota = $registro->interesCuota + $pagoDetalle->pagDetValorInteresCuotaPagado; 
+            $registro->interesMora = $registro->interesMora + $pagoDetalle->pagDetValorInteresMoraPagado; 
+            $registro->seguro = $registro->seguro + $pagoDetalle->pagDetValorSeguroCuotaPagado; 
         }
-        $pdf = PDF::loadView('factura', compact(['pago', 'numberToWord', 'totales']));
-        return $pdf->download('recibo-de-caja-'.$pago->pagosConsecutivo.'-'.time().'.pdf');
-        // return $pdf->stream('recibo-de-caja-'.$pago->id.'-'.time().'.pdf');
+        $registro->interesTotal = $registro->interesCuota+$registro->interesMora;
+        $pdf = PDF::loadView('factura', compact(['registro']));
+        return $pdf->download('recibo-de-caja-'.$registro->consecutivo.'-'.time().'.pdf');
     }
 
     public function listaPagos(Request $request)

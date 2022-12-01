@@ -224,15 +224,26 @@ class Pago extends Model
         // Consultar aplicación
         $pago = isset($dto['id']) ? Pago::find($dto['id']) : new Pago();
 
+        if(!isset($dto['id'])){
+            $parametro = ParametroConstante::where('codigo_parametro', 'CONSECUTIVO_RECIBO_CAJA')->first();
+            if(!$parametro){
+               $parametro = ParametroConstante::create([
+                   'codigo_parametro' => 'CONSECUTIVO_RECIBO_CAJA',
+                   'descripcion_parametro' => 'Último valor del consecutivo del recibo de caja',
+                   'valor_parametro' => 1,
+                   'estado' => 1,
+                   'usuario_creacion_id' => $usuario->id,
+                   'usuario_creacion_nombre' => $usuario->nombre,
+                   'usuario_modificacion_id' => $usuario->id,
+                   'usuario_modificacion_nombre' => $usuario->nombre,
+               ]);
+            }
+            $dto['pagosConsecutivo'] = $parametro->valor_parametro;
+        }
+
         // Guardar objeto original para auditoria
         $pagoOriginal = $pago->toJson();
-        
-        $ultimoConsecutivo = 0;
-        if(!isset($dto['id'])){
-            $lastPago = Pago::where('proyecto_id', '>', 0)->max('pagosConsecutivo');
-            $ultimoConsecutivo = $lastPago??0;
-            $dto['pagosConsecutivo'] = $ultimoConsecutivo+1;
-        }
+
 
         $pago->fill($dto);
         $guardado = $pago->save();
@@ -241,22 +252,8 @@ class Pago extends Model
         }
 
         if(!isset($dto['id'])){
-            $parametro = ParametroConstante::where('codigo_parametro', 'CONSECUTIVO_RECIBO_CAJA')->first();
-            if(isset($parametro)){
-                $parametro->valor_parametro = $ultimoConsecutivo+1;
-                $parametro->save();
-            } else {
-                $create = ParametroConstante::create([
-                    'codigo_parametro' => 'CONSECUTIVO_RECIBO_CAJA',
-                    'descripcion_parametro' => 'Último valor del consecutivo del recibo de caja',
-                    'valor_parametro' => $ultimoConsecutivo+1,
-                    'estado' => 1,
-                    'usuario_creacion_id' => $usuario->id,
-                    'usuario_creacion_nombre' => $usuario->nombre,
-                    'usuario_modificacion_id' => $usuario->id,
-                    'usuario_modificacion_nombre' => $usuario->nombre,
-                ]);
-            }
+            $parametro->valor_parametro += 1;
+            $parametro->save();
         }
 
         // Guardar auditoria

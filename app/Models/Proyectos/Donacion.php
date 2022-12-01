@@ -4,12 +4,18 @@ namespace App\Models\Proyectos;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Proyectos\Pago;
 use App\Enum\AccionAuditoriaEnum;
+use App\Models\Proyectos\Donacion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Parametrizacion\Banco;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Seguridad\AuditoriaTabla;
+use App\Models\Parametrizacion\FormaPago;
 use App\Models\PersonasEntidades\Persona;
+use App\Models\Parametrizacion\TipoDonacion;
+use App\Models\Parametrizacion\ParametroConstante;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Donacion extends Model
@@ -18,7 +24,8 @@ class Donacion extends Model
 
    protected $fillable = [ 
       'persona_id',
-      'benefactor_id',
+      'donacionesNumeroDocumentoTercero',
+      'donacionesNombreTercero',
       'donacionesFechaDonacion',
       'tipo_donacion_id',
       'donacionesValorDonacion',
@@ -39,20 +46,27 @@ class Donacion extends Model
    public function persona(){
       return $this->belongsTo(Persona::class, 'persona_id');
    }
+   public function tipoDonacion(){
+      return $this->belongsTo(TipoDonacion::class, 'tipo_donacion_id');
+   }
+   public function formaPago(){
+      return $this->belongsTo(FormaPago::class, 'forma_pago_id');
+   }
+   public function banco(){
+      return $this->belongsTo(Banco::class, 'banco_id');
+   }
  
    public static function obtenerColeccionLigera($dto) 
    {
       $query = DB::table('donaciones')
          ->join('personas', 'personas.id', '=', 'donaciones.persona_id')
-         ->join('benefactores', 'benefactores.id', '=', 'donaciones.benefactor_id')
          ->select(
             'donaciones.id',
+            'donaciones.donacionesNumeroDocumentoTercero',
+            'donaciones.donacionesNombreTercero',
             DB::Raw("CONCAT(IFNULL(CONCAT(personas.personasNombres), ''), 
                      IFNULL(CONCAT(' ', personas.personasPrimerApellido), ''),
                      IFNULL(CONCAT(' ', personas.personasSegundoApellido), '')) AS nombre"),
-            DB::Raw("CONCAT(IFNULL(CONCAT(benefactores.benefactoresNombres), ''), 
-                     IFNULL(CONCAT(' ', benefactores.benefactoresPrimerApellido), ''),
-                     IFNULL(CONCAT(' ', benefactores.benefactoresSegundoApellido), '')) AS benefactor"),
             'donaciones.estado', 
          );
       $query->orderBy('nombre', 'asc');
@@ -62,8 +76,7 @@ class Donacion extends Model
    public static function obtenerColeccion($dto) 
    {
       $query = DB::table('donaciones') 
-         ->join('personas', 'personas.id', '=', 'donaciones.persona_id')
-         ->join('benefactores', 'benefactores.id', '=', 'donaciones.benefactor_id')
+         ->leftJoin('personas', 'personas.id', '=', 'donaciones.persona_id')
          ->join('tipos_donacion', 'tipos_donacion.id', '=', 'donaciones.tipo_donacion_id')
          ->join('formas_pago', 'formas_pago.id', '=', 'donaciones.forma_pago_id')
          ->leftJoin('bancos', 'bancos.id', '=', 'donaciones.banco_id')
@@ -72,10 +85,9 @@ class Donacion extends Model
             DB::Raw("CONCAT(IFNULL(CONCAT(personas.personasNombres), ''), 
                      IFNULL(CONCAT(' ', personas.personasPrimerApellido), ''),
                      IFNULL(CONCAT(' ', personas.personasSegundoApellido), '')) AS nombre"),
-            DB::Raw("CONCAT(IFNULL(CONCAT(benefactores.benefactoresNombres), ''), 
-                     IFNULL(CONCAT(' ', benefactores.benefactoresPrimerApellido), ''),
-                     IFNULL(CONCAT(' ', benefactores.benefactoresSegundoApellido), '')) AS benefactor"),
             'donaciones.donacionesFechaDonacion',
+            'donaciones.donacionesNumeroDocumentoTercero',
+            'donaciones.donacionesNombreTercero',
             'tipos_donacion.tipDonDescripcion',
             'donaciones.donacionesValorDonacion',
             'donaciones.donacionesEstadoDonacion',
@@ -95,168 +107,57 @@ class Donacion extends Model
          );
  
       // Filtro por nombre
-      if (isset($dto['nombre'])) {
-         $arrayNames = explode(' ', $dto['nombre']);
-         $long = count($arrayNames);
-         if ($long === 1) {
-            $query->orWhere('personas.personasNombres', 'like', '%' . $arrayNames[0] . '%');
-            $query->orWhere('personas.personasPrimerApellido', 'like', '%' . $arrayNames[0] . '%');
-            $query->orWhere('personas.personasSegundoApellido', 'like', '%' . $arrayNames[0] . '%');
-         }
-         if ($long === 2) {
-            $query->orWhere('personas.personasNombres', 'like', '%'.$arrayNames[0].' '.$arrayNames[1].'%');
-            $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
-               TRIM(personas.personasPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-            $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-            $query->orWhereRaw("CONCAT(TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-         }
-         if ($long === 3) {
-            $query->orWhereRaw("CONCAT(TRIM(personas.personasNombres), ' ', 
-               TRIM(personas.personasPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(personas.personasNombres), ' ', 
-               TRIM(personas.personasPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(personas.personasNombres), ' ', 
-               TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasSegundoApellido), ' ', 
-               TRIM(personas.personasNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-         }
-         if ($long === 4) {
-            $query->orWhereRaw("CONCAT(
-               TRIM(personas.personasNombres), ' ',
-               TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(personas.personasPrimerApellido), ' ', 
-               TRIM(personas.personasSegundoApellido), ' ', 
-               TRIM(personas.personasNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
-         }
+      if (isset($dto['benefactor'])) {
+         $query->where('donaciones.donacionesNombreTercero', 'like', '%' . $dto['benefactor'] . '%');
+      }
+
+      // Filtro por fecha inicial
+      if (isset($dto['fechaInicial'])) {
+         $query->where('donaciones.donacionesFechaDonacion', '>=', $dto['fechaInicial']);
+      }
+
+      // Filtro por fecha final
+      if (isset($dto['fechaFinal'])) {
+         $query->where('donaciones.donacionesFechaDonacion', '<=', $dto['fechaFinal']);
       }
 
       //Filtro por identificacion persona 
       if(isset($dto['identificacion'])){
          $query->where('personas.personasIdentificacion', 'like', '%' . $dto['identificacion'] . '%');
-     }
-
-      // Filtro por benefactor
-      if (isset($dto['benefactor'])) {
-         $arrayNames = explode(' ', $dto['benefactor']);
-         $long = count($arrayNames);
-         if ($long === 1) {
-            $query->orWhere('benefactores.benefactoresNombres', 'like', '%' . $arrayNames[0] . '%');
-            $query->orWhere('benefactores.benefactoresPrimerApellido', 'like', '%' . $arrayNames[0] . '%');
-            $query->orWhere('benefactores.benefactoresSegundoApellido', 'like', '%' . $arrayNames[0] . '%');
-         }
-         if ($long === 2) {
-            $query->orWhere('benefactores.benefactoresNombres', 'like', '%'.$arrayNames[0].' '.$arrayNames[1].'%');
-            $query->orWhereRaw("CONCAT(TRIM(benefactores.benefactoresNombres), ' ', 
-               TRIM(benefactores.benefactoresPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-            $query->orWhereRaw("CONCAT(TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-            $query->orWhereRaw("CONCAT(TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].'%']);
-         }
-         if ($long === 3) {
-            $query->orWhereRaw("CONCAT(TRIM(benefactores.benefactoresNombres), ' ', 
-               TRIM(benefactores.benefactoresPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(benefactores.benefactoresNombres), ' ', 
-               TRIM(benefactores.benefactoresPrimerApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(benefactores.benefactoresNombres), ' ', 
-               TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresSegundoApellido), ' ', 
-               TRIM(benefactores.benefactoresNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].'%']);
-         }
-         if ($long === 4) {
-            $query->orWhereRaw("CONCAT(
-               TRIM(benefactores.benefactoresNombres), ' ',
-               TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresSegundoApellido)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
-            $query->orWhereRaw("CONCAT(
-               TRIM(benefactores.benefactoresPrimerApellido), ' ', 
-               TRIM(benefactores.benefactoresSegundoApellido), ' ', 
-               TRIM(benefactores.benefactoresNombres)) like ?",
-               ['%'.$arrayNames[0].' '.$arrayNames[1].' '.$arrayNames[2].' '.$arrayNames[3].'%']);
-         }
       }
 
       if (isset($dto['ordenar_por']) && count($dto['ordenar_por']) > 0)
          foreach ($dto['ordenar_por'] as $attribute => $value){
             if ($attribute == 'nombre') 
                $query->orderBy('nombre', $value); 
-
-            if ($attribute == 'benefactor')  
-               $query->orderBy('benefactor', $value); 
-
             if ($attribute == 'donacionesFechaDonacion')  
                $query->orderBy('donaciones.donacionesFechaDonacion', $value); 
-
             if ($attribute == 'tipDonDescripcion')  
                $query->orderBy('tipos_donacion.tipDonDescripcion', $value); 
-
             if ($attribute == 'donacionesValorDonacion')  
                $query->orderBy('donaciones.donacionesValorDonacion', $value); 
-
             if ($attribute == 'donacionesEstadoDonacion')  
                $query->orderBy('donaciones.donacionesEstadoDonacion', $value); 
-
             if ($attribute == 'forPagDescripcion')  
                $query->orderBy('formas_pago.forPagDescripcion', $value); 
-
             if ($attribute == 'donacionesNumeroCheque')  
                $query->orderBy('donaciones.donacionesNumeroCheque', $value); 
-
             if ($attribute == 'bancosDescripcion')  
                $query->orderBy('bancosDescripcion', $value); 
-
             if ($attribute == 'donacionesNumeroRecibo')  
                $query->orderBy('donaciones.donacionesNumeroRecibo', $value);
-
             if ($attribute == 'donacionesFechaRecibo')  
                $query->orderBy('donaciones.donacionesFechaRecibo', $value);
-
             if ($attribute == 'donacionesNotas')  
                $query->orderBy('donaciones.donacionesNotas', $value); 
-
             if ($attribute == 'estado')  
                $query->orderBy('donaciones.estado', $value); 
-
             if ($attribute == 'usuario_creacion_nombre')
                $query->orderBy('donaciones.usuario_creacion_nombre', $value);
-
             if ($attribute == 'usuario_modificacion_nombre')
                $query->orderBy('donaciones.usuario_modificacion_nombre', $value);
-
             if ($attribute == 'fecha_creacion')
                $query->orderBy('donaciones.created_at', $value);
-
             if ($attribute == 'fecha_modificacion')
                $query->orderBy('donaciones.updated_at', $value);
          }
@@ -292,7 +193,8 @@ class Donacion extends Model
       return [ 
          'id' => $regCargar->id,
          'persona_id' => $regCargar->persona_id,
-         'benefactor_id' => $regCargar->benefactor_id,
+         'donacionesNumeroDocumentoTercero' => $regCargar->donacionesNumeroDocumentoTercero,
+         'donacionesNombreTercero' => $regCargar->donacionesNombreTercero,
          'donacionesFechaDonacion' => $regCargar->donacionesFechaDonacion,
          'tipo_donacion_id' => $regCargar->tipo_donacion_id,
          'donacionesValorDonacion' => $regCargar->donacionesValorDonacion,
@@ -334,20 +236,41 @@ class Donacion extends Model
   
       // Consultar aplicación
       $reg = isset($dto['id']) ? Donacion::find($dto['id']) : new Donacion();
-  
+   
+      if(!isset($dto['id'])){
+         $parametro = ParametroConstante::where('codigo_parametro', 'CONSECUTIVO_RECIBO_CAJA')->first();
+         if(!$parametro){
+            $parametro = ParametroConstante::create([
+                'codigo_parametro' => 'CONSECUTIVO_RECIBO_CAJA',
+                'descripcion_parametro' => 'Último valor del consecutivo del recibo de caja',
+                'valor_parametro' => 1,
+                'estado' => 1,
+                'usuario_creacion_id' => $usuario->id,
+                'usuario_creacion_nombre' => $usuario->nombre,
+                'usuario_modificacion_id' => $usuario->id,
+                'usuario_modificacion_nombre' => $usuario->nombre,
+            ]);
+         }
+         $dto['donacionesNumeroRecibo'] = $parametro->valor_parametro;
+      }
+
       // Guardar objeto original para auditoria
       $regOri = $reg->toJson();
   
       $reg->fill($dto);
       $guardado = $reg->save();
-      if (!$guardado) 
-         throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
+      if (!$guardado) throw new Exception("Ocurrió un error al intentar guardar la aplicación.", $reg);
+
+      if(!isset($dto['id'])){
+         $parametro->valor_parametro += 1;
+         $parametro->save();
+      }
   
       // Guardar auditoria
       $auditoriaDto = [ 
          'id_recurso' => $reg->id,
          'nombre_recurso' => Donacion::class,
-         'descripcion_recurso' => $reg->persona_id,
+         'descripcion_recurso' => $reg->donacionesNumeroRecibo,
          'accion' => isset($dto['id']) ? AccionAuditoriaEnum::MODIFICAR : AccionAuditoriaEnum::CREAR,
          'recurso_original' => isset($dto['id']) ? $regOri : $reg->toJson(),
          'recurso_resultante' => isset($dto['id']) ? $reg->toJson() : null 
@@ -366,7 +289,7 @@ class Donacion extends Model
       $auditoriaDto = [ 
          'id_recurso' => $regEli->id,
          'nombre_recurso' => Donacion::class,
-         'descripcion_recurso' => $regEli->persona_id,
+         'descripcion_recurso' => $regEli->donacionesNumeroRecibo,
          'accion' => AccionAuditoriaEnum::ELIMINAR,
          'recurso_original' => $regEli->toJson() 
       ];

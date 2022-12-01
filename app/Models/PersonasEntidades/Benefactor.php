@@ -45,7 +45,7 @@ class Benefactor extends Model
       $query = DB::table('benefactores') 
          -> select(  
             'benefactores.id',
-            'benefactores.benefactoresIdentificacion',
+            'benefactores.benefactoresIdentificacion AS identificacion',
             DB::Raw("CONCAT(IFNULL(CONCAT(benefactoresNombres), ''), 
                      IFNULL(CONCAT(' ', benefactoresPrimerApellido), ''),
                      IFNULL(CONCAT(' ', benefactoresSegundoApellido), '')) AS nombre"),

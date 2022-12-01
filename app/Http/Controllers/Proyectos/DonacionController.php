@@ -9,14 +9,19 @@
 
 namespace App\Http\Controllers\Proyectos;
 
+use PDF;
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Models\Proyectos\Pago;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
 use App\Models\Proyectos\Donacion;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Validator;
+use App\Exports\Proyectos\DonacionesExport;
+use App\Models\Parametrizacion\ParametroConstante;
 
 class DonacionController extends Controller
 {
@@ -70,91 +75,63 @@ class DonacionController extends Controller
          $datos = $request->all();
 
          // realiza validaciones generales de datos para el repositorio donaciones
-         $retVal = Validator::make( 
-            $datos, 
-            [  'persona_id'
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('personas','id') -> 
-                        where(function ($query) { 
-                           $query->where('personasEstadoRegistro', 'AC'); 
-                        }), 
-                     ],
+         $retVal = Validator::make($datos, [
+            'persona_id' => [
+               'integer', 
+               'nullable', 
+               Rule::exists('personas','id')-> 
+                  where(function ($query) { 
+                     $query->where('personasEstadoRegistro', 'AC'); 
+               }), 
+            ],
+            'donacionesFechaDonacion' => 'date|nullable',
+            'tipo_donacion_id' => [
+               'integer', 
+               'required', 
+               Rule::exists('tipos_donacion','id')->
+                  where(function ($query) { 
+                     $query->where('tipDonEstado', 1); 
+               }), 
+            ],
+            'donacionesValorDonacion' => 'numeric|required',
+            'donacionesEstadoDonacion' => 'string|required|max:2',
+            'forma_pago_id' => [
+               'integer', 
+               'required', 
+               Rule::exists('formas_pago','id') ->
+                  where(function ($query) { 
+                     $query->where('forPagEstado', 1); 
+               }), 
+            ],
+            'donacionesNumeroCheque' => 'string|nullable|max:128',
+            'banco_id' => [
+               'integer', 
+               'nullable', 
+               Rule::exists('bancos','id') ->
+                  where(function ($query) { 
+                     $query->where('bancosEstado', 1); 
+               }), 
+            ],
+            // 'donacionesNumeroRecibo' => 'string|required|max:128',
+            'donacionesNumeroDocumentoTercero' => 'string|required|max:128',
+            'donacionesNombreTercero' => 'string|required|max:128',
+            'donacionesFechaRecibo' => 'date|required',
+            'donacionesNotas' => 'string|required|max:512',
+            'estado' => 'boolean|required',
+         ], $msgErr = [ 
+            'persona_id.exists' => 'La persona no existe o está en estado inactivo',
+            'tipo_donacion_id.exists' => 'El tipo de donacion seleccionado no existe o está en estado inactivo',
+            'forma_pago_id.exists' => 'La forma d pago seleccionada no existe o está en estado inactivo', 
+            'banco_id.exists' => 'El banco seleccionado no existe o está en estado inactivo', 
+         ]);
 
-               'benefactor_id'
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('benefactores','id') ->
-                        where(function ($query) { 
-                           $query->where('estado', 1); 
-                        }), 
-                     ],
-
-               'donacionesFechaDonacion' 
-                  =>'date|nullable',
-
-               'tipo_donacion_id'
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('tipos_donacion','id') ->
-                        where(function ($query) { 
-                           $query->where('tipDonEstado', 1); 
-                        }), 
-                     ],
-
-               'donacionesValorDonacion'
-                  =>'numeric|required',
-
-               'donacionesEstadoDonacion'
-                  =>'string|required|max:2',
-
-               'forma_pago_id'
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('formas_pago','id') ->
-                        where(function ($query) { 
-                           $query->where('forPagEstado', 1); 
-                        }), 
-                     ],
-
-               'donacionesNumeroCheque'
-                  =>'string|nullable|max:128',
-
-               'banco_id'
-                  =>['integer', 
-                     'nullable', 
-                     Rule::exists('bancos','id') ->
-                        where(function ($query) { 
-                           $query->where('bancosEstado', 1); 
-                        }), 
-                     ],
-
-               'donacionesNumeroRecibo'
-                  =>'string|required|max:128',
-
-               'donacionesFechaRecibo'
-                  =>'date|required',
-
-               'donacionesNotas'
-                  =>'string|required|max:512',
-
-               'estado'
-                  =>'boolean|required',
-               ],
-            $msgErr = [ 
-               'persona_id.exists'
-                  =>'La persona no existe o está en estado inactivo',
-               'benefactor_id.exists'
-                  =>'El benefactor no existe o está en estado inactivo',
-               'tipo_donacion_id.exists'
-                  =>'El tipo de donacion seleccionado no existe o está en estado inactivo',
-               'forma_pago_id.exists'
-                  =>'La forma d pago seleccionada no existe o está en estado inactivo', 
-               'banco_id.exists'
-                  =>'El banco seleccionado no existe o está en estado inactivo', 
-            ] );
          if ($retVal->fails())
             return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
+
+         $tipoDonacionOtros = ParametroConstante::where('CODIGO_PARAMETRO', 'ID_TIPO_DONACION_OTROS_INGRESOS')->first();
+         if(!$tipoDonacionOtros){
+            return response('Faltan parámetros por definir', Response::HTTP_BAD_REQUEST);
+         }
 
          // inserta registro en repositorio donaciones
          $regCre = Donacion::modificarOCrear($datos);
@@ -169,7 +146,7 @@ class DonacionController extends Controller
       }
       catch (Exception $e) {
          DB::rollback(); // Se devuelven los cambios, por que la transaccion falla
-         return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
+         return response($e, Response::HTTP_INTERNAL_SERVER_ERROR);
       }
    }
 
@@ -215,95 +192,64 @@ class DonacionController extends Controller
          $datos['id'] = $id;
 
          // verifica la existencia del id de registro y realiza validaciones a los campos para actualizar el repositorio donaciones
-         $retVal = Validator::make( 
-            $datos, 
-            [  'id' 
-                  =>'integer|required|exists:donaciones,id',
-
-               'persona_id' 
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('personas','id') ->
-                        where(function ($query) { 
-                           $query->where('personasEstadoRegistro', 'AC'); 
-                        }), 
-                     ],
-
-               'benefactor_id' 
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('benefactores','id') ->
-                        where(function ($query) { 
-                           $query->where('estado', 1); 
-                        }), 
-                     ],
-
-               'donacionesFechaDonacion' 
-                  =>'date|required',
-
-               'tipo_donacion_id' 
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('tipos_donacion','id') ->
-                        where(function ($query) { 
-                           $query->where('tipDonEstado', 1); 
-                        }), 
-                     ],
-
-               'donacionesValorDonacion' 
-                  =>'numeric|required',
-
-               'donacionesEstadoDonacion' 
-                  =>'string|required|max:2',
-
-               'forma_pago_id' 
-                  =>['integer', 
-                     'required', 
-                     Rule::exists('formas_pago','id') ->
-                        where(function ($query) { 
-                           $query->where('forPagEstado', 1); 
-                        }), 
-                     ],
-
-               'donacionesNumeroCheque'
-                  =>'string|nullable|max:128',
-
-               'banco_id' 
-                  =>['integer', 
-                     'nullable', 
-                     Rule::exists('bancos','id') ->
-                     where(function ($query) { 
-                        $query->where('bancosEstado', 1); 
-                     }), 
-                  ],
-
-               'donacionesNumeroRecibo' 
-                  =>'string|required|max:128',
-
-               'donacionesFechaRecibo' 
-                  =>'date|required',
-
-               'donacionesNotas' 
-                  =>'string|required|max:512',
-                  
-               'estado' 
-                  =>'boolean|required' 
+         $retVal = Validator::make($datos, [
+            'id' => 'integer|required|exists:donaciones,id',
+            'persona_id' => [
+               'integer', 
+               'nullable', 
+               Rule::exists('personas','id')-> 
+                  where(function ($query) { 
+                     $query->where('personasEstadoRegistro', 'AC'); 
+               }), 
             ],
-            $msgErr = [ 
-               'persona_id.exists'
-                  =>'La persona no existe o está en estado inactivo',
-               'benefactor_id.exists'
-                  =>'El benefactor no existe o está en estado inactivo',
-               'tipo_donacion_id.exists'
-                  =>'El tipo de donacion seleccionado no existe o está en estado inactivo',
-               'forma_pago_id.exists'
-                  =>'La forma d pago seleccionada no existe o está en estado inactivo', 
-               'banco_id.exists'
-                  =>'El banco seleccionado no existe o está en estado inactivo', 
-            ] 
-         );
+            'donacionesFechaDonacion' => 'date|nullable',
+            'tipo_donacion_id' => [
+               'integer', 
+               'required', 
+               Rule::exists('tipos_donacion','id')->
+                  where(function ($query) { 
+                     $query->where('tipDonEstado', 1); 
+               }), 
+            ],
+            'donacionesValorDonacion' => 'numeric|required',
+            'donacionesEstadoDonacion' => 'string|required|max:2',
+            'forma_pago_id' => [
+               'integer', 
+               'required', 
+               Rule::exists('formas_pago','id') ->
+                  where(function ($query) { 
+                     $query->where('forPagEstado', 1); 
+               }), 
+            ],
+            'donacionesNumeroCheque' => 'string|nullable|max:128',
+            'banco_id' => [
+               'integer', 
+               'nullable', 
+               Rule::exists('bancos','id') ->
+                  where(function ($query) { 
+                     $query->where('bancosEstado', 1); 
+               }), 
+            ],
+            // 'donacionesNumeroRecibo' => 'string|required|max:128',
+            'donacionesNumeroDocumentoTercero' => 'string|required|max:128',
+            'donacionesNombreTercero' => 'string|required|max:128',
+            'donacionesFechaRecibo' => 'date|required',
+            'donacionesNotas' => 'string|required|max:512',
+            'estado' => 'boolean|required',
+         ], $msgErr = [ 
+            'persona_id.exists' => 'La persona no existe o está en estado inactivo',
+            'tipo_donacion_id.exists' => 'El tipo de donacion seleccionado no existe o está en estado inactivo',
+            'forma_pago_id.exists' => 'La forma d pago seleccionada no existe o está en estado inactivo', 
+            'banco_id.exists' => 'El banco seleccionado no existe o está en estado inactivo', 
+         ]);
+
          if ($retVal->fails())
             return response(get_response_body(format_messages_validator($retVal)), Response::HTTP_BAD_REQUEST);
+
+         $tipoDonacionOtros = ParametroConstante::where('CODIGO_PARAMETRO', 'ID_TIPO_DONACION_OTROS_INGRESOS')->first();
+         if(!$tipoDonacionOtros){
+            return response('Faltan parámetros por definir', Response::HTTP_BAD_REQUEST);
+         }
 
          // actualiza/modifica registro en repositorio donaciones
          $regMod = Donacion::modificarOCrear($datos);
@@ -358,5 +304,39 @@ class DonacionController extends Controller
          DB::rollback(); // Se devuelven los cambios, por que la transaccion falla
          return response(null, Response::HTTP_INTERNAL_SERVER_ERROR);
       }
+   }
+
+   public function listaDonaciones(Request $request){
+      $nombreArchivo = 'donaciones-otros-ingresos-' . time() . '.xlsx';
+      return (new DonacionesExport($request->all()))->download($nombreArchivo);
+   }
+
+   public function recibo(Request $request, $id){
+      $donacion = Donacion::find($id);
+      if(!$donacion){
+          return;
+      }
+      $numberToWord = Pago::numberToWord($donacion->donacionesValorDonacion);
+      $registro = (object)[];
+      $registro->consecutivo = $donacion->donacionesNumeroRecibo;
+      $registro->valor = $donacion->donacionesValorDonacion;
+      $registro->persona = $donacion->donacionesNombreTercero;
+      $registro->identificacion = $donacion->donacionesNumeroDocumentoTercero;
+      $registro->concepto = $donacion->donacionesNotas;
+      $registro->banco = $donacion->banco->bancosDescripcion;
+      $registro->fechaC = $donacion->donacionesFechaDonacion;
+      $registro->fechaE = $donacion->donacionesFechaRecibo;
+      $registro->elaboradoPor = $donacion->usuario_creacion_nombre;
+      $registro->estado = $donacion->estado;
+      $registro->capital = '';
+      $registro->interesCuota = '';
+      $registro->interesMora = '';
+      $registro->interesTotal = '';
+      $registro->seguro = '';
+      $registro->cartera = '';
+      $registro->numberToWord = $numberToWord;
+      $registro->fecha = Carbon::now();
+      $pdf = PDF::loadView('factura', compact(['registro']));
+      return $pdf->download('recibo-de-caja-'.$registro->consecutivo.'-'.time().'.pdf');
    }
 }
