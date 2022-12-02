@@ -160,7 +160,7 @@ class BenefactorController extends Controller
                   'string|nullable|max:128',
 
                'benefactoresCorreo' => 
-                  'string|required|max:128',
+                  'string|nullable|max:128',
 
                'benefactoresNotas' => 
                   'string|nullable|max:512',
@@ -336,7 +336,7 @@ class BenefactorController extends Controller
                   'string|nullable|max:128',
 
                'benefactoresCorreo' => 
-                  'string|required|max:128',
+                  'string|nullable|max:128',
 
                'benefactoresNotas' => 
                   'string|nullable|max:512',
