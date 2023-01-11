@@ -283,6 +283,9 @@ class Pago extends Model
             $params['valor_intereses'] = $dto['valorInteres']??0;
             $params['valor_seguro'] = $dto['valorSeguro']??0;
             $params['valor_mora'] = $dto['valorMora']??0;
+            $params['condonarSeguro'] = $dto['condonarSeguro']?1:0;
+            $params['condonarMora'] = $dto['condonarMora']?1:0;
+            $params['condonarInteres'] = $dto['condonarInteres']?1:0;
             Pago::pagoEspecialAplicar($params);
         } else {
             if(!isset($dto['id'])){
@@ -405,11 +408,14 @@ class Pago extends Model
         $valorIntereses = $params['valor_intereses'];
         $valorSeguro = $params['valor_seguro'];
         $valorMora = $params['valor_mora'];
+        $condonarSeguro = $params['condonarSeguro'];
+        $condonarMora = $params['condonarMora'];
+        $condonarInteres = $params['condonarInteres'];
         $transaccion = 'AplicarPagosEspeciales';
         $usuarioId = $params['usuario_id'];
         $usuario = $params['usuario_nombre'];
         $procedure = DB::select(
-            'CALL SP_PagosAplicarEspecial(?,?,?,?,?,?,?,?,?,?,?,?)', 
+            'CALL SP_PagosAplicarEspecial(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)', 
             array(
                 $numeroProyecto,
                 $pagoId,
@@ -420,6 +426,9 @@ class Pago extends Model
                 $valorIntereses,
                 $valorSeguro,
                 $valorMora,
+                $condonarSeguro,
+                $condonarMora,
+                $condonarInteres,
                 $transaccion,
                 $usuarioId,
                 $usuario
