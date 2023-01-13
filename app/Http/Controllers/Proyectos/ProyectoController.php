@@ -70,6 +70,14 @@ class ProyectoController extends Controller
                         $query->where('personasEstadoRegistro', 'AC');
                     }),
                 ],
+                'proyecto_unificado_id' => [
+                    'integer',
+                    'nullable',
+                    Rule::exists('proyectos','id')->where(function ($query) {
+                        $query->whereNotIn('proyectosEstadoProyecto', ['CON', 'REC']);
+                    }),
+                ],
+                'proyectosValorSaldoUnificado' => 'numeric|nullable',
                 'proyectosEstadoProyecto' => 'string|required',
                 'proyectosFechaSolicitud' => 'date|required',
                 'proyectosTipoProyecto' => 'string|required',
@@ -259,6 +267,14 @@ class ProyectoController extends Controller
                         $query->where('personasEstadoRegistro', 'AC');
                     }),
                 ],
+                'proyecto_unificado_id' => [
+                    'integer',
+                    'nullable',
+                    Rule::exists('proyectos','id')->where(function ($query) {
+                        $query->whereNotIn('proyectosEstadoProyecto', ['CON', 'REC']);
+                    }),
+                ],
+                'proyectosValorSaldoUnificado' => 'numeric|nullable',
                 'proyectosEstadoProyecto' => 'string|required',
                 'proyectosFechaSolicitud' => 'date|required',
                 'proyectosTipoProyecto' => 'string|required',

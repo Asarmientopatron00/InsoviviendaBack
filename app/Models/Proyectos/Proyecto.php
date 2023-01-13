@@ -74,6 +74,8 @@ class Proyecto extends Model
         'proyectosFechaCancelacion',
         'orientador_id',
         'proyectosObservaciones',
+        'proyecto_unificado_id',
+        'proyectosValorSaldoUnificado',
         'usuario_creacion_id',
         'usuario_creacion_nombre',
         'usuario_modificacion_id',
@@ -120,6 +122,10 @@ class Proyecto extends Model
         return $this->belongsTo(Orientador::class, 'orientador_id');
     }
 
+    public function proyectoUnificado(){
+        return $this->belongsTo(Proyecto::class, 'proyecto_unificado_id');
+    }
+
     public function planAmortizacion(){
         return $this->hasMany(PlanAmortizacion::class, 'proyecto_id');
     }
@@ -145,6 +151,14 @@ class Proyecto extends Model
                     IFNULL(CONCAT(' ', personas.personasSegundoApellido), '')
                 ) AS nombre"
             ),
+            DB::raw("COALESCE((SELECT s1.plAmDeValorSaldoCapital
+                FROM plan_amortizacion_def s1
+                WHERE s1.proyecto_id = proyectos.id
+                AND s1.plAmDeCuotaCancelada = 'N'
+                ORDER BY s1.plAmDeNumeroCuota
+                LIMIT 1
+                ),0) AS saldo
+            "),
             'personas.personasIdentificacion AS identificacion',
             'proyectos.proyectosEstadoProyecto AS estado', 
          );
@@ -187,6 +201,14 @@ class Proyecto extends Model
                         )
                     AS remitente"
                 ),
+                DB::raw("COALESCE((SELECT s1.plAmDeValorSaldoCapital
+                    FROM plan_amortizacion_def s1
+                    WHERE s1.proyecto_id = proyectos.id
+                    AND s1.plAmDeCuotaCancelada = 'N'
+                    ORDER BY s1.plAmDeNumeroCuota
+                    LIMIT 1
+                    ),0) AS saldo
+                "),
                 'paises.paisesDescripcion AS pais',
                 'departamentos.departamentosDescripcion AS departamento',
                 'ciudades.ciudadesDescripcion AS ciudad',
@@ -444,6 +466,7 @@ class Proyecto extends Model
         $barrio = $proyecto->barrio;
         $banco = $proyecto->banco;
         $orientador = $proyecto->orientador;
+        $proyectoUnificado = $proyecto->proyectoUnificado;
 
         return [
             'id' => $proyecto->id,
@@ -538,6 +561,9 @@ class Proyecto extends Model
                 'id' => $barrio->id,
                 'nombre' => $barrio->barriosDescripcion
             ] : null,
+            'proyectoUnificado' => isset($proyectoUnificado) ? [
+                'id' => $proyectoUnificado->id,
+            ] : null,
         ];
     }
 
@@ -565,6 +591,12 @@ class Proyecto extends Model
         $guardado = $proyecto->save();
         if(!$guardado){
             throw new Exception("Ocurrió un error al intentar guardar el proyecto.", $proyecto);
+        }
+
+        if(isset($dto['proyecto_unificado_id'])){
+            $proyectoUnificado = Proyecto::find($dto['proyecto_unificado_id']);
+            $proyectoUnificado->proyectosEstadoProyecto = 'CUN';
+            $proyectoUnificado->save();
         }
 
         // Guardar auditoria
