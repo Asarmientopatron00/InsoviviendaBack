@@ -56,6 +56,7 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
                      WHEN 'DES' THEN 'Desembolsado'
                      WHEN 'CAN' THEN 'Cancelado'
                      WHEN 'CON' THEN 'Congelado'
+                     WHEN 'CUN' THEN 'Cancelado por Unificación'
                      ELSE '' END AS proyectosEstadoProyecto"),
             DB::Raw("DATE(proyectos.proyectosFechaSolicitud) AS proyectosFechaSolicitud"),
             DB::Raw("CASE proyectos.proyectosTipoProyecto
@@ -107,6 +108,8 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
             'proyectos.proyectosTasaInteresNMV',
             'proyectos.proyectosTasaInteresEA',
             'proyectos.proyectosNumeroCuotas',
+            'proyectos.proyecto_unificado_id',
+            'proyectos.proyectosValorSaldoUnificado',
             DB::Raw("IFNULL(bancos.bancosDescripcion, '') AS bancosDescripcion"),
             DB::Raw("CASE proyectos.proyectosTipoCuentaRecaudo
                      WHEN 'AH' THEN 'Ahorros'
@@ -161,8 +164,9 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
    }
 
    public function styles(Worksheet $sheet){
-      $sheet->getStyle('A1:BE1')->getFont()->setBold(true);
+      $sheet->getStyle('A1:BG1')->getFont()->setBold(true);
       $sheet->getStyle('Z:AH')->getNumberFormat()->setFormatCode('$#,##0');
+      $sheet->getStyle('AM')->getNumberFormat()->setFormatCode('$#,##0');
    }
 
    public function headings(): array
@@ -205,6 +209,8 @@ class ProyectoExport implements FromQuery, WithHeadings, ShouldAutoSize, WithSty
          "Tasa Interés NMV",
          "Tasa Interés EA",
          "Número Cuotas",
+         "Número Proyecto Unificado",
+         "Saldo Proyecto Unificado",
          "Banco Recaudo",
          "Tipo Cuenta Recaudo",
          "Número Cuenta Recaudo",
