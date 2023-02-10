@@ -61,45 +61,23 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
                   AND t4.plAmDeCuotaCancelada = 'S'
                ) AS ultima_fecha_pago
             "),
-            DB::raw("
-                  CASE WHEN 
-               (
-                  SELECT t4.pagosSaldoDespPago
-                  FROM pagos t4
-                  WHERE t4.proyecto_id = t1.id
-                  AND t4.pagosEstado = 1
-                  AND t4.pagosFechaPago = (
-                     SELECT MAX(t5.pagosFechaPago)
-                     FROM pagos t5
-                     WHERE t5.proyecto_id = t1.id
-                     AND t5.pagosEstado = 1
-                  )
-                  ORDER BY t4.id DESC
-                  LIMIT 1 
-               ) IS NULL 
-                  THEN
-                  (
-                     SELECT SUM(desembolsos.desembolsosValorDesembolso)
-                     FROM desembolsos
-                     WHERE desembolsos.proyecto_id = t1.id
-                     AND desembolsos.desembolsosEstado = 1
-                  )
-                  ELSE
-                  (
-                     SELECT t4.pagosSaldoDespPago
-                     FROM pagos t4
-                     WHERE t4.proyecto_id = t1.id
-                     AND t4.pagosEstado = 1
-                     AND t4.pagosFechaPago = (
-                        SELECT MAX(t5.pagosFechaPago)
-                        FROM pagos t5
-                        WHERE t5.proyecto_id = t1.id
-                        AND t5.pagosEstado = 1
-                     )
-                     ORDER BY t4.id DESC
-                     LIMIT 1 
-                  )
-                END AS saldo
+            DB::raw("(
+               SELECT COALESCE(t1.proyectosValorSaldoUnificado, 0)
+               ) AS valor_saldo_unificado
+            "),
+            DB::raw("(
+               SELECT SUM(desembolsos.desembolsosValorDesembolso)
+               FROM desembolsos
+               WHERE desembolsos.proyecto_id = t1.id
+               AND desembolsos.desembolsosEstado = 1
+               ) AS valor_desembolsos
+            "),
+            DB::raw("(
+               SELECT IFNULL(SUM(pd.pagDetValorCapitalCuotaPagado) + SUM(IFNULL(pd.pagDetValorSaldoCuotaPagado,0)),0) 
+               FROM PAGOS_DETALLE pd 
+               WHERE pd.proyecto_id = t1.id
+               AND pd.pagDetEstado = 1
+               ) AS valor_pagos
             "),
          )
          ->where('t1.proyectosEstadoProyecto', 'DES')
@@ -112,15 +90,24 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
             ) > 0
          ");
 
-      $query->orderBy(DB::raw("
-         CONCAT(
-            IFNULL(CONCAT(t2.personasNombres), ''),
-            IFNULL(CONCAT(' ',t2.personasPrimerApellido),''),
-            IFNULL(CONCAT(' ',t2.personasSegundoApellido), '')
-            )"), 
-         'asc');
+      $subQuery = DB::table($query, 'sub')
+         ->select(
+             'sub.fecha',
+             'sub.tipo_identificacion',
+             'sub.personasIdentificacion',
+             'sub.nombre',
+             'sub.personasTelefonoCasa',
+             'sub.personasTelefonoCelular',
+             'sub.proyectosValorCuotaAprobada',
+             'sub.ultima_fecha_vencimiento',
+             'sub.ultima_fecha_pago',
+             'sub.ultima_fecha_pago',
+             DB::raw("sub.valor_saldo_unificado+sub.valor_desembolsos-sub.valor_pagos")
+         );
+
+      $subQuery->orderBy('sub.nombre', "asc");
       
-      return $query;
+      return $subQuery;
    }
    
    public function styles(Worksheet $sheet)
