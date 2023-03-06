@@ -637,6 +637,10 @@ class Proyecto extends Model
             (   
                 $registroInicial->proyectosValorCuotaAprobada > 0 && 
                 $registroInicial->proyectosValorCuotaAprobada != $proyecto->proyectosValorCuotaAprobada
+            )   || 
+            (   
+                $registroInicial->proyectosTasaInteresNMV > 0 && 
+                $registroInicial->proyectosTasaInteresNMV != $proyecto->proyectosTasaInteresNMV
             ))
             ){
                 $desembolsosDefinitivo = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosPlanDefinitivo', 1)->count();
