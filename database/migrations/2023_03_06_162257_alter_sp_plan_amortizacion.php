@@ -1,4 +1,20 @@
-CREATE PROCEDURE SP_PlanAmortizacionGenerar
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        $procedure1 = "DROP PROCEDURE IF EXISTS `SP_PlanAmortizacionGenerar`;
+        CREATE PROCEDURE SP_PlanAmortizacionGenerar
 (
 	P_NUMEROPROYECTO INT,
 	P_TIPOPLAN VARCHAR(3),
@@ -762,4 +778,17 @@ SP: BEGIN
 			SYSDATE(),
 			SYSDATE()
 		);
-END;
+        END;";
+        DB::unprepared($procedure1);
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        //
+    }
+};
