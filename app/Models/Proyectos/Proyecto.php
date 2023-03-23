@@ -618,7 +618,9 @@ class Proyecto extends Model
             DocumentoProyecto::crearDocumentosDelProyecto($data);
         }
 
-        if($dto['proyectosEstadoProyecto'] === 'APR' || $dto['proyectosEstadoProyecto'] === 'DES'){
+        $tieneDesembolsos = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosEstado', 1)->count();
+
+        if($dto['proyectosEstadoProyecto'] === 'APR' || ($dto['proyectosEstadoProyecto'] === 'DES' && !($tieneDesembolsos > 0))){
             $data['numero_proyecto'] = $proyecto->id;
             $data['tipo_plan'] = 'APR';
             $data['plan_def'] = 'N';
