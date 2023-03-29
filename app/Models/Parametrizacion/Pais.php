@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Pais extends Model
 {
-protected $table = 'Paises'; // nombre de la tabla en la base de datos
+protected $table = 'paises'; // nombre de la tabla en la base de datos
 
 protected $fillable = [ // nombres de los campos
     'paisesDescripcion',

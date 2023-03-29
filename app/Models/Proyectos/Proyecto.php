@@ -74,6 +74,8 @@ class Proyecto extends Model
         'proyectosFechaCancelacion',
         'orientador_id',
         'proyectosObservaciones',
+        'asesor_gestion_cartera_id',
+        'proyectosObservacionesGestionC',
         'proyecto_unificado_id',
         'proyectosValorSaldoUnificado',
         'usuario_creacion_id',
@@ -138,6 +140,10 @@ class Proyecto extends Model
         return $this->hasMany(Desembolso::class, 'proyecto_id');
     }
 
+    public function asesorGestionC(){
+        return $this->belongsTo(Orientador::class, 'asesor_gestion_cartera_id');
+    }
+
     public static function obtenerColeccionLigera($dto) 
    {
       $query = DB::table('proyectos')
@@ -178,6 +184,7 @@ class Proyecto extends Model
             ->leftJoin('barrios', 'proyectos.barrio_id', 'barrios.id')
             ->leftJoin('bancos', 'proyectos.banco_id', 'bancos.id')
             ->leftJoin('orientadores', 'proyectos.orientador_id', 'orientadores.id')
+            ->leftJoin('orientadores AS asesores', 'proyectos.asesor_gestion_cartera_id', 'asesores.id')
             ->select(
                 'proyectos.id',
                 DB::Raw(
@@ -247,7 +254,9 @@ class Proyecto extends Model
                 'proyectos.proyectosFechaAutDes',
                 'proyectos.proyectosFechaCancelacion',
                 'orientadores.orientadoresNombre AS orientador',
+                'asesores.orientadoresNombre AS asesor',
                 'proyectos.proyectosObservaciones',
+                'proyectos.proyectosObservacionesGestionC',
                 'proyectos.usuario_creacion_id',
                 'proyectos.usuario_creacion_nombre',
                 'proyectos.usuario_modificacion_id',
@@ -255,6 +264,11 @@ class Proyecto extends Model
                 'proyectos.created_at AS fecha_creacion',
                 'proyectos.updated_at AS fecha_modificacion',
             );
+        
+            
+        if(isset($dto['gestion_cartera'])){
+            $query->where('proyectos.proyectosEstadoProyecto', 'DES');
+        }
 
         if(isset($dto['solicitante'])){
             $query->where('personas.personasIdentificacion', 'like', '%' . $dto['solicitante'] . '%');
@@ -408,8 +422,14 @@ class Proyecto extends Model
                 if($attribute == 'orientador'){
                     $query->orderBy('orientadores.orientadoresNombre', $value);
                 }
+                if($attribute == 'asesor'){
+                    $query->orderBy('asesores.orientadoresNombre', $value);
+                }
                 if($attribute == 'proyectosObservaciones'){
                     $query->orderBy('proyectos.proyectosObservaciones', $value);
+                }
+                if($attribute == 'proyectosObservacionesGestionC'){
+                    $query->orderBy('proyectos.proyectosObservacionesGestionC', $value);
                 }
                 if($attribute == 'usuario_creacion_nombre'){
                     $query->orderBy('proyectos.usuario_creacion_nombre', $value);
@@ -466,6 +486,7 @@ class Proyecto extends Model
         $barrio = $proyecto->barrio;
         $banco = $proyecto->banco;
         $orientador = $proyecto->orientador;
+        $asesor = $proyecto->asesorGestionC;
         $proyectoUnificado = $proyecto->proyectoUnificado;
 
         return [
@@ -515,7 +536,9 @@ class Proyecto extends Model
             'proyectosFechaAutDes' => $proyecto->proyectosFechaAutDes,
             'proyectosFechaCancelacion' => $proyecto->proyectosFechaCancelacion,
             'orientador_id' => $proyecto->orientador_id,
+            'asesor_gestion_cartera_id' => $proyecto->asesor_gestion_cartera_id,
             'proyectosObservaciones' => $proyecto->proyectosObservaciones,
+            'proyectosObservacionesGestionC' => $proyecto->proyectosObservacionesGestionC,
             'usuario_creacion_id' => $proyecto->usuario_creacion_id,
             'usuario_creacion_nombre' => $proyecto->usuario_creacion_nombre,
             'usuario_modificacion_id' => $proyecto->usuario_modificacion_id,
@@ -536,6 +559,11 @@ class Proyecto extends Model
                 'id' => $orientador->id,
                 'nombre' => $orientador->orientadoresNombre,
                 'identificacion' => $orientador->orientadoresIdentificacion,
+            ] : null,
+            'asesor' => isset($asesor) ? [
+                'id' => $asesor->id,
+                'nombre' => $asesor->orientadoresNombre,
+                'identificacion' => $asesor->orientadoresIdentificacion,
             ] : null,
             'tipoPrograma' => isset($tipoPrograma) ? [
                 'id' => $tipoPrograma->id,
@@ -611,51 +639,53 @@ class Proyecto extends Model
         
         AuditoriaTabla::crear($auditoriaDto);
 
-        if(!isset($dto['id'])){
-            $data['proyecto_id'] = $proyecto->id;
-            $data['usuario_id'] = $usuario->id;
-            $data['usuario_nombre'] = $usuario->nombre;
-            DocumentoProyecto::crearDocumentosDelProyecto($data);
-        }
-
-        $tieneDesembolsos = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosEstado', 1)->count();
-
-        if($dto['proyectosEstadoProyecto'] === 'APR' || ($dto['proyectosEstadoProyecto'] === 'DES' && !($tieneDesembolsos > 0))){
-            $data['numero_proyecto'] = $proyecto->id;
-            $data['tipo_plan'] = 'APR';
-            $data['plan_def'] = 'N';
-            $data['usuario_id'] = $usuario->id;
-            $data['usuario_nombre'] = $usuario->nombre;
-            PlanAmortizacion::calcularPlan($data);
-        }
-
-        $registroInicial = json_decode($proyectoOriginal);
-        if(isset($dto['id']) && 
-            ((   
-                $registroInicial->proyectosValorSeguroVida > 0 && 
-                $registroInicial->proyectosValorSeguroVida != $proyecto->proyectosValorSeguroVida
-            ) 
-                || 
-            (   
-                $registroInicial->proyectosValorCuotaAprobada > 0 && 
-                $registroInicial->proyectosValorCuotaAprobada != $proyecto->proyectosValorCuotaAprobada
-            )   || 
-            (   
-                $registroInicial->proyectosTasaInteresNMV > 0 && 
-                $registroInicial->proyectosTasaInteresNMV != $proyecto->proyectosTasaInteresNMV
-            ))
-            ){
-                $desembolsosDefinitivo = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosPlanDefinitivo', 1)->count();
-                if($desembolsosDefinitivo > 0){
-                    $data['numero_proyecto'] = $proyecto->id;
-                    $data['tipo_plan'] = 'REG';
-                    $data['plan_def'] = 'N';
-                    $data['usuario_id'] = $usuario->id;
-                    $data['usuario_nombre'] = $usuario->nombre;
-                    PlanAmortizacion::calcularPlan($data); 
-                }
+        if(!$dto["gestion_cartera"]){
+            if(!isset($dto['id'])){
+                $data['proyecto_id'] = $proyecto->id;
+                $data['usuario_id'] = $usuario->id;
+                $data['usuario_nombre'] = $usuario->nombre;
+                DocumentoProyecto::crearDocumentosDelProyecto($data);
             }
-        
+    
+            $tieneDesembolsos = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosEstado', 1)->count();
+    
+            if($dto['proyectosEstadoProyecto'] === 'APR' || ($dto['proyectosEstadoProyecto'] === 'DES' && !($tieneDesembolsos > 0))){
+                $data['numero_proyecto'] = $proyecto->id;
+                $data['tipo_plan'] = 'APR';
+                $data['plan_def'] = 'N';
+                $data['usuario_id'] = $usuario->id;
+                $data['usuario_nombre'] = $usuario->nombre;
+                PlanAmortizacion::calcularPlan($data);
+            }
+    
+            $registroInicial = json_decode($proyectoOriginal);
+            if(isset($dto['id']) && 
+                ((   
+                    $registroInicial->proyectosValorSeguroVida > 0 && 
+                    $registroInicial->proyectosValorSeguroVida != $proyecto->proyectosValorSeguroVida
+                ) 
+                    || 
+                (   
+                    $registroInicial->proyectosValorCuotaAprobada > 0 && 
+                    $registroInicial->proyectosValorCuotaAprobada != $proyecto->proyectosValorCuotaAprobada
+                )   || 
+                (   
+                    $registroInicial->proyectosTasaInteresNMV > 0 && 
+                    $registroInicial->proyectosTasaInteresNMV != $proyecto->proyectosTasaInteresNMV
+                ))
+                ){
+                    $desembolsosDefinitivo = Desembolso::where('proyecto_id', $proyecto->id)->where('desembolsosPlanDefinitivo', 1)->count();
+                    if($desembolsosDefinitivo > 0){
+                        $data['numero_proyecto'] = $proyecto->id;
+                        $data['tipo_plan'] = 'REG';
+                        $data['plan_def'] = 'N';
+                        $data['usuario_id'] = $usuario->id;
+                        $data['usuario_nombre'] = $usuario->nombre;
+                        PlanAmortizacion::calcularPlan($data); 
+                    }
+                }
+        }
+
         return Proyecto::cargar($proyecto->id);
     }
 

@@ -30,6 +30,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
       $query = DB::table('proyectos AS t1')
          ->join('personas AS t2', 't2.id', 't1.persona_id')
          ->join('tipos_identificacion AS t3', 't3.id', 't2.tipo_identificacion_id')
+         ->leftJoin('orientadores AS t4', 't4.id', 't1.asesor_gestion_cartera_id')
          ->select(
             DB::raw("(SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%d %H:%i')) AS fecha"),
             't3.tipIdeDescripcion AS tipo_identificacion',
@@ -42,6 +43,8 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
                    )
                AS nombre"
             ),
+            't4.orientadoresNombre AS asesor',
+            't1.proyectosObservacionesGestionC',
             't2.personasTelefonoCasa',
             't2.personasTelefonoCelular',
             't1.proyectosValorCuotaAprobada',
@@ -74,7 +77,7 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
             "),
             DB::raw("(
                SELECT IFNULL(SUM(pd.pagDetValorCapitalCuotaPagado) + SUM(IFNULL(pd.pagDetValorSaldoCuotaPagado,0)),0) 
-               FROM PAGOS_DETALLE pd 
+               FROM pagos_detalle pd 
                WHERE pd.proyecto_id = t1.id
                AND pd.pagDetEstado = 1
                ) AS valor_pagos
@@ -96,12 +99,14 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
              'sub.tipo_identificacion',
              'sub.personasIdentificacion',
              'sub.nombre',
+             'sub.asesor',
+             'sub.proyectosObservacionesGestionC',
              'sub.personasTelefonoCasa',
              'sub.personasTelefonoCelular',
              'sub.proyectosValorCuotaAprobada',
              'sub.ultima_fecha_vencimiento',
              'sub.ultima_fecha_pago',
-             'sub.ultima_fecha_pago',
+             DB::raw("(SELECT DATEDIFF(sub.fecha, sub.ultima_fecha_vencimiento))"),
              DB::raw("sub.valor_saldo_unificado+sub.valor_desembolsos-sub.valor_pagos")
          );
 
@@ -112,9 +117,9 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
    
    public function styles(Worksheet $sheet)
    {
-      $sheet->getStyle('A1:J1')->getFont()->setBold(true);
-      $sheet->getStyle('G')->getNumberFormat()->setFormatCode('$#,##0');    
-      $sheet->getStyle('J')->getNumberFormat()->setFormatCode('$#,##0');    
+      $sheet->getStyle('A1:M1')->getFont()->setBold(true);
+      $sheet->getStyle('I')->getNumberFormat()->setFormatCode('$#,##0');    
+      $sheet->getStyle('M')->getNumberFormat()->setFormatCode('$#,##0');    
    }
    
    public function headings(): array
@@ -124,11 +129,14 @@ class InformeGestionCartera implements FromQuery, WithHeadings, ShouldAutoSize, 
          "Tipo Documento",   
          "Número Documento",   
          "Nombre Solicitante",
+         "Responsable",
+         "Observaciones Gestión Cartera",
          "Tel. Fijo",
          "Tel. Celular",
          "Valor Cuota",
          "Fecha Venc. Ult. Cuota Cancelada",
          "Fecha Último Pago",
+         "Dias Cartera",
          "Valor Saldo Capital",
       ];
    } 
