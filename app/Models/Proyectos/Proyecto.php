@@ -639,7 +639,7 @@ class Proyecto extends Model
         
         AuditoriaTabla::crear($auditoriaDto);
 
-        if(!$dto["gestion_cartera"]){
+        if(!isset($dto["gestion_cartera"])){
             if(!isset($dto['id'])){
                 $data['proyecto_id'] = $proyecto->id;
                 $data['usuario_id'] = $usuario->id;
