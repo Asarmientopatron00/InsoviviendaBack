@@ -273,6 +273,9 @@ class Proyecto extends Model
         if(isset($dto['solicitante'])){
             $query->where('personas.personasIdentificacion', 'like', '%' . $dto['solicitante'] . '%');
         }
+        if(isset($dto['asesor'])){
+            $query->where('asesores.orientadoresIdentificacion', 'like', '%' . $dto['asesor'] . '%');
+        }
         if(isset($dto['tipo'])){
             $query->where('proyectos.proyectosTipoProyecto', $dto['tipo']);
         }
